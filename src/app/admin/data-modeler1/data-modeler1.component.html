@@ -1,0 +1,317 @@
+<ng-container *ngIf="bm">
+  <div class="breadcrumbs p-1 mb-1" style="background-color: #fff;">
+    <a (click)="routeBack()">
+      <img [src]="backsImageUrl" style="filter: var(--plx-app-list-icon-filter);" width="20px">
+      <span>Back</span>
+    </a> 
+  </div>
+  <app-dm-header></app-dm-header>
+  <app-dm-menu
+    [mode]="bm.Mode"
+    [businessModel]="bm"
+    (modeChange)="changeMode($event)"
+    (newVersion)="onNewVersion()"
+    (generateXml)="onGenerateXML()"
+  >
+  </app-dm-menu>
+  <!-- <app-dm-breadcrumbs
+    [bm]="bm"
+    (select)="openObjectDetails($event)"
+  ></app-dm-breadcrumbs> -->
+
+  <!-- <div class="tab-container">
+    <div class="tab active">View Name 1</div>
+    <div class="tab">View Name 2</div>
+    <div class="tab">View Name 3</div>
+    <div class="tab">View Name 4</div>
+    <div class="add-tab"><i class="fa fa-plus"></i></div>
+</div>
+
+<div class="section-container">
+    <div class="section active">Section One</div>
+    <div class="section">Section Two</div>
+    <div class="section">Section Three</div>
+    <div class="add-tab"><i class="fa fa-plus"></i></div>
+</div>
+
+
+ -->
+
+<!-- <div class="add-tab" 
+title="Add BMOG"
+[disabled]="true"
+[data]="bm"
+*ngIf="!bm.published"
+>
+<i class="fa fa-plus"></i></div> -->
+
+<!--Two tabs dwon-->
+ <!-- <div class="formcomponents">
+        <div
+          class="drag-list"
+          id="form-controls"
+          cdkDropList
+          (cdkDropListDropped)="onDropLayout($event)"
+          [cdkDropListData]="panelControls"
+        >
+          <li
+            class="list-group-item-action list-group-item-success drag-list-item px-2 p-1 mt-2 ml-2"
+            cdkDrag
+            [cdkDragDisabled]="readonly"
+            *ngFor="let item of panelControls"
+            style="display: inline-block; width: auto; white-space: nowrap; border: none; cursor: pointer;"
+          >
+            <i [class]="item.class" style="margin-right: 5px"></i>{{ item.name }}
+          </li>
+        </div>
+      </div> -->
+      
+
+      <!-- <app-tabs 
+          (tabSelected)="onTabSelect($event)" 
+          (tabClicked)="onTabClick($event)"  
+          (tabEdit)="onTabEdit($event)"
+          (tabRemove)="onTabRemove($event)"
+          (dropped)="dropped($event, bm?.selectedBMO)"
+          [actions]="tabActions">
+          
+          <app-tab *ngIf="allowNewDMOG" [disabled]="true" [data]="bm.selectedBMO" title="Add DMOG this one"></app-tab>
+        </app-tabs> -->
+
+
+
+
+  <!-- <section class="stick-tabs-box" *ngIf="!IsOldNews">
+    <div class="col-sm-12">
+      <app-tabs
+        (tabSelected)="onTabSelect($event)"
+        (tabClicked)="onTabClick($event)"
+        (tabEdit)="onTabEdit($event)"
+        (tabRemove)="onTabRemove($event)"
+        [actions]="tabActions"
+        [isNewDesign]="true"
+        [isView]="true"
+      >
+        <ng-container *ngFor="let bmogId of bm?.Children">
+          <app-tab
+            *ngIf="bm.childrenMap[bmogId] as bmog"
+            [title]="bmog.Name"
+            [data]="bmog"
+            [active]="bmog.id === bm.selectedBMOG?.id"
+            [shared]="bmog.shared"
+          ></app-tab>
+        </ng-container>
+        <app-tab
+          title="Add BMOG"
+          [disabled]="true"
+          [data]="bm"
+          *ngIf="!bm.published"
+        ></app-tab> 
+      </app-tabs>
+      <app-tabs
+        (tabSelected)="onTabSelect($event)"
+        (tabClicked)="onTabClick($event)"
+        (tabEdit)="onTabEdit($event)"
+        (tabRemove)="onTabRemove($event)"
+        (dropped)="dropped($event, bm?.selectedBMOG)"
+        m
+        [actions]="tabActions"
+        [isSection]="true"
+        [isNewDesign]="true"
+      >
+        <ng-container *ngFor="let bmoId of bm?.selectedBMOG?.Children">
+          <app-tab
+            *ngIf="bm.selectedBMOG.childrenMap[bmoId] as bmo"
+            [title]="bmo.DisplayName"
+            [data]="bmo"
+            [active]="bmo.id === bm.selectedBMO?.id"
+            [shared]="bmo.shared"
+            [isBMO]="true"
+          ></app-tab>
+        </ng-container>
+        <app-tab
+          *ngIf="bm?.Children.length > 0 && !bm.published"
+          [disabled]="true"
+          [data]="bm.selectedBMOG"
+          title="Add BMO"
+        ></app-tab>
+      </app-tabs>
+     
+    </div>
+  </section> -->
+
+
+
+
+
+
+
+
+  <section
+    aria-label="Modal heading text content"
+    class="modal-body body-mt-20"
+    style="padding: 0px !important;"
+    role="document"
+    [ngSwitch]="bm.selectedBMO?.BmoType"
+  >
+
+  <div class="parentsection">
+    <div *ngIf="!isDraggingStart"></div>
+    <div id="sidebar" [ngStyle]="{ 'width': isDrawerOpen ? '300px' : sideNavModel ? '19px' :'1px' }" *ngIf="!(bm.published)">
+      <div   [ngClass]="isDrawerOpen && sideNavModel ? 'container-new-open' : 'container-new-close'">
+      <div>
+        <div class="open-side-menu-button"  [ngClass]="isDrawerOpen ? 'drawer-open' : 'drawer-closed' " *ngIf="sideNavModel">
+          <div class="open-close-side-menu-button" [class]="isDrawerOpen ? 'open-close-side-menu-arrow' : 'open-close-side-menu-arrow-black'">
+            <img 
+            [src]="isDrawerOpen ? leftDrawerIconUrl : rightDrawerIconUrl" 
+            alt="Toggle Drawer Icon"
+            (click)="toggleDrawer()"
+          />
+          </div>
+        </div>
+        <div  class="side-nav stick-side-bar-nav" [ngClass]="{ 'open': isDrawerOpen }">
+        <div *ngIf="isDrawerOpen">
+          <app-left-side-panel 
+          [sideNavModel] ="sideNavModel"  
+          (UpdatedDataForSidepanle)="GetUpdatedDataForSidepanle($event)" 
+          [selectedItemFromchild]="selectedItemFromchild" 
+          [isDraggingStart]="isDraggingStart"
+          ></app-left-side-panel>
+        </div>
+      </div>
+    </div>
+    </div>
+
+
+    </div>
+
+<div class="main-content-section">
+  <app-tabs
+  (tabSelected)="onTabSelect($event)"
+  (tabClicked)="onTabClick($event)"
+  (tabEdit)="onTabEdit($event)"
+  (tabRemove)="onTabRemove($event)"
+  [actions]="tabActions"
+  [isNewDesign]="true"
+  [isView]="true"
+>
+  <ng-container *ngFor="let bmogId of bm?.Children">
+    <app-tab
+      *ngIf="bm.childrenMap[bmogId] as bmog"
+      [title]="bmog.Name"
+      [data]="bmog"
+      [active]="bmog.id === bm.selectedBMOG?.id"
+      [shared]="bmog.shared"
+      [showPlucIcon]="false"
+    ></app-tab>
+  </ng-container>
+  <app-tab
+    title="Add BMOG"
+      [disabled]="true"
+      [data]="bm"
+      *ngIf="!bm.published"
+      [showPlucIcon]="true"
+    >
+  </app-tab> 
+</app-tabs>
+
+
+<app-tabs
+(tabSelected)="onTabSelect($event)"
+(tabClicked)="onTabClick($event)"
+(tabEdit)="onTabEdit($event)"
+(tabRemove)="onTabRemove($event)"
+(dropped)="dropped($event, bm?.selectedBMOG)"
+m
+[actions]="tabActions"
+[isSection]="true"
+[isNewDesign]="true"
+>
+<ng-container *ngFor="let bmoId of bm?.selectedBMOG?.Children">
+  <app-tab
+    *ngIf="bm.selectedBMOG.childrenMap[bmoId] as bmo"
+    [title]="bmo.DisplayName"
+    [data]="bmo"
+    [active]="bmo.id === bm.selectedBMO?.id"
+    [shared]="bmo.shared"
+    [isBMO]="true"
+  ></app-tab>
+</ng-container>
+<app-tab
+  *ngIf="bm?.Children.length > 0 && !bm.published"
+  [disabled]="true"
+  [data]="bm.selectedBMOG"
+  title="Add BMO"
+  [showPlucIcon]="true"
+></app-tab>
+</app-tabs>
+
+
+
+    <app-dmog-form-view
+      [SideNavModelData] ="sideNavModel"  
+      *ngSwitchCase="'Forms'"
+      [UpdatedDataFromSideNav]="UpdatedData"
+      [dmog]="bm.selectedDMOG"
+      [bmo]="bmo"
+      [bm]="bm"
+      [selectedBMO]="bm.selectedBMO"
+      (sideNavModelEmitter)="sideNavModelEmitter($event)"
+      (isDrawerOpenEmitter)="isDrawerOpenEmitter($event)"
+      (sideNavModel)="sideNavModelemit($event)"
+      [readonly]="
+        bm.published
+      "
+      [dmoMode]="dmoMode"
+      (updatedbmo)="updatedbmo($event)"
+      (DraggingStatus)="DraggingStatus($event)"
+      (updatedbmEmitter)="updatedbmEmitter($event)"
+    ></app-dmog-form-view>
+    <img
+      *ngSwitchCase="'Contacts'"
+      width="100%"
+      [src]="contactsImageUrl"
+      alt="Contacts"
+    />
+    <img
+      *ngSwitchCase="'Attachments'"
+      width="100%"
+      [src]="attachmentsImageUrl"
+      alt="Contacts"
+    />
+    <img
+      *ngSwitchCase="'Documents'"
+      width="100%"
+      [src]="documentsImageUrl"
+      alt="Contacts"
+    />
+    <div *ngSwitchCase="'Subprocess'" class="custom-box">
+      <span>{{clickedTabData?.DisplayName}}</span>
+      <button class="custom-button"  *ngIf="this.proccessName" (click)="goToBMGrid()">
+          Go to Sub Process
+          <span class="icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-up-right" viewBox="0 0 16 16"> <path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5z"/> <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0v-5z"/> </svg></span> 
+      </button>
+    </div>
+    <div *ngSwitchCase="'ChildProcess'" class="custom-box">
+      <span>{{clickedTabData?.DisplayName}}</span>
+      <button class="custom-button" *ngIf="this.proccessName" (click)="goToBMGrid()">
+          Go to Child Process
+          <span class="icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-up-right" viewBox="0 0 16 16"> <path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5z"/> <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0v-5z"/> </svg></span> 
+      </button>
+    </div>
+
+
+    <img
+      *ngSwitchCase="'SharedChildProcess'"
+      width="100%"
+      [src]="sharedChildProcessImageUrl"
+      alt="Contacts"
+    />
+  </div>
+  </div>
+  </section>
+
+
+</ng-container>

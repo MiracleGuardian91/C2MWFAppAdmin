@@ -1,0 +1,16 @@
+// node_modules/inherits-browser/dist/index.es.js
+function e(e2, t) {
+  t && (e2.super_ = t, e2.prototype = Object.create(t.prototype, {
+    constructor: {
+      value: e2,
+      enumerable: false,
+      writable: true,
+      configurable: true
+    }
+  }));
+}
+
+export {
+  e
+};
+//# sourceMappingURL=chunk-4FMKAPTB.js.map

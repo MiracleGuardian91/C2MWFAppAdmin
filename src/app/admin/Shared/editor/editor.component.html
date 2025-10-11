@@ -1,0 +1,47 @@
+<div class="toolbar">
+  <!-- Paragraph & Headings -->
+  <select (change)="applyBlockFormat($event.target.value)">
+    <option value="p">Paragraph</option>
+    <option value="h1">Heading 1</option>
+    <option value="h2">Heading 2</option>
+    <option value="h3">Heading 3</option>
+    <option value="h4">Heading 4</option>
+    <option value="h5">Heading 5</option>
+  </select>
+  
+  <!-- Bold, Italic, Underline -->
+  <button (click)="formatText('bold')" [class.active]="isFormatActive('bold')"><b>B</b></button>
+  <button (click)="formatText('italic')" [class.active]="isFormatActive('italic')"><i>I</i></button>
+  <button (click)="formatText('underline')" [class.active]="isFormatActive('underline')"><u>U</u></button>
+
+  <!-- Text Alignment -->
+  <button (click)="alignText('left')" title="Align Left"><i class="fas fa-align-left"></i></button>
+  <button (click)="alignText('center')" title="Align Center"><i class="fas fa-align-center"></i></button>
+  <button (click)="alignText('right')" title="Align Right"><i class="fas fa-align-right"></i></button>
+
+
+  <!-- Lists -->
+  <button (click)="insertList('ul')" title="Unordered List"><i class="fas fa-list-ul"></i></button>
+  <button (click)="insertList('ol')" title="Ordered List"><i class="fas fa-list-ol"></i></button>
+
+  <!-- Insert Table & Link -->
+  <button (click)="insertTable()" title="Insert Table"><i class="fas fa-table"></i></button>
+  <button (click)="insertLink()" title="Insert Link"><i class="fas fa-link"></i></button>
+
+  <!-- Text & Background Color -->
+  <input type="color" (input)="changeTextColor($event)" title="Text Color">
+  <input type="color" (input)="changeBgColor($event)" title="Background Color">
+
+  <!-- Undo & Redo -->
+  <button (click)="undo()">↩ Undo</button>
+  <button (click)="redo()">↪ Redo</button>
+
+  <!-- Toggle Source Code -->
+  <button (click)="toggleSource()">📝 Source</button>
+</div>
+
+<!-- Content Editable Div -->
+<div [hidden]="showSource" #editor contenteditable="true" class="editor" (input)="updateContent()"></div>
+
+<!-- Source Code Mode -->
+<textarea [(ngModel)]="value" class="source-code" [hidden]="!showSource"></textarea>

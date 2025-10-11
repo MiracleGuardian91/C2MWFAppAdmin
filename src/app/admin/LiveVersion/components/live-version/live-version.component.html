@@ -1,0 +1,106 @@
+<form *ngIf="WFBMForm" [formGroup]="WFBMForm">
+    <div>
+        <div class="modal-header">
+            <h4 class="modal-titlewf">Live Version ({{processName}})</h4>
+            <button type="button" class="close" aria-label="Close" (click)="activeModal.close(false)">
+                <span aria-hidden="true" class="fas fa-times-circle fa-fw"></span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="contents">
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <section>
+                            <table class="basicTable stripped" style="border-top:0;border-right:0;border-left:0;">
+                                <thead>
+                                    <tr class="span-row">
+                                        <th  style="width: 80px; font-weight: 500; font-size: 14px;">
+                                            <span>Workflow</span>
+                                        </th>
+                                        <th  style="width: 80px; font-weight: 500; font-size: 14px;">
+                                            <span>Business Model</span>
+                                        </th>
+                                        
+                                        <th  style="width: 54px; font-weight: 500; font-size: 14px;">
+                                            <span>Date Created</span>
+                                        </th>
+                                        <th  style="width: 25px; font-weight: 500; font-size: 14px;">
+                                            <span>Mode</span>
+                                        </th>
+                                        <th class="text-center" style="width: 37px; font-weight: 500; font-size: 14px;">
+                                            <span>Actions</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="span-row">
+                                        <td>
+                                            <ng-select class="form-control" [ngClass]="{'is-invalid': (isWFBMSubmit && !f.Workflow.value)}"
+                                                formControlName="Workflow" placeholder="Select...">
+                                                <ng-option *ngFor="let wf of availableWFList" [value]="wf.WorkflowId">
+                                                    {{ wf.Workflowname }}
+                                                </ng-option>
+                                            </ng-select>
+                                        </td>
+                                        <td>
+                                            <ng-select class="form-control"
+                                                [ngClass]="{'is-invalid': (isWFBMSubmit && !f.BM.value)}"
+                                                formControlName="BM" placeholder="Select...">
+                                                <ng-option *ngFor="let bm of BMList" [value]="bm.BmId">
+                                                    {{ bm.BmName }}
+                                                </ng-option>
+                                            </ng-select>
+                                        </td>
+                                        
+                                        <td style="width: 134px;">                                                                                     
+                                          </td>
+                                          <td style="width: 134px;">                                                                                       
+                                          </td>
+                                        <td class="d-flex align-items-center justify-content-around">
+                                            <a href="javascript:void(0)" style="color:#EB583B;cursor: pointer;" (click)="AddWfBMPair()" title="Save">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 22 22" fill="none">
+                                                    <path
+                                                        d="M16.5556 21.2539V13.4761C16.5556 13.1814 16.4385 12.8988 16.2301 12.6905C16.0217 12.4821 15.7391 12.365 15.4444 12.365H6.55556C6.26087 12.365 5.97826 12.4821 5.76988 12.6905C5.56151 12.8988 5.44444 13.1814 5.44444 13.4761V21.2539M5.44444 1.25391V5.69835C5.44444 5.99304 5.56151 6.27565 5.76988 6.48402C5.97826 6.6924 6.26087 6.80946 6.55556 6.80946H14.3333M14.5556 1.25391C15.1417 1.26226 15.7008 1.50187 16.1111 1.92057L20.3333 6.1428C20.752 6.55309 20.9917 7.1122 21 7.69835V19.0317C21 19.6211 20.7659 20.1863 20.3491 20.603C19.9324 21.0198 19.3671 21.2539 18.7778 21.2539H3.22222C2.63285 21.2539 2.06762 21.0198 1.65087 20.603C1.23413 20.1863 1 19.6211 1 19.0317V3.47613C1 2.88676 1.23413 2.32153 1.65087 1.90478C2.06762 1.48803 2.63285 1.25391 3.22222 1.25391H14.5556Z"
+                                                        stroke="#333333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                                </svg>
+                                            </a>
+                                        </td>
+                                        
+                                    </tr>
+                                    <ng-container *ngIf="associatedWFList">
+                                        <tr *ngFor="let wflst of associatedWFList; let i = index" [ngClass]="{'addcss': wflst.Status === 'Live'}">
+                                          <td><span style="padding-left: 10px;">{{wflst.Workflowname}}</span></td>
+                                          <td><span style="padding-left: 10px;">{{wflst.BmName}}</span></td> 
+                                          
+                                          <td><span>{{wflst.DateCreated}}</span></td>
+                                          <td><span style="color:#EB583B;">{{wflst.Status}}</span></td>
+                                        <td [ngClass]="{
+                                            'd-flex align-items-center justify-content-around': wflst.Status === 'Live',
+                                            'alignLiveAlignment': wflst.Status !== 'Live'
+                                          }">
+                                              <span><a href="javascript:void(0)"  style="color:#EB583B;cursor: pointer;" (click)="ChangeZone(wflst)" title="Change Zone">
+                                               <svg xmlns="http://www.w3.org/2000/svg" width="12" height="14" viewBox="0 0 22 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left-right-icon lucide-arrow-left-right"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg>
+                                                </a></span>
+                                                <span *ngIf="wflst.Status !== 'Live'"> <a href="javascript:void(0)" style="color:#EB583B;cursor: pointer;" title="Remove" (click)="deleteAssociation(wflst)">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="14" viewBox="0 0 22 24" fill="none">
+                                                            <path
+                                                                d="M8.77778 11.1539V17.7539M13.2222 11.1539V17.7539M18.7778 5.65391V21.0539C18.7778 21.6374 18.5437 22.197 18.1269 22.6095C17.7102 23.0221 17.1449 23.2539 16.5556 23.2539H5.44444C4.85507 23.2539 4.28984 23.0221 3.8731 22.6095C3.45635 22.197 3.22222 21.6374 3.22222 21.0539V5.65391M1 5.65391H21M6.55556 5.65391V3.45391C6.55556 2.87043 6.78968 2.31085 7.20643 1.89827C7.62318 1.48569 8.18841 1.25391 8.77778 1.25391H13.2222C13.8116 1.25391 14.3768 1.48569 14.7936 1.89827C15.2103 2.31085 15.4444 2.87043 15.4444 3.45391V5.65391"
+                                                                stroke="#333333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                                        </svg>
+                                                    </a></span>
+                                          </td>
+                                        </tr>
+                                      </ng-container>
+                                    
+                                </tbody>
+                            </table>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary btn-sm" style="color: white; " (click)="activeModal.close(false)">Cancel</button>
+        </div>
+    </div>
+</form>

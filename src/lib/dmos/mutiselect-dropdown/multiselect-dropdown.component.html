@@ -1,0 +1,41 @@
+<div [formGroup]="parentForm" *ngIf="parentForm && parentForm.controls as f">
+  <ng-select
+    #select
+    [multiple]="true"
+    [readonly]="dmo.IsReadOnly"
+    [virtualScroll]="true"
+    [items]="items"
+    bindLabel="label"
+    bindValue="value"
+    [closeOnSelect]="false"
+    [clearSearchOnAdd]="true"
+    [typeahead]="input$"
+    [compareWith]="compareWith"
+    (scrollToEnd)="getMore(select.searchTerm)"
+    placeholder="Select..."
+    id="{{ 'MultiSelectDropDownList_' + dmoGUID }}"
+    formControlName="{{ dmo.Name }}"
+    class="form-control"
+    [class.form-control--in-grid]="inGridEdit"
+    [ngClass]="{
+      'is-invalid':
+        (submitted && f[dmo.Name].errors) ||
+        (triggered && f[dmo.Name].errors && !f[dmo.Name].errors.required)
+    }"    
+  >
+    <ng-template ng-multi-label-tmp let-items="items" let-clear="clear">
+      <div class="ng-value" *ngFor="let item of items | slice: 0:6">
+        <span [title]="item.label" style="font-size: 12px; padding: 0.5em;">{{ item.label }}</span>
+        <span
+          class="ng-value-icon right"
+          (click)="clear(item)"
+          aria-hidden="true"
+          >×</span
+        >
+      </div>
+      <div class="ng-value" *ngIf="items.length > 6">
+        <span class="ng-value-label">{{ items.length - 6 }} more...</span>
+      </div>
+    </ng-template>
+  </ng-select>
+</div>

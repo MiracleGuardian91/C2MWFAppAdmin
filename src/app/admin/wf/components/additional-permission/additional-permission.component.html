@@ -1,0 +1,39 @@
+<div class="modal-header">
+  <h4 class="modal-titlewf">Additional Permission</h4>
+  <button type="button" class="close" aria-label="Close" (click)="activeModal.close()">
+    <span aria-hidden="true" class="fas fa-times-circle fa-fw"></span>
+  </button>
+</div>
+<div class="modal-body">
+  <div class="contents">
+    <table class="basicTable stripped" style="border-top: 0; border-right: 0; border-left: 0">
+      <thead>
+        <tr>
+          <th *ngFor="let col of columns; let i = index" width="{{ col.width }}">
+            <span style="
+              padding-left: 0px;
+          " class="colHead">{{ col.displayName }}</span>
+          </th>
+        </tr>
+      </thead>
+
+      <tbody *ngIf="dataSource">
+        <tr *ngFor="let item of dataSource; index as i" [formGroup]="forms[i]">
+          <td> 
+            <span name="role">{{ item.DISPNAME }}</span>
+          </td>
+          <td *ngFor="let col of columns | slice:1" style="text-align: center;">
+            <label class="checkbox ml-2 mt-1"  style="width: 16px;">
+              <input
+                [formControlName]="col.objectKey"
+                type="checkbox"
+                (change)="onSubmit(i)"
+              />
+              <i class="skin"></i>
+            </label>
+          </td>
+        </tr>
+      </tbody>    
+    </table>
+  </div>
+</div>

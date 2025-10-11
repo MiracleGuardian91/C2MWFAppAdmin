@@ -1,0 +1,40 @@
+<div class="popup">
+  <div class="popup__header">
+    <h2>Top Corner Detail</h2>
+    <span class="popup__close"><i class="fas fa-times-circle fa-fw" (click)="ref.close()"></i></span>
+  </div>
+  <hr>
+  <div style="position: relative; display: inline-block; width: 200px;">
+    <select class="form-control" (change)="ReloadDMOS($event.target.value)" style="width: 100%;" name="ddlBMOG" #ddlBMOG>
+      <option *ngFor="let objBmog of BMOGInfo"
+        [value]="objBmog.BMOGID">{{objBmog.BMOGNAME}}</option>
+    </select>
+    <span style="
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: #888;
+    ">
+      <i class="fas fa-chevron-down"></i>
+    </span>
+  </div>
+  <div class="double-column">
+    <app-association
+      class="span-12"
+      *ngIf="associations$ | async as items" 
+      [displayWith]="displayWith"
+      [uniqueWith]="uniqueWith"
+      [items]="items[0]"
+      [associatedItems]="items[1]"
+      checkBy="selected"
+      (select)="onSelect($event)">
+    </app-association>
+  </div>
+  
+  <div class="popup__actions">
+    <button class="btn btn-light btn-sm" type="button" (click)="ref.close()">Cancel</button>
+    <button [disabled]="!selectedItems || this.bmogId=='-1'" class="btn btn-primary btn-sm" type="submit" (click)="onSubmit()">Save</button>
+  </div>
+</div>

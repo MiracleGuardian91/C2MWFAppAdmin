@@ -1,0 +1,42 @@
+<ng-container *ngIf="dataClass">
+  <div class="popup">
+    <div class="popup__header">
+      <h2 *ngIf="newObject"><i [class]="uiData.class" style="margin-right: 5px"></i>New {{ uiData.name }}</h2>
+      <h2 *ngIf="!newObject"><i [class]="uiData.class" style="margin-right: 5px"> </i>{{ uiData.name }} Details</h2>
+      <span class="popup__close"><i class="fas fa-times-circle fa-fw" (click)="ref.close()"></i></span>
+    </div>
+    
+    <form [formGroup]="form">
+      <app-tabs>
+        <app-tab title="Display">
+          <ng-container *ngTemplateOutlet="renderControls; context: {controls: displayControls}"></ng-container>
+        </app-tab>
+        <app-tab *ngIf="uiData.hasData" title="Data">
+          <ng-container *ngTemplateOutlet="renderControls; context: {controls: dataControls}"></ng-container>
+        </app-tab>
+        <app-tab *ngIf="uiData.validate" title="Validation">
+          <ng-container *ngTemplateOutlet="renderControls; context: {controls: validationControls}"></ng-container>
+        </app-tab>
+      </app-tabs>
+    
+      <div class="popup__actions">
+        <button class="btn btn-light btn-sm" type="button" (click)="onCancel()">Cancel</button>
+        <button class="btn btn-primary btn-sm" type="submit" (click)="onSubmit()" *ngIf="!parent.root.published && !readonly">
+          <ng-container *ngIf="newObject">Create</ng-container>
+          <ng-container *ngIf="!newObject">Update</ng-container>
+        </button>
+      </div>
+      <!-- </div> -->
+    </form>
+  </div>
+ 
+</ng-container>
+
+
+<ng-template #renderControls let-controls="controls">
+  <div class="double-column mt-3" [formGroup]="form">
+    <ng-container *ngFor="let control of controls">
+      <app-object-control [submitted]="submitted" [parentForm]="form" [config]="control" *ngIf="control.show | async"></app-object-control>
+    </ng-container> 
+  </div>
+</ng-template>

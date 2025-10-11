@@ -1,0 +1,106 @@
+<!--Header-->
+
+<ng-container >
+  <div class="breadcrumbs p-3" style="background-color: #fff;">
+    <a (click)="routeBack()">
+      <img [src]="backsImageUrl" style="filter: var(--plx-app-list-icon-filter);" width="20px">
+      <span>Back</span>
+    </a> 
+  </div>
+</ng-container>
+
+<div class="p-3">
+  <div class="mt-1 mb-3 mr-0.8">
+    <button
+  *ngIf="isComingStageandState"
+  type="button"
+  class="close close-custom"
+  aria-label="Close"
+  (click)="closeModal()"
+  style="padding: 1rem 1rem; margin: -1rem -1rem 1rem auto;"
+>
+  <span aria-hidden="true" class="fas fa-times-circle fa-fw"></span>
+</button>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">  
+    <div class="display-name">WF Conditions</div>
+    
+    </div>
+
+    <ng-container *ngIf="showSelectedFilters">
+      <div class="tags-list ml-2" *ngIf="_bodyData.SortColumn !='-1' || !(isEmptyObject(filters))">
+        <div class="tags-list-label">Selected Filter(s) :</div>
+        <ul>
+     <!--  *ngIf="!(_bodyData.SortColumn.toLowerCase() ==='crtdon' && _bodyData.SortOrder.toLowerCase() ==='desc')" -->
+          <li *ngIf="_bodyData.SortColumn != '-1' "><span>{{sortColumnName + '(' + _bodyData.SortOrder +')' }}</span>
+            <a id="a_otchannel" href="javascript:void(0);" class="icon-close"
+              (click)="onFilterClear(_bodyData.SortColumn, 'sort')"><i class="fas fa-times"></i></a>
+          </li>
+          <ng-container *ngFor="let item of filters | keyvalue">
+            <li *ngIf="showSelectedFilter(item.value.DataField)"><span>{{this.FilterList(item.value)}}</span>
+              <a id="a_otchannel" href="javascript:void(0);" class="icon-close"
+                (click)="onFilterClear(item.value.DataField,'Global_Search' , item)"><i class="fas fa-times"></i></a>
+            </li>
+          </ng-container>
+          
+          <li class="resetFilter" (click)="ClearFilters()">
+            <span>Remove All Filter(s)</span>
+          </li>
+        </ul>
+      </div>
+    </ng-container> 
+
+    </div>
+    <!--Gloabl Search-->
+    <form class="position-relative text-center" #gblFilterForm
+    (ngSubmit)="onGlobalFilter(gblFilterForm,'dmoName','Global_Search',undefined)">
+      <div class="p-2">
+        <div class="wfMainGSearch">
+          <div class="globalSearchWrap">
+            <div class="position-relative">
+              <input id="globalSearch" #txtGlobal placeholder="Global Search" type="search" (paste)="onPaste($event, txtGlobal)">
+              <button aria-label="Search" class="btn-search search-icon-btn " routerlink="" tabindex="0" type="submit">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-warning text-white open-popup-btn d-none" (click)="openNewFormViewPopup(null)">
+        <i class="fas fa-plus" aria-hidden="true"></i>
+      </button>
+    </form>
+    <div></div>
+    <div class="p-1"></div>
+    <form [formGroup]="WFCondForm">
+    <div class="table-filters-group">        
+      <div class="button-group d-none" style="padding: 3px 5px;">              
+        <select name='ChangeStatus' formControlName="ChangeStatus" class="btn btn-primary-special btn-small" (change)="ChangeStatus($event)">
+            <option value="-1">Change Status</option>
+            <option value="1">Active</option>
+            <option value="0">Inactive</option>
+        </select>   
+      </div>
+      <button (click)="openNewFormViewPopup(null)" class="icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="18" viewBox="0 0 19 18" fill="none">
+          <path
+            d="M16.851 7.07143H11.0653V1.28571C11.0653 0.575759 10.4895 0 9.77958 0H8.49386C7.78391 0 7.20815 0.575759 7.20815 1.28571V7.07143H1.42243C0.712478 7.07143 0.136719 7.64719 0.136719 8.35714V9.64286C0.136719 10.3528 0.712478 10.9286 1.42243 10.9286H7.20815V16.7143C7.20815 17.4242 7.78391 18 8.49386 18H9.77958C10.4895 18 11.0653 17.4242 11.0653 16.7143V10.9286H16.851C17.561 10.9286 18.1367 10.3528 18.1367 9.64286V8.35714C18.1367 7.64719 17.561 7.07143 16.851 7.07143Z"
+            fill="white" />
+        </svg>
+      </button>
+      <button class="btn btn-primary-special btn-small my-1 d-none" style="padding: 3px 5px;" type="button" (click)="ClearFilters()">Remove Filter</button>
+    </div>
+  </form>
+    <div class="p-1"></div>
+    <div class="grid">
+ <generic-grid
+ [dataSource]="dataSource"
+ [headerMap]="HeaderMap"
+ [itemsCount]="itemsCount"
+ [sNo]="false"
+[pageNum]="pageNum"
+(pageChange)="pageChange($event)"
+(actionClick)="actionClick($event)"
+(rowClick)="OnRowClick($event)"
+#genericgridcomponent></generic-grid>
+</div>
+</div>

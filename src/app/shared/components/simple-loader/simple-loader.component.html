@@ -1,0 +1,19 @@
+<div class="loader_wrap">
+  <div class="onboarding-generating-figure__bg">
+    <object type="image/svg+xml" [attr.data]="loaderSvgUrl" aria-label="Loading...">
+                </object>  
+ <div class="carousel-container">
+      <div class="carousel-track" [ngStyle]="{ 'transform': 'translateX(-' + trackTranslate + 'px)' }">
+        <div class="carousel-item" *ngFor="let icon of icons; let i = index" [class.active]="isActive(i)">
+          <img [src]="icon.src" [alt]="icon.alt" />
+        </div>
+      </div>
+    </div>
+    <div class="text">Applying model changes...</div>
+    <br>
+    <div class="progress2 progress-moved">
+      <div class="progress-bar2">
+      </div>
+    </div>
+  </div>
+</div>

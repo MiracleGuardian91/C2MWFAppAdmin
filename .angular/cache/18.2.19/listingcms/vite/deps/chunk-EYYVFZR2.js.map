@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../../../../node_modules/diagram-js/lib/util/ModelUtil.js"],
+  "sourcesContent": ["import { has, isNil, isObject } from 'min-dash';\n\n/**\n * Checks whether a value is an instance of Connection.\n *\n * @param {any} value\n *\n * @return {boolean}\n */\nexport function isConnection(value) {\n  return isObject(value) && has(value, 'waypoints');\n}\n\n/**\n * Checks whether a value is an instance of Label.\n *\n * @param {any} value\n *\n * @return {boolean}\n */\nexport function isLabel(value) {\n  return isObject(value) && has(value, 'labelTarget');\n}\n\n/**\n * Checks whether a value is an instance of Root.\n *\n * @param {any} value\n *\n * @return {boolean}\n */\nexport function isRoot(value) {\n  return isObject(value) && isNil(value.parent);\n}"],
+  "mappings": ";;;;;;AASO,SAAS,aAAa,OAAO;AAClC,SAAO,SAAS,KAAK,KAAK,IAAI,OAAO,WAAW;AAClD;AASO,SAAS,QAAQ,OAAO;AAC7B,SAAO,SAAS,KAAK,KAAK,IAAI,OAAO,aAAa;AACpD;",
+  "names": []
+}

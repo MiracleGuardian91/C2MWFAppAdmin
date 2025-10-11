@@ -1,0 +1,29 @@
+<div class="d-flex flex-column workflow-application" style="min-height: 100vh;">
+  <app-header *ngIf="showHeaderFooter"></app-header>
+  <section  class="flex-grow-1" [ngClass]="{ 'main-box': showHeaderFooter }">
+    <router-outlet></router-outlet>
+  </section>
+  <app-footer *ngIf="showHeaderFooter"></app-footer>
+
+  <!-- Conditional Simple Loaders for API calls -->
+  <app-simple-loader *ngIf="(isApiLoading$ | async) && (loaderType$ | async) === 'A'"></app-simple-loader>
+  <app-simple-loader-b *ngIf="(isApiLoading$ | async) && (loaderType$ | async) === 'B'"></app-simple-loader-b>
+  
+  <!-- Global Loader -->
+  <ng-http-loader *ngIf="!localLoaderComponent" [entryComponent]="globalLoaderComponent"></ng-http-loader>
+
+  <!-- Local Loader -->
+  <ng-http-loader *ngIf="localLoaderComponent" [entryComponent]="localLoaderComponent"></ng-http-loader>
+</div>
+
+
+
+<!-- <div *ngIf="globalLoaderComponent">
+  <ng-container *ngComponentOutlet="globalLoaderComponent"></ng-container>
+</div> 
+
+<div *ngIf="localLoaderComponent">
+  <ng-container *ngComponentOutlet="localLoaderComponent"></ng-container>
+</div>  -->
+
+

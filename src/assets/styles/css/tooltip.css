@@ -1,0 +1,30 @@
+/* BEGIN Tooltip ***************************** */
+.icon-tooltip{display:inline-block;height:16px;margin:-3px 3px 0px 3px;vertical-align:middle;font-size:1.6rem;color:#999;position:relative;}
+.form-row label .icon-tooltip{margin:-6px 3px 0px 3px;}
+#tooltip{
+font-size:1.2rem;
+line-height:1.4;
+color:#fff;
+background:#999;
+position:absolute;
+z-index:1042;
+padding:15px;}
+#tooltip:after{
+width:0;
+height:0;
+border-left:10px solid transparent;
+border-right:10px solid transparent;
+border-top:10px solid #999;
+content:'';
+position:absolute;
+left:50%;
+bottom:-10px;
+margin-left:-10px;}
+#tooltip.top:after{border-top-color:transparent;
+border-bottom:10px solid #999;
+top:-20px;bottom:auto;}
+#tooltip.left:after{
+left:10px;
+margin:0;}
+#tooltip.right:after{right:10px;left:auto;margin:0;}
+/* END Tooltip ***************************** */

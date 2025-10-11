@@ -1,0 +1,161 @@
+<div class="tabs"  *ngIf="!isNewDesign">
+  <ng-container *ngIf="tabs.length > 0">  
+    <ul class="nav nav-tabs tab-link" cdkdra cdkDropList (cdkDropListDropped)="onDropped($event)" cdkDropListOrientation="horizontal">
+        <li
+          *ngFor="let tab of tabs"
+          (mouseenter)="tab.showActions = true"
+          (mouseleave)="tab.showActions = false"
+          [hidden]="!tab.bmodisplay"
+          [class.active]="tab.active"
+          [class.form-invalid]="tab.hasInvalidForm"
+          style="min-width: 50px;"
+          cdkDrag  
+        >
+          <div class="actions" [class.open]="(editable || deletable) && tab.showActions && !tab.disabled">
+            <span class="edit" (click)="onTabEdit(tab)" *ngIf="editable">
+              <i class="fas fa-pencil-alt"></i>
+            </span>
+            <span class="remove" (click)="onTabRemove(tab)" *ngIf="deletable">
+              <i class="far fa-trash-alt"></i>
+            </span>
+          </div>
+          <a (click)="selectTab(tab); onTabClick(tab)">
+              {{tab?.title}} 
+            </a>
+        </li>       
+    </ul>
+  </ng-container>
+  <ng-content></ng-content>
+</div>
+
+
+
+
+
+
+<div *ngIf="isNewDesign && isView"  class="tab-inner" >
+  <div  *ngIf="tabs.length > 0">
+    <div cdkdra cdkDropList (cdkDropListDropped)="onDropped($event)" cdkDropListOrientation="horizontal" class="center-plex">
+
+      <div  class="tab active tab-hover"
+        *ngFor="let tab of tabs"
+        (mouseenter)="tab.showActions = true"
+        (mouseleave)="tab.showActions = false"
+        [hidden]="!tab.bmodisplay"
+        [class.active]="tab.active"
+        [class.form-invalid]="tab.hasInvalidForm"
+       
+        cdkDrag  
+      >
+       <div class="tab-content" *ngIf="!tab.showPlucIcon">
+          <div class="title-head-view">
+            <a (click)="selectTab(tab); onTabClick(tab)">
+              <span *ngIf="tab.shared"><i class="fas fa-link"></i></span>
+              {{tab?.title}}
+            </a>
+          </div>
+          <div class="tab-acction">
+            <div class="actions" [class.open]="(editable || deletable) && tab.showActions && !tab.disabled">
+              <span class="edit" (click)="onTabEdit(tab)" *ngIf="editable">
+                <i class="fas fa-pencil-alt"></i>
+              </span>
+              <span class="remove" (click)="onTabRemove(tab)" *ngIf="deletable">
+                <i class="far fa-trash-alt"></i>
+              </span>
+            </div>
+          </div>
+       </div>
+       <div  class="add-tab-view" *ngIf="tab.showPlucIcon">
+        <div (click)="selectTab(tab); onTabClick(tab)">
+           <i class="fa fa-plus"></i>
+        </div>
+      </div>
+       
+      
+      </div>
+   
+    </div>
+  </div>
+</div>
+
+
+
+  <div  *ngIf="isNewDesign &&  isSection" class="tab-inner-section">
+  
+    <div  *ngIf="tabs.length > 0" >
+      <div cdkdra cdkDropList (cdkDropListDropped)="onDropped($event)" cdkDropListOrientation="horizontal" class="center-plex">
+      <div class="section active"
+      *ngFor="let tab of tabs"
+      (mouseenter)="tab.showActions = true"
+      (mouseleave)="tab.showActions = false"
+      [hidden]="!tab.bmodisplay"
+      [class.active]="tab.active"
+      [class.form-invalid]="tab.hasInvalidForm"
+      style="min-width: 50px;"
+      cdkDrag  
+      >
+        
+          <div class="tab-content" *ngIf="!tab.showPlucIcon">
+            <div class="title-head-sec">
+              <a (click)="selectTab(tab); onTabClick(tab)">
+                {{tab?.title}}
+              </a>
+            </div>
+            <div class="tab-acction">
+              <div class="actions" [class.open]="(editable || deletable) && tab.showActions && !tab.disabled">
+                <span class="edit" (click)="onTabEdit(tab)" *ngIf="editable">
+                  <i class="fas fa-pencil-alt"></i>
+                </span>
+                <span class="remove" (click)="onTabRemove(tab)" *ngIf="deletable">
+                  <i class="fas fa-unlink"></i>
+                </span>
+              </div>
+            </div>
+        </div>
+        <div class="add-tab-section" *ngIf="tab.showPlucIcon">
+          <div (click)="selectTab(tab); onTabClick(tab)">
+             <i class="fa fa-plus"></i>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <div class="tab active">View Name 1</div> -->
+
+
+
+
+
+<!-- <div class="tab-main-section" *ngIf="isNewDesign ">
+  <div id="viewOnly" *ngIf="isView">
+  <div class="tab-container"  *ngFor="let tab of tabs" >
+    <div class="tab active">{{tab?.title}}</div>
+</div>
+<div class="add-tab"><i class="fa fa-plus"></i></div>
+  </div>
+
+<div class="section-container" *ngIf="!isView">
+    <div class="section active">Section One</div>
+    <div class="section">Section Two</div>
+    <div class="section">Section Three</div>
+    <div class="add-tab"><i class="fa fa-plus"></i></div>
+</div>
+</div> -->

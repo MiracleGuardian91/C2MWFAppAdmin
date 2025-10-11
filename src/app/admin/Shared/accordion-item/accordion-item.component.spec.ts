@@ -1,0 +1,26 @@
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+import { AccordionItemComponent } from './accordion-item.component';
+
+describe('AccordionItemComponent', () => {
+  let component: AccordionItemComponent;
+  let fixture: ComponentFixture<AccordionItemComponent>;
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+    imports: [BrowserAnimationsModule, AccordionItemComponent]
+})
+    .compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(AccordionItemComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});

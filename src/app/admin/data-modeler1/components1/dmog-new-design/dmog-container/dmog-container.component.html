@@ -1,0 +1,437 @@
+
+
+<div
+[ngClass]="isContainerActive('main_'+title)"
+  style="margin-bottom: 10px;"
+  cdkDragBoundary=".form-view"
+  class="rectangle resizePanel"
+  [class.show-default-popup]="!readonly && data.Type !== 'CardGroup'"
+  [class.show-group-popup]="!readonly && data.Type === 'CardGroup'"
+  id="{{'main_'+title}}"
+  [ngStyle]="style"
+  (drop)="dropRow($event)"
+  (dragover)="onDragOver($event)" 
+  (mouseenter)="dmo.display = true"
+  (mouseleave)="dmo.display = false;"
+>
+  <div [ngStyle]="headerStyle" (click)="ShowDmogSettings($event)"  (keydown)="onKeyDown($event)"
+    class="row"
+    (mouseover)="hoveredRowIndex = data"
+    (mouseout)="hoveredRowIndex = null"
+    (focus)="onFocus()"
+    (blur)="onBlur()"
+  >
+    <div class="col-md-6">
+      
+      <label for="inputField" class="input-label dmog-title" style="font-size: 13px;" cdkDragHandle >
+        <i class="fas fa-grip-lines drag-icon"></i>
+        <span *ngIf="readonly && mode !== 'Published'"><i class="fas fa-link"></i></span>
+         {{ title }}
+      </label>
+
+     
+    </div>
+    <div class="col-md-2">
+    
+    </div>
+   
+  </div>
+
+  <div (drop)="dropdmo($event)" *ngFor="let r of rows; let rowIndex = index" id="{{r.columns.length> 0? '': data.id+'_row_'+rowIndex}}"
+  [ngClass]="r.columns.length>0 && ShowParentRowHover(r)?'NoRemoveHover row-hover-item-div main-row-div border-hide':r.columns.length<1 && isCurrentActive(data.id+'_row_'+rowIndex)? 'active-container':''"
+  class="empty-row colouredDiv selectionDiv rightpadding row rowBorder sub-row dmo.display row-colour"  (click)="showContextMenu($event,{'type':'parentRow', r,rowIndex},data.id+'_row_'+rowIndex)"
+  (keydown)="onKeyDown($event)"
+  >
+
+  <div *ngIf="r.columns.length>0 && ShowParentRowHover(r) && !readonly" class="Add-row-hover-item">
+    <div class="icon-wrapper"  
+    >
+    <svg _ngcontent-ywm-c490="" width="10" height="24" viewBox="0 0 12 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path _ngcontent-ywm-c490="" d="M2 3C2.55228 3 3 2.55228 3 2C3 1.44772 2.55228 1 2 1C1.44772 1 1 1.44772 1 2C1 2.55228 1.44772 3 2 3Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path _ngcontent-ywm-c490="" d="M10 3C10.5523 3 11 2.55228 11 2C11 1.44772 10.5523 1 10 1C9.44772 1 9 1.44772 9 2C9 2.55228 9.44772 3 10 3Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path _ngcontent-ywm-c490="" d="M2 11C2.55228 11 3 10.5523 3 10C3 9.44772 2.55228 9 2 9C1.44772 9 1 9.44772 1 10C1 10.5523 1.44772 11 2 11Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path _ngcontent-ywm-c490="" d="M10 11C10.5523 11 11 10.5523 11 10C11 9.44772 10.5523 9 10 9C9.44772 9 9 9.44772 9 10C9 10.5523 9.44772 11 10 11Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path _ngcontent-ywm-c490="" d="M2 19C2.55228 19 3 18.5523 3 18C3 17.4477 2.55228 17 2 17C1.44772 17 1 17.4477 1 18C1 18.5523 1.44772 19 2 19Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path _ngcontent-ywm-c490="" d="M10 19C10.5523 19 11 18.5523 11 18C11 17.4477 10.5523 17 10 17C9.44772 17 9 17.4477 9 18C9 18.5523 9.44772 19 10 19Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+    <div class="custom-icon-menu-row">
+      <div class="custom-icon-button" (click)="onAddRowAfter($event, r, 'above')" (keydown)="onKeyDown($event)" title="Add new row above">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path fill="#005996" d="M0 0h24v24H0z"/>
+          <path fill="#FFFFFF" d="M20 11v2H4v-2h16zm-8-8l5 5h-3v4h-4V8H7l5-5z"/>
+        </svg>
+      </div>
+      <div class="custom-icon-button" (click)="onAddRowAfter($event, r, 'below')" (keydown)="onKeyDown($event)" title="Add new row below">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path fill="#005996" d="M0 0h24v24H0z"/>
+          <path  fill="#FFFFFF" d="M20 11v2H4v-2h16zm-8 11l-5-5h3v-4h4v4h3l-5 5z"/>
+        </svg>
+      </div>
+    </div>
+    </div>
+  </div>
+
+    <div *ngIf="r.columns.length>0 && ShowParentRowHover(r) && !readonly" class="row-hover-item" title="Row Settings" (click)="rowSetting($event,r,data.id+'_row_'+rowIndex,{'type':'parentRow', r,rowIndex})" (keydown)="onKeyDown($event)" >&nbsp;</div>
+    <div *ngIf="r.columns.length>0" class="row-container" 
+         [ngClass]="r.columns.length> 0? '' : 'empty-row'"
+         [ngClass]="isCurrentActive(data.id+'_row_'+rowIndex)"
+         id="{{data.id}}_row_{{rowIndex}}"
+         (click)="rowSetting($event,r,data.id+'_row_'+rowIndex,{'type':'parentRow', r,rowIndex})"
+         (keydown)="onKeyDown($event)"
+         #parentResizeDir="columnResize"
+         columnResize
+         [columnResizeEnabled]="!childResizeDir?.isResizing"
+         [rows]="rows"
+         [rowIndex]="rowIndex"
+         (onResize)="resizeColumnNew($event.columns, $event.rowIndex)">
+        
+
+      <div *ngFor="let c of r.columns; let colIndex = index"
+      [ngClass]="isCurrentActive(data.id+'_parent_column_'+rowIndex+'_'+colIndex)"
+        class="columnBorder sub-column pr-1 colouredDiv selectionDiv column-colour box"
+        id="{{data.id+'_parent_column_'+rowIndex+'_'+colIndex}}"
+        [ngStyle]="styleObject(c)"
+        (click)="(c.dmoguid == null || c.dmoguid.length<2)?showContextMenu($event,{'type':'column',r,c,rowIndex,colIndex},data.id+'_parent_column_'+rowIndex+'_'+colIndex):null"
+        (keydown)="onKeyDown($event)">
+      <div class="resizer">
+      </div>
+      <div (dragover)="onDragOver($event)" (drop)="dropdmo($event)" *ngIf="c.rows?.length==0" id="{{data.id}}_column_{{rowIndex}}_{{colIndex}}"  class="colouredDiv  column-colour column-row-column-Border pr-1 center-plus-icon list-dmo">
+        
+        <div (drop)="dropdmo($event)"
+        (dragenter)="onDragEnter($event,{'type':'column',r,c,rowIndex,colIndex},data.id+'_parent_column_'+rowIndex+'_'+colIndex)"
+        (dragleave)="onDragLeave($event,{'type':'column',r,c,rowIndex,colIndex},data.id+'_parent_column_'+rowIndex+'_'+colIndex)"
+        (dragover)="onDragOver($event)" class="width plus-icon" *ngIf="!removeOrphanedDmos(c.dmoguid)"  id="{{data.id}}_column_{{rowIndex}}_{{colIndex}}"  >
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="12" viewBox="0 0 13 12" fill="none">
+          <path d="M11.317 4.71429H7.39955V0.857143C7.39955 0.383839 7.00972 0 6.52902 0H5.65848C5.17778 0 4.78795 0.383839 4.78795 0.857143V4.71429H0.870536C0.389837 4.71429 0 5.09812 0 5.57143V6.42857C0 6.90188 0.389837 7.28571 0.870536 7.28571H4.78795V11.1429C4.78795 11.6162 5.17778 12 5.65848 12H6.52902C7.00972 12 7.39955 11.6162 7.39955 11.1429V7.28571H11.317C11.7977 7.28571 12.1875 6.90188 12.1875 6.42857V5.57143C12.1875 5.09812 11.7977 4.71429 11.317 4.71429Z" fill="#333333" fill-opacity="0.7"/>
+        </svg>
+        </div>
+        
+        <div
+       
+         *ngFor="let rdmg of filterDmoguidList(c.dmoguid);"  id="{{rdmg}}_column_{{rowIndex}}_{{colIndex}}"   
+        (click)="removeOrphanedDmos(c.dmoguid)?showContextMenu($event,{'type':'column','dmoguid':rdmg,r,c,rowIndex,colIndex},rdmg+'_column_'+rowIndex+'_'+colIndex):null"
+        (dragenter)="onDragEnter($event,{'type':'column','dmoguid':rdmg,r,c,rowIndex,colIndex})"
+        (dragleave)="onDragLeave($event,{'type':'column','dmoguid':rdmg,r,c,rowIndex,colIndex})"
+        (keydown)="onKeyDown($event)"
+        [class.active-container]="isCurrentActive(rdmg+'_column_'+rowIndex+'_'+colIndex)"
+        [ngClass]="{
+          'width': true, 
+          'word-break': true,
+          'margtop': c.dmoguid?.length > 1,
+          'margbottom': true 
+         }"
+        >
+          <app-dmo
+          [attr.data-dmo]="true"   
+          [containerStyle]="containerStyle"
+       (dragover)="onDragOver($event)"
+        draggable="true"
+        (dragstart)="dragdmo($event,rdmg,data.id)"
+        (dragend)="onInnerDragEnded($event,rdmg)"
+        [attr.data-dmoguid]="rdmg"
+        class="drag-list-item"
+        [dmo]="getCurrentDMO(rdmg)"
+        (mouseenter)="onMouseEnterInnerDragEnded($event,rdmg)"
+        (mouseleave)="onMouseLeaveInnerDragEnded($event,rdmg)"
+              ></app-dmo>
+              
+        </div>
+      </div>
+      <!--CR LOOP-->
+      <div *ngFor="let cr of c.rows;let colRowIndex = index"
+       class="columnrowBorder rightpadding colouredDiv selectionDiv row-colour row-hover-item-inner-div"
+       (click)="showContextMenu($event,{'type':'NestedcolumnRow',cr,r,c,rowIndex,colIndex,colRowIndex},data.id+'_column_'+rowIndex+'_'+colIndex+'+'+colRowIndex)"
+       id="{{data.id}}_column_{{rowIndex}}_{{colIndex}}_{{colRowIndex}}"
+       [ngClass]="isCurrentActive(data.id+'_column_'+rowIndex+'_'+colIndex+'+'+colRowIndex)"
+       (keydown)="onKeyDown($event)"
+       
+       #childResizeDir="columnResize"
+       columnResize
+       [rows]="c.rows"
+       [rowIndex]="colRowIndex"
+       (onResize)="resizeColumnNew($event.columns, $event.rowIndex)"
+       >
+       
+       <div *ngIf="cr.columns && cr.columns.length==0" class="empty-row "
+       (mouseenter)="cr.columns && cr.columns.length==0?showChildContextMenu($event,data.id+'_column_'+rowIndex+'_'+colIndex+'_'+colRowIndex,'mouseenter'):null"
+       (mouseleave)="cr.columns && cr.columns.length==0 ?showChildContextMenu($event,data.id+'_column_'+rowIndex+'_'+colIndex+'_'+colRowIndex,'mouseleave'):null"
+      
+       >
+
+       
+
+       <div *ngIf="cr.columns && cr.columns.length==0 && !readonly" class="row-hover-item" 
+       (keydown)="onKeyDown($event)"
+       (click)="showContextMenu($event,{'type':'NestedcolumnRow',cr,r,c,rowIndex,colIndex,colRowIndex},data.id+'_column_'+rowIndex+'_'+colIndex+'+'+colRowIndex)">
+        &nbsp;
+        <div class="row-hover-item-menu">
+          <div class="row-hover-sub-item"  (click)="showContextMenu($event,{'type':'parentRow', r,rowIndex},data.id+'_row_'+rowIndex)" (keydown)="onKeyDown($event)" >Row</div>
+          <div class="row-hover-sub-item" class="" (click)="showContextMenu($event,{'type':'column','dmoguid':rdmg,r,c,rowIndex,colIndex},data.id+'_parent_column_'+rowIndex+'_'+colIndex)" (keydown)="onKeyDown($event)"> Column</div>
+          <div class="row-hover-sub-item" (click)="showContextMenu($event,{'type':'NestedcolumnRow',cr,r,c,rowIndex,colIndex,colRowIndex},data.id+'_column_'+rowIndex+'_'+colIndex+'_'+colRowIndex)" (keydown)="onKeyDown($event)">Inner Row</div>
+        </div>
+      </div>
+    </div>
+
+       <div 
+        *ngFor="let rcr of cr.columns;let colRowcolumnIndex = index" 
+       (click)="(rcr.dmoguid == null || rcr.dmoguid.length<2)?showContextMenu($event,{'type':'columnRow',cr,r,c,rowIndex,colIndex,colRowIndex,colRowcolumnIndex},data.id+'_columnRow_'+rowIndex+'_'+colIndex+'_'+colRowIndex+'_'+colRowcolumnIndex):null"
+        class="list-dmo column-row-column-Border colouredDiv selectionDiv column-colour center-plus-icon box"
+        [ngStyle]="styleChildObject(rcr)" 
+        (keydown)="onKeyDown($event)"
+        (drop)="dropdmo($event)"
+       
+        id="{{data.id}}_columnRow_{{rowIndex}}_{{colIndex}}_{{colRowIndex}}_{{colRowcolumnIndex}}"
+        (dragover)="onDragOver($event)"
+        [ngClass]="isCurrentActive(data.id+'_columnRow_'+rowIndex+'_'+colIndex+'_'+colRowIndex+'_'+colRowcolumnIndex)"
+        (mouseenter)="showChildContextMenu($event,data.id+'_column_'+rowIndex+'_'+colIndex+'_'+colRowIndex,'mouseenter')"
+        (mouseleave)="showChildContextMenu($event,data.id+'_column_'+rowIndex+'_'+colIndex+'_'+colRowIndex,'mouseleave')"
+        >    
+        
+       <div *ngIf="cr.columns.length>0 && colRowcolumnIndex === cr.columns.length - 1 && !readonly" class="Add-row-hover-item">
+        <div class="icon-wrapper-inner-row"   
+        >
+        <svg _ngcontent-ywm-c490="" width="10" height="24" viewBox="0 0 12 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path _ngcontent-ywm-c490="" d="M2 3C2.55228 3 3 2.55228 3 2C3 1.44772 2.55228 1 2 1C1.44772 1 1 1.44772 1 2C1 2.55228 1.44772 3 2 3Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path _ngcontent-ywm-c490="" d="M10 3C10.5523 3 11 2.55228 11 2C11 1.44772 10.5523 1 10 1C9.44772 1 9 1.44772 9 2C9 2.55228 9.44772 3 10 3Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path _ngcontent-ywm-c490="" d="M2 11C2.55228 11 3 10.5523 3 10C3 9.44772 2.55228 9 2 9C1.44772 9 1 9.44772 1 10C1 10.5523 1.44772 11 2 11Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path _ngcontent-ywm-c490="" d="M10 11C10.5523 11 11 10.5523 11 10C11 9.44772 10.5523 9 10 9C9.44772 9 9 9.44772 9 10C9 10.5523 9.44772 11 10 11Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path _ngcontent-ywm-c490="" d="M2 19C2.55228 19 3 18.5523 3 18C3 17.4477 2.55228 17 2 17C1.44772 17 1 17.4477 1 18C1 18.5523 1.44772 19 2 19Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path _ngcontent-ywm-c490="" d="M10 19C10.5523 19 11 18.5523 11 18C11 17.4477 10.5523 17 10 17C9.44772 17 9 17.4477 9 18C9 18.5523 9.44772 19 10 19Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          <div class="custom-icon-menu">
+
+            <div class="custom-icon-button" (click)="onAddRowAfter($event, r, 'above')" (keydown)="onKeyDown($event)"  title="Add new row above">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path fill="#005996" d="M0 0h24v24H0z"/>
+                <path fill="#FFFFFF" d="M20 11v2H4v-2h16zm-8-8l5 5h-3v4h-4V8H7l5-5z"/>
+              </svg>
+            </div>
+            <div class="custom-icon-button" (click)="onAddRowAfter($event, r, 'below')" (keydown)="onKeyDown($event)" title="Add new row below">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path fill="#005996" d="M0 0h24v24H0z"/>
+                <path  fill="#FFFFFF" d="M20 11v2H4v-2h16zm-8 11l-5-5h3v-4h4v4h3l-5 5z"/>
+              </svg>
+            </div>
+
+            <div class="custom-icon-button" (click)="onAddInnerRowAfter($event, r, c, cr, 'above', colRowIndex)" (keydown)="onKeyDown($event)" title="Add new inner row above">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path fill="#005996" d="M0 0h24v24H0z"/>
+                <path fill="#FFFFFF" d="M12 4l4 4h-3v4h-2V8H8l4-4zm-8 8h16v2H4v-2zm0 4h10v2H4v-2z"/>
+              </svg>
+            </div>
+            <div class="custom-icon-button" (click)="onAddInnerRowAfter($event, r, c, cr, 'below', colRowIndex)" (keydown)="onKeyDown($event)" title="Add new inner row below">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path fill="#005996" d="M0 0h24v24H0z"/>
+                <path fill="#FFFFFF" d="M4 10h10v2H4v-2zm0 4h16v2H4v-2zm8 6l-4-4h3v-4h2v4h3l-4 4z"/>
+              </svg>
+            </div>
+
+          </div>
+        </div>
+      </div>  
+        
+        <div class="row-hover-item"  *ngIf="!readonly && colRowcolumnIndex === 0" (keydown)="onKeyDown($event)"  (click)="showContextMenu($event,{'type':'NestedcolumnRow',cr,r,c,rowIndex,colIndex,colRowIndex},data.id+'_column_'+rowIndex+'_'+colIndex+'+'+colRowIndex)">
+          &nbsp;
+          <div class="row-hover-item-menu">
+            <div  (click)="showContextMenu($event,{'type':'parentRow', r,rowIndex},data.id+'_row_'+rowIndex)" (keydown)="onKeyDown($event)">Row </div>
+            <div class="" (click)="showContextMenu($event,{'type':'column','dmoguid':rdmg,r,c,rowIndex,colIndex},data.id+'_parent_column_'+rowIndex+'_'+colIndex)" (keydown)="onKeyDown($event)">Column </div>
+            <div (click)="showContextMenu($event,{'type':'NestedcolumnRow',cr,r,c,rowIndex,colIndex,colRowIndex},data.id+'_column_'+rowIndex+'_'+colIndex+'_'+colRowIndex)" (keydown)="onKeyDown($event)">Inner Row </div>
+          </div>
+        </div>
+        <div (drop)="dropdmo($event)"
+        (dragover)="onDragOver($event)" class="width plus-icon"  *ngIf="!removeOrphanedDmos(rcr.dmoguid)" id="{{data.id}}_columnRow_{{rowIndex}}_{{colIndex}}_{{colRowIndex}}_{{colRowcolumnIndex}}" 
+        (dragenter)="onDragEnter($event,{'type':'columnRow',cr,r,c,rowIndex,colIndex,colRowIndex,colRowcolumnIndex},data.id+'_columnRow_'+rowIndex+'_'+colIndex+'_'+colRowIndex+'_'+colRowcolumnIndex)"
+        (dragleave)="onDragLeave($event,{'type':'columnRow',cr,r,c,rowIndex,colIndex,colRowIndex,colRowcolumnIndex},data.id+'_columnRow_'+rowIndex+'_'+colIndex+'_'+colRowIndex+'_'+colRowcolumnIndex)"
+        >
+        
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="12" viewBox="0 0 13 12" fill="none">
+          <path d="M11.317 4.71429H7.39955V0.857143C7.39955 0.383839 7.00972 0 6.52902 0H5.65848C5.17778 0 4.78795 0.383839 4.78795 0.857143V4.71429H0.870536C0.389837 4.71429 0 5.09812 0 5.57143V6.42857C0 6.90188 0.389837 7.28571 0.870536 7.28571H4.78795V11.1429C4.78795 11.6162 5.17778 12 5.65848 12H6.52902C7.00972 12 7.39955 11.6162 7.39955 11.1429V7.28571H11.317C11.7977 7.28571 12.1875 6.90188 12.1875 6.42857V5.57143C12.1875 5.09812 11.7977 4.71429 11.317 4.71429Z" fill="#333333" fill-opacity="0.7"/>
+        </svg>
+        </div>
+   
+        <div  
+        (keydown)="onKeyDown($event)"
+        *ngFor="let rdmgs of filterDmoguidList(rcr.dmoguid);let dmoguidIndex = index;" id="{{rdmgs}}_columnRow_{{rowIndex}}_{{colIndex}}_{{colRowIndex}}_{{colRowcolumnIndex}}" 
+        (click)="removeOrphanedDmos(rcr.dmoguid)?showContextMenu($event,{'type':'columnRow','dmoguid':rdmgs,cr,r,c,rowIndex,colIndex,colRowIndex,colRowcolumnIndex},rdmgs+'_columnRow_'+rowIndex+'_'+colIndex+'_'+colRowIndex+'_'+colRowcolumnIndex):null"
+        (dragenter)="onDragEnter($event,{'type':'columnRow','dmoguid':rdmgs,cr,r,c,rowIndex,colIndex,colRowIndex,colRowcolumnIndex},data.id+'_columnRow_'+rowIndex+'_'+colIndex+'_'+colRowIndex+'_'+colRowcolumnIndex)"
+        (dragleave)="onDragLeave($event,{'type':'columnRow','dmoguid':rdmgs,cr,r,c,rowIndex,colIndex,colRowIndex,colRowcolumnIndex},data.id+'_columnRow_'+rowIndex+'_'+colIndex+'_'+colRowIndex+'_'+colRowcolumnIndex)"
+        [class.active-container]="isCurrentActive(rdmgs + '_columnRow_' + rowIndex + '_' + colIndex + '_' + colRowIndex + '_' + colRowcolumnIndex)"
+        [ngClass]="{
+          'width': true, 
+          'word-break': true,
+          'margtop': rcr.dmoguid?.length > 1
+         
+         }"
+        >
+        <app-dmo
+        [containerStyle]="containerStyle"
+        (dragover)="onDragOver($event)"
+        draggable="true"
+        [attr.data-dmoguid]="rdmgs"
+        (dragstart)="dragdmo($event,rdmgs,data.id)"
+        (dragend)="onInnerDragEnded($event,rdmg)"
+        (mouseenter)="onMouseEnterInnerDragEnded($event,rdmg)"
+        (mouseleave)="onMouseLeaveInnerDragEnded($event,rdmg)"
+        class="drag-list-item"
+        [dmo]="getCurrentDMO(rdmgs)"
+              
+              
+        ></app-dmo>
+        </div>
+        <div class="resizer">
+        </div>
+      </div>
+
+      
+      </div>
+     
+    </div>
+    </div>
+
+      <i class=""></i>
+    
+  </div>
+
+  <!--Below ng content Project Child-->
+  <ng-content></ng-content>
+
+  <div class="add-row-container" *ngIf="!readonly && data.Type!='CardGroup'">
+   
+    <button class="add-row" (click)="addNewRow($event)">+ Add Row</button>
+  </div>
+  <div class="add-row-container" *ngIf="!readonly && data.Type=='CardGroup'">
+   
+    <button class="add-row" (click)="AddDmogInGroup()">+ Add Card</button>
+  </div>
+
+
+
+
+  <ng-template #itemActionColumn let-item="item">
+    <ng-container *ngIf="!readonly">
+      <div
+        class="item-actions dmo-actions active"
+        [class.active]="
+        hoveredRowIndex === item.rowIndex &&
+        hoveredColumnIndex === item.colIndex
+      ">
+      <a  
+      class="item-action"
+      ngbTooltip="Add Row"
+      (click)="onAddRowInColumn(item)"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="12" viewBox="0 0 13 12" fill="none">
+        <path d="M11.317 4.71429H7.39955V0.857143C7.39955 0.383839 7.00972 0 6.52902 0H5.65848C5.17778 0 4.78795 0.383839 4.78795 0.857143V4.71429H0.870536C0.389837 4.71429 0 5.09812 0 5.57143V6.42857C0 6.90188 0.389837 7.28571 0.870536 7.28571H4.78795V11.1429C4.78795 11.6162 5.17778 12 5.65848 12H6.52902C7.00972 12 7.39955 11.6162 7.39955 11.1429V7.28571H11.317C11.7977 7.28571 12.1875 6.90188 12.1875 6.42857V5.57143C12.1875 5.09812 11.7977 4.71429 11.317 4.71429Z" fill="#333333" fill-opacity="0.7"/>
+      </svg>
+    </a>
+        <a *ngIf="item.current.rows.length==0"
+          class="item-action mr-0"
+          style="color: rgb(187, 53, 53); margin-right: 10px"
+          ngbTooltip="Data Model Objects"
+          [matMenuTriggerFor]="menu"
+          (click)="GetSelectMenu(item.rowIndex, item.colIndex)"
+        >
+          <i class="fa fa-ellipsis-v"></i>
+        </a>
+        <a *ngIf="item.current.rows.length==0"
+          class="item-action"
+          style="color: rgb(187, 53, 53)"
+          ngbTooltip="Remove Column"
+          (click)="onRemoveColumn(item.rowIndex, item.colIndex)"
+        >
+          <i class="fa fa-trash-alt"></i>
+        </a>
+      
+     
+      </div>
+    </ng-container>
+  </ng-template>
+
+  
+    <div 
+    class="popup-div default-popup" 
+    *ngIf="!readonly && data.Type !== 'CardGroup'" 
+    >
+        <a
+        class="item-action"
+        [ngbTooltip]="data.Type === 'CardGroup' ? 'Delete Card Group' : 'Unshare Card'"
+        (click)="onTabRemove(this)"
+      >
+      <i [ngClass]="data.Type === 'CardGroup' ? 'far fa-trash-alt' : 'fas fa-unlink'"></i>
+      </a>   
+        <a 
+        class="item-action"
+        (click)="ShowDmogSettings($event)"
+        [ngbTooltip]="data.Type === 'CardGroup' ? 'Card Group Settings' : 'Card Settings'"
+      >
+        <i class="fas fa-th"></i>
+      </a>
+      <a
+      class="item-action"
+      (click)="onEditDMOGRemove(this)"
+      [ngbTooltip]="data.Type === 'CardGroup' ? 'Edit Card Group' : 'Edit Card'"
+    >
+      <i class="fas fa-tools"></i>
+      
+    </a>
+    </div>
+
+    
+  
+    <div 
+      class="popup-div group-popup" 
+      *ngIf="!readonly && data.Type === 'CardGroup'" 
+    >
+    <a
+    *ngIf="!hasChildren"
+    class="item-action"
+    [ngbTooltip]="data.Type === 'CardGroup' ? 'Delete Card Group' : 'Delete Card'"
+    (click)="onTabRemove(this)"
+    >
+    <i class="far fa-trash-alt"></i>
+    </a>   
+    <a 
+    class="item-action"
+    (click)="ShowDmogSettings($event)"
+    [ngbTooltip]="data.Type === 'CardGroup' ? 'Card Group Settings' : 'Card Settings'"
+    >
+    <i class="fas fa-th"></i>
+    </a>
+    <a
+    class="item-action"
+    (click)="onEditDMOGRemove(this)"
+    [ngbTooltip]="data.Type === 'CardGroup' ? 'Edit Card Group' : 'Edit Card'"
+    >
+    <i class="fas fa-tools"></i>
+
+    </a>
+
+
+    </div>
+  
+  
+  
+
+
+</div>
+
+<div>
+  <app-contextMenu [object]="contextMenuData"
+                   [showContextMenuFor]="contextMenuData"
+                   [contextMenuPosition]="contextMenuPosition"
+                   (contextMenuSelected)="OperateContextMenu($event)"
+                    [readonly]="readonly"
+                    [selectedDivId]="selectedDivId"
+                    [isDmoExist]="isDmoExist"
+                   ></app-contextMenu>
+              
+                 <app-dmo-form-controls [showContextMenuFor]="contextMenuData"
+                   [contextMenuPosition]="contextMenuPosition"
+                   [showContextMenu]="showFormContextMenu"
+                  (formControlSelect) ="FormControlSelect($event)"
+                  
+                   >
+                   </app-dmo-form-controls>
+             
+                   <app-sharedmo-controls [showContextMenuFor]="contextMenuData"
+                   [contextMenuPosition]="contextMenuPosition"
+                   [showContextMenu]="showSharedmoContextMenu"
+                   [shareDmoList]="availableDmoToShare!.components"
+                   [rows]="rows"
+                  (shareDmoSelect) ="shareDmoSelect($event)"
+                   >
+                   </app-sharedmo-controls>
+                  
+                 
+</div>
+
+
+<ng-template #dragPlaceholder>
+  <div class="cdk-drag-placeholder"></div>
+</ng-template>

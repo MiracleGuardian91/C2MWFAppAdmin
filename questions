@@ -1,0 +1,11 @@
+- condition guids? 
+  conditions are the only elements without guids.
+
+- timer
+  how to identify if a trigger has timer attached to it? currently the api response has no info about it
+
+- gateway
+  how to persist gateway when user creates one trigger condition and refreshes the page? 
+
+- deleting elements
+  does order matter? should it be sync or async?

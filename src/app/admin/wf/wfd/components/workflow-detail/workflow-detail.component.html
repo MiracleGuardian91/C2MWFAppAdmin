@@ -1,0 +1,149 @@
+<div class="popup">
+  <div class="popup__header">
+    <h2 *ngIf="newElement">New Workflow</h2>
+    <h2 *ngIf="!newElement">Workflow Details</h2>
+    <span class="popup__close"><i class="fas fa-times-circle fa-fw" (click)="ref.close()"></i></span>
+  </div>
+  <hr>
+  
+  <form [formGroup]="form">
+    <div class="double-column">
+      <div class="form-group span-6">
+        <label>Workflow Name <span style="color: red">*</span></label>
+        <br />
+        <input 
+          type="text" 
+          class="form-control" 
+          formControlName="name" 
+          [readonly]="!newElement" 
+          [style.background-color]="!newElement ? '#e9ecef' : 'white'"
+          (blur)="CheckValidationWF()"
+          [ngClass]="{'is-invalid': submitted && f.name.errors || f.name.errors && !f.name.errors.required || f.name.errors?.duplicate}"
+        />
+       
+        <div *ngIf="f.name?.errors?.duplicate" class="invalid-feedback">
+          Duplicate name
+        </div>
+      </div>
+    
+      <div class="form-group span-6">
+        <label>Friendly Name <span style="color: red">*</span></label>
+        <br />
+        <input 
+          type="text" 
+          class="form-control" 
+          formControlName="friendlyName"
+          [ngClass]="{'is-invalid': submitted && f.friendlyName.errors || f.friendlyName.errors && !f.friendlyName.errors.required}"
+           />
+      </div>
+    
+      <div class="form-group span-6">
+        <label>Version</label>
+        <br />
+        <input 
+          type="text" 
+          class="form-control" 
+          formControlName="version"
+          readonly
+          [ngClass]="{'is-invalid': submitted && f.version.errors || f.version.errors && !f.version.errors.required}"
+           />
+      </div>
+    
+      <div class="form-group span-6">
+        <label>Certification Type</label>
+        <br />
+        <app-custom-select
+          [parentForm]="form"
+          controlName="processName"
+          [items]="data.AllCertificationType | keyvalue"
+          [submitted]="submitted"
+        ></app-custom-select>
+      </div>
+    
+      <div class="form-group span-6">
+        <label>Associated Roles</label>
+        <br />
+        <app-custom-select
+          [parentForm]="form"
+          controlName="associatedRoles"
+          [items]="data.AllAvailableRoles | keyvalue"
+          [submitted]="submitted"
+          [multiple]="true"
+        ></app-custom-select>
+      </div>
+    
+      <div class="form-group span-6">
+        <label>Short Description <span style="color: red">*</span></label>
+        <br />
+        <input 
+          type="text" 
+          class="form-control" 
+          formControlName="shortDesc"
+          [ngClass]="{'is-invalid': submitted && f.shortDesc.errors || f.shortDesc.errors && !f.shortDesc.errors.required}"
+           />
+      </div>
+    
+      <div class="form-group span-12">
+        <label>Long Description</label>
+        <br />
+        <div class="Ql-container" >
+          <quill-editor
+          [modules]="{ toolbar: editorConfig.toolbar }"
+          class="Ql-InsideContainer"
+          formControlName="longDesc"
+        ></quill-editor>
+        </div> 
+      </div>
+    
+    
+      <div class="form-group span-6">
+        <label>Email From <span style="color: red">*</span></label>
+        <br />
+        <input 
+          type="text" 
+          class="form-control" 
+          formControlName="emailFrom"
+          [ngClass]="{'is-invalid': submitted && f.emailFrom.errors || f.emailFrom.errors && !f.emailFrom.errors.required}"
+           />
+      </div>
+    
+      <div class="form-group span-6">
+        <label>OBE Email Subject Line</label>
+        <br />
+        <input 
+          type="text" 
+          class="form-control" 
+          formControlName="obeMailSublect"
+          [ngClass]="{'is-invalid': submitted && f.obeMailSublect.errors || f.obeMailSublect.errors && !f.obeMailSublect.errors.required}"
+           />
+      </div>
+      
+    
+      <!-- <div class="form-group span-12" style="display:none ;">
+        <label>State Percentage</label>
+        <br />
+        <app-list
+          [parentForm]="form"
+          controlName="statePercentage"
+          [config]="statePercentages"
+        ></app-list>
+      </div> -->
+    
+    </div>
+  
+    <div class="popup__actions">
+      <button class="btn btn-light btn-sm" type="button" (click)="onCancel()">Cancel</button>
+      <button 
+        class="btn btn-primary btn-sm" 
+        type="submit" 
+        (click)="onSubmit()"
+        [title]="data.Mode === 'Published' ? 'Workflow is published.' : ''"
+        *ngIf="!published"
+        >
+        <ng-container *ngIf="newElement">Create</ng-container>
+        <ng-container *ngIf="!newElement">Update</ng-container> 
+      </button>
+    </div>
+  
+  </form>
+</div>

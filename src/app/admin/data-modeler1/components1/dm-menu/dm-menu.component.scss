@@ -1,0 +1,121 @@
+.sticky-sub-head {
+	position: fixed;
+	z-index: 1998;
+	width: 100%;
+}
+
+.header-row {
+	display: flex;
+	align-items: center;
+	//flex-wrap: wrap;
+	gap: 10px;
+	border-top: 1px solid #E3E5EA;
+	border-bottom: 1px solid #E3E5EA;
+	background: #F4F4F4;
+	height: 40px;
+	justify-content: space-between;
+	display: flex;
+	padding: 5px 10px;
+	border-radius: 8px;
+
+	button {
+		font-size: 12px;
+		border-radius: 8px;
+
+
+	}
+
+
+}
+
+.btn-outline-white {
+	// display: inline-block;
+	display: flex;
+	gap: 5px;
+	align-items: center;
+	justify-content: center;
+	font-weight: 500;
+	color: #fff;
+	text-align: center;
+	vertical-align: middle;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	user-select: none;
+	background-color: rgba(0, 89, 150, 1);
+	border: 1px solid white;
+	font-size: 12px;
+	line-height: 18px;
+	height: 30px;
+	width: 132px;
+	padding: 0px 0px 0px 0px;
+	border-radius: 8px;
+	transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.btn-outline-white-edit {
+	// display: inline-block;
+	display: flex;
+	gap: 5px;
+	align-items: center;
+	justify-content: center;
+	font-weight: 500;
+	color: #fff;
+	text-align: center;
+	vertical-align: middle;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	user-select: none;
+	background-color: rgba(0, 89, 150, 1);
+	border: 1px solid white;
+	font-size: 12px;
+	line-height: 18px;
+	height: 30px;
+	width: 78px;
+	padding: 0px 0px 0px 0px;
+	border-radius: 8px;
+	transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.heading-section {
+	display: flex;
+	align-items: baseline;
+	gap: 6px;
+}
+
+.btn-section {
+	display: flex;
+}
+
+.buss-heading {
+	color: #333;
+	font-family: Roboto;
+	font-size: 16px;
+	font-style: normal;
+	font-weight: 400;
+	line-height: 14px;
+	padding: 8px 10px;
+
+}
+
+.gear-icon {
+	width: 17.851px;
+	height: 18.803px;
+	flex-shrink: 0;
+	cursor: pointer;
+}
+
+.fas fa-code {
+	width: 20px;
+	height: 17.283px;
+	flex-shrink: 0;
+}
+
+.btn:hover {
+	background-color: #005996;
+
+}
+
+.compAssContainer{
+	width: 150px;
+	margin: 0px 5px 0px 5px;
+}

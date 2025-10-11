@@ -1,0 +1,38 @@
+<div [formGroup]="parentForm" *ngIf="parentForm && parentForm.controls as f">
+  <div 
+    class="form-control searchbox" 
+    [ngClass]="{'is-invalid': submitted && f[dmo.Name].errors || triggered && f[dmo.Name].errors && !f[dmo.Name].errors.required}"
+  >
+    <input 
+      type="text" 
+      [title]="f[dmo.Name].value"
+      class="searchbox__input" 
+      [id]="('TextBox_' + dmoGUID)" 
+      [ngClass]="{'is-invalid': submitted && f[dmo.Name].errors || triggered && f[dmo.Name].errors && !f[dmo.Name].errors.required}"
+      [formControlName]="dmo.Name"
+      [placeholder]="dmo.Placeholder || ''" 
+      matInput 
+      [matAutocomplete]="searchBox"
+      [readonly]="dmo.IsReadOnly"
+    >
+    <mat-autocomplete 
+      #searchBox="matAutocomplete" 
+      showPanel="true"
+      >
+      <mat-option 
+        *ngFor="let option of results$ | async" 
+        (onSelectionChange)="updateSelectedOption(option)"
+        [value]="option[dmo.DisplayValue]">
+        {{ option[dmo.DisplayValue] }}
+      </mat-option>
+    </mat-autocomplete>
+    <div class="searchbox__spinner" *ngIf="loading$ | async">
+      <i class="fas fa-circle-notch fa-spin nomar"></i>
+    </div>
+  </div>
+  
+  <div *ngIf="(submitted || triggered) && f[dmo.Name].errors" class="invalid-feedback">
+    <div *ngIf="submitted && f[dmo.Name].errors.required">This field is required</div>
+  </div>
+
+</div>

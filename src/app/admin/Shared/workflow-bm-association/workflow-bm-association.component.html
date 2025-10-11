@@ -1,0 +1,55 @@
+<form>
+    <div>
+        <div class="modal-header">
+            <h4 class="modal-titlewf">Workflow Business Model Association ({{WFName}} {{Version}})</h4>
+            <button type="button" class="close" aria-label="Close" (click)="activeModal.close(false)">
+              <span aria-hidden="true" class="fas fa-times-circle fa-fw"></span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="contents">
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <section aria-label="Modal heading text content" class="modal-body" role="document">
+                            <div class="fWrap sections">
+                              <div class="form-row nomar">
+                                <div class="drag_grid state-filter-wrap col-sm-12">
+                                  <div class="row">
+                                    <div class="left_cell">
+                                      <div class="scroll_wrap">
+                                        <ul>
+                                          <li *ngFor="let bm of AvailableBMList">
+                                            <span>{{bm.BMNAME}}</span>
+                                            <span>
+                                              <a *ngIf="GridBMFilter[bm.BMID]==undefined ? 'Add' : 'Added'  as btnbmFilterText"
+                                                (click)="AddBMFilter(bm)" href="javascript:void(0)">
+                                                {{btnbmFilterText}}</a></span>
+                                          </li>
+                                        </ul>
+                                      </div>
+                                    </div>
+                                    <div class="right_cell">
+                                      <div class="scroll_wrap">
+                                        <ul cdkDropList (cdkDropListDropped)="dropColumn($event)">
+                                          <li class="pop" cdkDrag *ngFor="let bm of AssociatedBMList; let i = index">
+                                            <span>{{bm.BMNAME}}</span>
+                                            <span><a (click)="DeleteBmFilter(bm)" href="javascript:void(0)">Remove</a></span>
+                                          </li>
+                                        </ul>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary btn-sm" (click)="activeModal.close(false)">Cancel</button>
+            <button type="submit" class="btn btn-primary btn-sm" (click)="SaveWorkflowBMAssociation()">Submit</button>
+        </div>
+    </div>
+</form>

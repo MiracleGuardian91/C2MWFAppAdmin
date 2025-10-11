@@ -1,0 +1,424 @@
+<div class="container" [style.top]="transformy" >
+ 
+  <div class="tab-header" [innerText]="sideNavModel.dmog.Type === 'CardGroup' ? 'Card Group Settings' : 'Card Settings'" ></div>
+  <div class="drag-side-sidebar">
+
+    <mat-tab-group class="custom-tab-container-settings" *ngIf="sideNavModel.dmog.Type!='CardGroup'" (selectedTabChange)="onTabChange($event)">
+      
+      <mat-tab label="Layout">
+        <div class="main-heading">Settings</div>
+        <div class="continer-header">
+          <div class="continer-heading">Card Name</div>
+          <div class="continer-Name-bold">{{sideNavModel!.dmog!.DisplayName}}</div>
+        </div>
+        <div class="continer-header">
+          <div class="continer-heading">Card Width (%)</div>
+          <div class="continer-Name">
+            <div class="settings-range"> 
+                <div class="range-box">
+                  <input class="range-line" type="range"
+                  (input)="changeWidth($event)"
+                  (change)="SaveWidthWidth($event)"
+                  min="0"
+                  max="100"
+                  step="1"
+                  displayWith="formatLabel"
+                  [(ngModel)]="width"
+                  >
+                </div>
+                <div class=" range-counter">
+                  <input
+                  class="width-input"
+                  min="0"
+                  max="100"
+                  class="input"
+                  (change)="SaveWidthWidth($event)"
+                  [(ngModel)]="width"
+                 
+                />
+              </div>
+            </div>
+            
+          </div>
+        </div>
+     
+        <hr class="break-line" />
+        <!-- ********row -->
+        <div class="main-heading">Drag Items</div>
+        <div class="rows-container"
+          draggable="true"
+          [attr.data.rowsId-drag]="rowdmogId"
+          id="{{ rowdmogId }}"
+          (dragstart)="dragRow($event)"
+          (dragover)="onDragOver($event)"
+        >
+          <div class="rows-content">
+            <div class="icons-main">
+             
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
+                <path d="M19.5312 0.0625H2.34375C1.0498 0.0625 0 1.1123 0 2.40625V19.5938C0 20.8877 1.0498 21.9375 2.34375 21.9375H19.5312C20.8252 21.9375 21.875 20.8877 21.875 19.5938V2.40625C21.875 1.1123 20.8252 0.0625 19.5312 0.0625ZM4.49219 12.9531C4.16992 12.9531 3.90625 12.6895 3.90625 12.3672V9.63281C3.90625 9.31055 4.16992 9.04688 4.49219 9.04688H17.3828C17.7051 9.04688 17.9688 9.31055 17.9688 9.63281V12.3672C17.9688 12.6895 17.7051 12.9531 17.3828 12.9531H4.49219Z" fill="black"/>
+                </svg>
+           
+            </div>
+            <span class="texts">Inner Row</span>
+          </div>
+          <div class="menus-box">
+            <div class="menus-main">
+              <svg width="12" height="20" viewBox="0 0 12 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2 3C2.55228 3 3 2.55228 3 2C3 1.44772 2.55228 1 2 1C1.44772 1 1 1.44772 1 2C1 2.55228 1.44772 3 2 3Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M10 3C10.5523 3 11 2.55228 11 2C11 1.44772 10.5523 1 10 1C9.44772 1 9 1.44772 9 2C9 2.55228 9.44772 3 10 3Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 11C2.55228 11 3 10.5523 3 10C3 9.44772 2.55228 9 2 9C1.44772 9 1 9.44772 1 10C1 10.5523 1.44772 11 2 11Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M10 11C10.5523 11 11 10.5523 11 10C11 9.44772 10.5523 9 10 9C9.44772 9 9 9.44772 9 10C9 10.5523 9.44772 11 10 11Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 19C2.55228 19 3 18.5523 3 18C3 17.4477 2.55228 17 2 17C1.44772 17 1 17.4477 1 18C1 18.5523 1.44772 19 2 19Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M10 19C10.5523 19 11 18.5523 11 18C11 17.4477 10.5523 17 10 17C9.44772 17 9 17.4477 9 18C9 18.5523 9.44772 19 10 19Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+        </div>
+        
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Styling">
+      <div class="main-drag-side-menu">
+        <div class="drag-side-menu">
+        
+          <input
+            type="checkbox"
+            class="drag-side-menu-checkbox"
+            id="menu-toggle-1"
+          />
+         
+          <div class="drag-side-menu-content">
+            <div class="fill-heading">
+              Background
+            </div>
+            <div class="drop-side-color">
+              <div>
+                <label class="drag-side-border-label-fill">Fill Color</label>
+              </div>
+              <div class="color-picker">
+                <input type="color" class="color-picker-input" [(ngModel)]="background_color" (change)="RealTimeStyleChanges()" />
+                <span class="fill-code" *ngIf="background_color">{{background_color | uppercase}}</span>
+                <span class="fill-code" *ngIf="!background_color">#FFFFFF</span>
+              </div>
+            </div>
+            <hr class="break-line">
+            <div class="border-class">
+            <div class="border-heading">
+              Border
+            </div>
+            <div class="drop-side-color">
+            <label class="drag-side-bordertype-label" for="dropdown">Border Type</label>
+              <div class="drag-side-border-container">
+                
+                <div class="border-type-content">
+                <div>
+                <span 
+                  class="border-st" 
+                  [ngStyle]="{
+                    'border-style': border !== 'none' ? border : 'none',
+                    'border-color': 'black'
+                  }">
+                  -----
+                </span>
+                </div>
+                <select
+                  class="drag-side-border-dropdown"
+                  [(ngModel)]="border"
+                  (change)="RealTimeStyleChanges()"
+                >
+                  <option   *ngFor="let item of borderStyle" value="{{item.name}}">{{item.name}}
+                  </option>
+                  
+                </select>
+              </div>
+              </div>
+            </div>
+          
+            <div class="drop-side-color">
+              <div>
+                <label class="drag-side-border-label">Border Color </label>
+              </div>
+              
+              <div class="color-picker">
+                <input type="color" class="color-picker-input" [(ngModel)]="border_color" (change)="RealTimeStyleChanges()" />
+                <span class="fill-code" *ngIf="border_color">{{border_color | uppercase}}</span>
+                <span class="fill-code" *ngIf="!border_color">#FFFFFF</span>
+              </div>
+            </div>
+
+            <div class="drop-side-color">
+              <div>
+                <label class="drag-side-border-label">Border Width</label>
+              </div>
+             <div class="range-picker">
+              <input type="range" class="range-input" [(ngModel)]="border_width" (change)="RealTimeStyleChanges()" />
+              <input type="number" class="range-number-input" [(ngModel)]="border_width" (change)="RealTimeStyleChanges()" />
+             </div> 
+            
+            </div>
+            <div class="drag-side-border-container">
+              <div> <label class="drag-side-cornerborder-label" for="dropdown"
+                >Border Radius</label
+              ></div>
+             
+              <div class="drag-side-border-radius-dropdown">
+                <div class="">
+                  <input
+                    type="number"
+                    class="drag-side-border-inputpos"
+                    [(ngModel)]="corner_radius_top"
+                    (change)="RealTimeStyleChanges()"
+                  />
+                </div>
+              </div>
+              <select
+                class="drag-side-border-radius-dropdown d-none"
+                id="dropdown"
+                name="dropdown"
+              >
+                <option value="option1">px</option>
+                
+              </select>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="drag-side-menu">
+          <!-- Hidden checkbox to control dropdown visibility -->
+          <input
+            type="checkbox"
+            class="drag-side-menu-checkbox"
+            id="menu-toggle-2"
+          />
+        </div>
+      
+           <hr>
+          <!-- Dropdown menu content -->
+          <div class="border-heading">
+            Label
+          </div>
+          <div class="drag-side-menu-content">
+            <div class="drag-side-border-container">
+              <label class="drag-side-border-label" for="dropdown"
+                >Label Position</label
+              >
+              <div class="lebal-postion-align">
+                <div  class="lebal-postion-Top" (click)="ChangeLabelPostion('Top')" [ngClass]="{'lebal-selected-postion-align': label_position === 'Top'}">
+                  <span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="14" viewBox="0 0 15 14" fill="none">
+                      <path d="M7.5 3L4.6875 6H6.5625V14H8.4375V6H10.3125L7.5 3Z" fill="black"/>
+                      <rect width="15" height="2" fill="#090909"/>
+                      </svg>
+                  </span>
+                </div>
+                <div class="lebal-postion-Left"  (click)="ChangeLabelPostion('Left')" [ngClass]="{'lebal-selected-postion-align': label_position === 'Left'}">
+                
+                  <span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="16" viewBox="0 0 15 16" fill="none">
+                      <path d="M3.95591 8.48253L6.97236 11.2774L6.96136 9.40241L14.9612 9.35546L14.9502 7.48049L6.95035 7.52744L6.93935 5.65247L3.95591 8.48253Z" fill="black"/>
+                      <rect x="1" y="16" width="15" height="2" transform="rotate(-90.3363 1 16)" fill="#090909"/>
+                      </svg>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="drag-side-border-container">
+              <label class="drag-side-border-label" for="dropdown"
+                >Label Alignment</label
+              >
+              <div class="lebal-aligment-position">
+                <span class="align-text-left" (click)="ChangeLabelAlignment('Left')" [ngClass]="{'lebal-selected-postion-align': label_align === 'Left'}">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 15 15" fill="none">
+                  <g clip-path="url(#clip0_3038_117)">
+                  <path d="M10.3125 0.9375H0.9375V2.8125H10.3125V0.9375Z" fill="black"/>
+                  <path d="M0.9375 4.6875H14.0625V6.5625H0.9375V4.6875Z" fill="black"/>
+                  <path d="M10.3125 8.4375H0.9375V10.3125H10.3125V8.4375Z" fill="black"/>
+                  <path d="M14.0625 12.1875H0.9375V14.0625H14.0625V12.1875Z" fill="black"/>
+                  </g>
+                  <defs>
+                  <clipPath id="clip0_3038_117">
+                  <rect width="15" height="15" fill="white"/>
+                  </clipPath>
+                  </defs>
+                  </svg>
+                </span>
+                  <span class="align-text-center" (click)="ChangeLabelAlignment('Center')" [ngClass]="{'lebal-selected-postion-align': label_align === 'Center'}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 15 15" fill="none">
+                      <g clip-path="url(#clip0_3038_123)">
+                      <path d="M12.1875 0.9375H2.8125V2.8125H12.1875V0.9375Z" fill="black"/>
+                      <path d="M0.9375 4.6875H14.0625V6.5625H0.9375V4.6875Z" fill="black"/>
+                      <path d="M12.1875 8.4375H2.8125V10.3125H12.1875V8.4375Z" fill="black"/>
+                      <path d="M14.0625 12.1875H0.9375V14.0625H14.0625V12.1875Z" fill="black"/>
+                      </g>
+                      <defs>
+                      <clipPath id="clip0_3038_123">
+                      <rect width="15" height="15" fill="white"/>
+                      </clipPath>
+                      </defs>
+                      </svg>
+                  </span>
+                  <span class="align-text-right" (click)="ChangeLabelAlignment('Right')" [ngClass]="{'lebal-selected-postion-align': label_align === 'Right'}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 15 15" fill="none">
+                      <g clip-path="url(#clip0_3038_111)">
+                        <path d="M14.0625 0.9375H4.6875V2.8125H14.0625V0.9375Z" fill="black"/>
+                        <path d="M0.9375 4.6875H14.0625V6.5625H0.9375V4.6875Z" fill="black"/>
+                        <path d="M14.0625 8.4375H4.6875V10.3125H14.0625V8.4375Z" fill="black"/>
+                        <path d="M14.0625 12.1875H0.9375V14.0625H14.0625V12.1875Z" fill="black"/>
+                      </g>
+                      <defs>
+                        <clipPath id="clip0_3038_111">
+                          <rect width="15" height="15" fill="white"/>
+                        </clipPath>
+                      </defs>
+                    </svg>
+                  </span>
+                  <span class="align-text-justify" (click)="ChangeLabelAlignment('justify')" [ngClass]="{'lebal-selected-postion-align': label_align === 'justify'}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 15 15" fill="none">
+                      <path d="M14 1H1V3H14V1Z" fill="black"/>
+                      <path d="M0.9375 4.6875H14.0625V6.5625H0.9375V4.6875Z" fill="black"/>
+                      <path d="M14 8H1V10H14V8Z" fill="black"/>
+                      <path d="M14.0625 12.1875H0.9375V14.0625H14.0625V12.1875Z" fill="black"/>
+                    </svg>
+                  </span>
+              </div>
+            </div>
+
+           
+            <div class="drop-side-color">
+              <div>
+                <label class="drag-side-border-label">Label Color</label>
+              </div>
+              <div class="color-picker">
+                <input type="color" class="color-picker-input" [(ngModel)]="label_color" (change)="RealTimeStyleChanges()" />
+                <span class="fill-code" *ngIf="label_color">{{label_color | uppercase}}</span>
+                <span class="fill-code" *ngIf="!label_color">#FFFFFF</span>
+              </div>
+            </div>
+
+
+            <div class="drop-side-color">
+              <div>
+                <label class="drag-side-border-label">Help Icon Color</label>
+              </div>
+              <div class="color-picker">
+                <input type="color" class="color-picker-input" [(ngModel)]="help_icon_color" (change)="RealTimeStyleChanges()" />
+                <span class="fill-code" *ngIf="help_icon_color">{{help_icon_color | uppercase}}</span>
+                <span class="fill-code" *ngIf="!help_icon_color">#FFFFFF</span>
+              </div>
+            </div>
+
+
+          </div>
+        </div>
+
+        <div class="drag-side-menu">
+          <!-- Hidden checkbox to control dropdown visibility -->
+          <input
+            type="checkbox"
+            class="drag-side-menu-checkbox"
+            id="menu-toggle-3"
+          />
+            <hr>
+          <!-- Dropdown menu content -->
+          <div class="border-heading">
+            Header
+          </div>
+          <div class="drag-side-menu-content">
+            <div class="drag-side-border-container">
+              <label class="drag-side-border-label" for="dropdown"
+                >Header Style</label
+              >
+              <div class="header-check">
+                  <div class="header-check-input">
+                     
+                    <label class="custom-checkbox">
+                      <input type="checkbox"
+                      [(ngModel)]="header_border" 
+                      (change)="onHeaderBorderChange(header_border)"
+                      />
+                      <span></span>
+                    </label>
+                     
+                  </div>
+              </div>
+
+            </div>
+            
+            <div class="drop-side-color">
+              <div>
+                <label class="drag-side-border-label">Fill Color</label>
+              </div>
+              <div class="color-picker">
+                <input type="color" class="color-picker-input"  [(ngModel)]="header_fill_color" (change)="RealTimeStyleChanges()" />
+                <span class="fill-code" *ngIf="header_fill_color">{{header_fill_color | uppercase}}</span>
+                <span class="fill-code" *ngIf="!header_fill_color">#FFFFFF</span>
+              </div>
+            </div>
+
+            <div class="drop-side-color">
+              <div>
+                <label class="drag-side-border-label">Text Color</label>
+              </div>
+              <div class="color-picker">
+                <input type="color" class="color-picker-input"  [(ngModel)]="header_text_color" (change)="RealTimeStyleChanges()" />
+                <span class="fill-code" *ngIf="header_text_color">{{header_text_color | uppercase}}</span>
+                <span class="fill-code" *ngIf="!header_text_color">#FFFFFF</span>
+              </div>
+            </div>
+          </div>
+        </div>
+         
+        </div>
+        <div class="btn-save">
+          <button class="styling-save-btn" type="button" (click)="SaveChanges()">Save Changes</button>
+        </div>
+      </mat-tab>
+    </mat-tab-group>   
+
+
+    <div  *ngIf="sideNavModel.dmog.Type ==='CardGroup'">
+      <div class="main-heading">Settings</div>
+      <div class="continer-header">
+        <div class="continer-heading">Card Group Name</div>
+        <div class="continer-Name-bold">{{sideNavModel!.dmog!.DisplayName}}</div>
+      </div>
+      <div class="continer-header">
+        <div class="continer-heading">Card Group Width (%)</div>
+        <div class="continer-Name">
+          <div class="settings-range"> 
+              <div class="range-box">
+                <input class="range-line" type="range"
+                (input)="changeWidth($event)"
+                (change)="SaveWidthWidth($event)"
+                min="0"
+                max="100"
+                step="1"
+                displayWith="formatLabel"
+                [(ngModel)]="width"
+                >
+              </div>
+              <div class=" range-counter">
+                <input
+                class="width-input"
+                min="0"
+                max="100"
+                class="input"
+                (change)="SaveWidthWidth($event)"
+                [(ngModel)]="width"
+               
+              />
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+
+
+
+  </div>
+
+
+

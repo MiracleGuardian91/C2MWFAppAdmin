@@ -1,0 +1,93 @@
+<form *ngIf="WFRoleForm" [formGroup]="WFRoleForm">
+    <div>
+        <div class="modal-header">
+            <h4 class="modal-titlewf">Workflow Role Association</h4>
+            <button type="button" class="close" aria-label="Close" (click)="activeModal.close(false)">
+                <span aria-hidden="true" class="fas fa-times-circle fa-fw"></span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="contents">
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <section>
+                            <table class="basicTable stripped" style="border-top:0;border-right:0;border-left:0;">
+                                <thead>
+                                    <tr class="span-row">
+                                        <th>
+                                            <span>Role</span>
+                                        </th>
+                                        <th>
+                                            <span>Workflow</span>
+                                        </th>
+                                        <th class="text-center" style="width: 80px;">
+                                            <span>Actions</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="span-row">
+                                        <td>
+                                            <ng-select class="form-control"
+                                                [ngClass]="{'is-invalid': (isRoleSubmit && f.Role.value==='-1')}"
+                                                formControlName="Role">
+                                                <ng-option value="-1">Select...</ng-option>
+                                                <ng-option *ngFor="let role of availableRoleList" 
+                                                    value="{{role.RoleGuid}}">{{role.RoleName}} </ng-option>
+                                            </ng-select>
+                                        </td>
+                                        <td style="width: 134px;">
+                                            <input class="form-control"
+                                                [ngClass]="{'is-invalid': (isRoleSubmit && (f.Workflow.value === '' || f.Workflow.value === 'undefined'))}"
+                                                formControlName="Workflow">                                            
+                                        </td>
+                                        <td class="d-flex align-items-center justify-content-around">                                           
+                                            <a href="javascript:void(0)"  style="color:#000;cursor: pointer;" (click)="AddNewRole()" title="Save">
+                                                <img [src]="saveImageUrl" alt="Save" style="width:13px;height:13px;"/> 
+                                              </a>
+                                        </td>
+                                    </tr>
+                                    <tr *ngFor="let role of associatedDataList"  
+                                  value="{{role.RoleGuid}}" >
+                      <td>{{role.RoleName }}</td>                
+                        <td><span style="padding-left: 10px;">{{WFName}}</span></td>
+                        <td class="d-flex align-items-center justify-content-around">
+                            <!-- <a href="javascript:void(0)"  style="color:#4C9E00;cursor: pointer;" (click)="AddNewRole()" title="Edit">
+                                <i class="fas fa-pencil-alt"></i>
+                              </a> -->
+                            <a href="javascript:void(0)"  style="color:#000;cursor: pointer;" (click)="DeleteWFRole(role)" title="Delete">
+                                 <img src="assets/images/delete.svg" alt="Save" style="width:16px;height:16px;"/> 
+                              </a>                      
+                        </td>
+
+                
+                        <ng-container *ngIf="associatedRoleList">
+              <tr *ngFor="let role of availableRoleList; let i = index">
+                <td><span style="padding-left: 10px;">{{role.RoleName}}</span></td>
+                <td><span style="padding-left: 10px;">{{WFName}}</span></td>
+                <td class="d-flex align-items-center justify-content-around">
+                    <!-- <a href="javascript:void(0)"  style="color:#4C9E00;cursor: pointer;" (click)="AddNewRole()" title="Edit">
+                        <i class="fas fa-pencil-alt"></i>
+                      </a> -->
+                    <a href="javascript:void(0)"  style="color:#000;cursor: pointer;" (click)="DeleteWFRole(role)" title="Delete">
+                        <i class="fas fa-trash-alt"></i>
+                      </a>                      
+                </td>
+              </tr>
+            </ng-container>
+        </tr> 
+            
+
+                                </tbody>
+                            </table>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary btn-sm" (click)="activeModal.close(false)">Cancel</button>
+        </div>
+    </div>
+</form>

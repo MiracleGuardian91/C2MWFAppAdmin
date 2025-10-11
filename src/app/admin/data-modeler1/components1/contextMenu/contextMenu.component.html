@@ -1,0 +1,19 @@
+<div *ngIf="showContextMenu" 
+     class="contextMenuContainer" 
+     [ngStyle]="style" 
+     [class.context-menu-visible]="showContextMenu"
+     (document:click)="clickout($event)" 
+     [style.left.px]="contextMenuPosition.centerX"
+     [style.top.px]="contextMenuPosition.centerY"
+     [style.transform]="'translate(-50%, -100%)'"
+
+     >
+  <ng-container>
+    <div class="menu-link click_input item-action"
+         *ngFor="let menuItem of contextMenuItems; index as i"
+         (click)="onContextMenuClick($event, menuItem.menuEvent)">
+      <i class="{{menuItem.menuIcon}} menuIcon" ngbTooltip="{{menuItem.menuText}}"></i>
+      <!-- {{ menuItem.menuText }} -->
+    </div>
+  </ng-container>
+</div>

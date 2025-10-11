@@ -1,0 +1,388 @@
+<div>
+    <div class="table-filters-group" *ngIf="isExport === true">
+      <div class="export-btns-group">
+        <a href="javascript:void(0)" (click)="onAction(0,'Export Excel','')" title="Excel"><i class="far fa-file-excel"
+            role="img" aria-label="Excel"></i>Excel</a>
+        <a href="javascript:void(0)" (click)="onAction(0,'Export PDF','')" title="PDF"><i class="far fa-file-pdf"
+            role="img" aria-label="PDF"></i>PDF</a>
+      </div>
+    </div>  
+    <ng-container>
+      <table class="basicTable stripped" style="border-top:0;border-right:0;border-left:0;">
+        <thead cdkDropListGroup>
+          <tr>
+            <th *ngIf="headerMap?.config.header.action.Checkbox" style="width:3%">
+              <label class="checkbox ml-2 marginleftadntop" [style.width.%]="'1%'">
+                <input type="checkbox" name="chkboxlist" id="selectAll" [(ngModel)]="selectedAll"
+                  (ngModelChange)="selectAllCheckBox()">
+                <i class="skin"></i>
+              </label>
+            </th>
+            <!-- All Action Buttons (Edit, Delete, Copy) -->
+            
+            <!-- Close All Action Buttons (Edit, Delete, Copy) -->
+            <th *ngIf="sNo" style="width: 50px">
+              <span class="colHead">S. No.</span>
+            </th>
+            <th
+              *ngIf="((headerMap?.config.header.action.Link || headerMap?.config.header.action.DropDown) &&
+                     (!headerMap?.config.header.action.Link.Placement || headerMap?.config.header.action.Link.Placement=='Left' || !headerMap?.config.header.action.DropDown.Placement || headerMap?.config.header.action.DropDown.Placement=='Left'))"
+              style="width: 50px">
+              <span>Action</span>
+            </th>
+            <th *ngFor="let key of headerMap?.config.header.columns; let i = index" width={{key.width}}>
+              <!-- <i class="fas fa-sort"></i> -->
+              <span class="colHead header" (click)="sort(i, sortType)">{{key.displayName}}</span>
+              <div *ngIf="headerMap?.config.header.columnFilter" ngbDropdown class="grid-filter-wrap"
+              #ColumnFilterDropdown="ngbDropdown">
+              <div class="" id="dropdownBasic1" ngbDropdownToggle>
+                <img (click)="bindColumnFilterDdl(i, tblFilterForm)" alt=""
+                  [src]="arrangeArrowUrl">
+              </div>
+              <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                <ul class="list-unstyled">
+                  <li>
+                    <a href="javasript: void(0)" (click)="sort(i, 'asc', ColumnFilterDropdown)">
+                      <div class="fas fa-sort-alpha-down"></div> Sort Ascending
+                    </a>
+                  </li>
+                  <li>
+                    <a href="javasript: void(0)" (click)="sort(i, 'desc', ColumnFilterDropdown)">
+                      <div class="fas fa-sort-alpha-up"></div> Sort Descending
+                    </a>
+                  </li>
+                  <li>
+                    <a href="javasript: void(0)" (click)="onAction(i, 'Remove Sort', ColumnFilterDropdown)">
+                      <div class="fas fa-random"></div> Remove Sort
+                    </a>
+                  </li>
+                  <li type="separator" class="li-separator" role="menuitem"></li>
+                  <li>
+                    <form #tblFilterForm #f="ngForm" id='frm_{{key.objectKey}}'
+                      (ngSubmit)="f.form.valid && onFilterClick(i, tblFilterForm, 'Filter_Click', ColumnFilterDropdown )">
+                      <div class="filter" style="height: 18px; margin-top: 3px; margin-bottom: 3px;">Show rows where:
+                      </div>
+                      <!-- Check box html code and condition -->
+                      <div *ngIf="key.dataType === 'Checkbox' else OtherColumnFilter">
+                        <input type="hidden" value="or" />
+                        <div class="list-group">
+                          <ul style="width: 200px;" class="list-unstyled list-group">
+                            <!-- <li [hidden]="showItemLoading" class="dropdown-item text-center" class="list-group-item"><i
+                                class="fas fa-circle-notch fa-spin nomar" style="font-size:18px"></i></li> -->
+                            <li *ngFor="let conditionType of headerMap?.config.header.columnFilter['colData_' +i]">
+                              <input type="checkbox" name="filterValue1" class="checkbox checkboxMargin"
+                                [value]="conditionType.key">
+                              <span>
+                                {{conditionType.value}}
+                              </span>
+                            </li>
+                            <li type="separator" class="li-separator" role="menuitem"></li>
+                          </ul>
+                        </div>
+                      </div>
+                      <!-- Check box html code and condition -->
+
+                      <ng-template #OtherColumnFilter>
+                        <div class="form-group">
+                          <select class="form-control" style="width: 200px;" name="ConditionOpt1" #ConditionOpt1
+                            [ngClass]="{ 'is-invalid': f.submitted && ConditionOpt1.value == ''}" required>
+                            <option *ngFor="let conditionType of headerMap?.config.header.columnFilter['colData_' +i]"
+                              [value]="conditionType.key">{{conditionType.value}}</option>
+                          </select>
+                        </div>
+                        <div class="form-group" *ngIf="key.dataType=='Date'">
+                          <div class="input-group">
+                            <input class="form-control" placeholder="Select Date" name="filterValue1" ngbDatepicker
+                              #d="ngbDatepicker" #FromDateobj
+                              [ngClass]="{ 'is-invalid': f.submitted  && FromDateobj.value == ''  }" required>
+                            <div class="input-group-append">
+                              <button class="btn btn-sm btn-outline-secondary calendar" (click)="d.toggle()"
+                                type="button">
+                                <i class="far fa-calendar-alt"></i></button>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="form-group" *ngIf="key.dataType != 'Date'">
+                          <input type="text" class="form-control" name="filterValue1" placeholder="Filter Value"
+                            [ngClass]="{ 'is-invalid': f.submitted  && filterValue1.value == ''  }" required
+                            style="width: 200px;" #filterValue1>
+                        </div>
+                        <div class="form-group">
+                          <!-- [ngClass]="{ 'is-invalid': f.submitted && logicalOpt.value == 'Select...' }" required -->
+                          <select class="form-control" style="width: 200px;" name="logicalOpt" #logicalOpt>
+                            <option value="">Select...</option>
+                            <option value="OR" selected>Or</option>
+                            <option value="AND">AND</option>
+                          </select>
+                        </div>
+                        <div class="form-group">
+                          <select class="form-control" style="width: 200px;" name="ConditionOpt2" #ConditionOpt2>
+                            <option *ngFor="let conditionType of headerMap?.config.header.columnFilter['colData_' +i]"
+                              [value]="conditionType.key">{{conditionType.value}}</option>
+                          </select>
+                        </div>
+                        <div class="form-group" *ngIf="key.dataType=='Date'">
+                          <div class="input-group">
+                            <input class="form-control" name="filterValue2" placeholder="Select Date" ngbDatepicker
+                              #d="ngbDatepicker" #ToDateobj>
+                            <div class="input-group-append">
+                              <button class="btn btn-sm btn-outline-secondary calendar" (click)="d.toggle()"
+                                type="button">
+                                <i class="far fa-calendar-alt"></i></button>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="form-group" *ngIf="key.dataType != 'Date'">
+                          <input type="text" class="form-control" name="filterValue2" placeholder="Filter Value"
+                            style="width: 200px;" #filterValue2>
+                        </div>
+                      </ng-template>
+                      <div class="d-flex justify-content-between mt-2">
+                        <button type="submit" class="btn btn-primary btn-sm" style="color:white;">Filter</button>
+                        <button type="reset" class="btn btn-secondary btn-sm"
+                          (click)="onFilterClick(i, tblFilterForm, 'FilterClear_Click', ColumnFilterDropdown)">Clear</button>
+                      </div>
+                    </form>
+                  </li>
+                </ul>
+              </div>
+            </div> 
+            </th>  
+            <th
+              *ngIf="((headerMap?.config.header.action.Link || headerMap?.config.header.action.DropDown)  && ( headerMap?.config.header.action.Link.Placement=='Right' || headerMap?.config.header.action.DropDown.Placement=='Right'  ) )"
+              style="width: 50px">
+              <span class="colHead">Action</span>
+            </th>
+            <th class="action-column" *ngIf="headerMap?.config.header.action.Edit || headerMap?.config.header.action.Delete || headerMap?.config.header.action.showGenerateJsonBtn"
+              [ngStyle]="{'width.%': actionWidth}">
+              <span class="colHead">Actions</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody *ngIf="dataSource?.length == 0">
+          <tr>
+            <td [colSpan]="colSpan" class=" text-center">No Data Found</td>
+          </tr>
+        </tbody>
+        <tbody *ngIf="dataSource?.length>0">
+          <tr *ngFor="let data of dataSource; let i = index" class="table-row" [ngClass]="{
+            'active': data['selected'], 
+            'success': applyRowStateClass(data, 'success'),
+            'fail': applyRowStateClass(data, 'fail')
+          }">
+            <td *ngIf="headerMap?.config.header.action.Checkbox">
+              <label class="checkbox ml-2 marginleftadntop">
+                <input type="checkbox" name="chkboxlist" [(ngModel)]="data.selected"
+                  (ngModelChange)="checkIfAllSelected()">
+                <i class="skin"></i>
+              </label>
+            </td>
+            <!-- Close All Action Buttons (Edit, Delete, Copy) -->
+            <td *ngIf="sNo">{{ (((itemsPerPage > 0 ? itemsPerPage : pageSizeOptions[0]) * (currentPage-1)) + i) + 1 }}
+            </td>
+            <td
+              *ngIf="((headerMap?.config.header.action.Link || headerMap?.config.header.action.DropDown)  && (!headerMap?.config.header.action.Link.Placement || headerMap?.config.header.action.Link.Placement=='Left' || 
+            !headerMap?.config.header.action.DropDown.Placement || headerMap?.config.header.action.DropDown.Placement=='Left'))"
+              style="width: 40px">
+              <a href="javascript:void(0)" (click)="onRowClick(i, data)"
+                *ngIf="headerMap?.config.header.action.Link && (!headerMap?.config.header.action.Link.Placement || headerMap?.config.header.action.Link.Placement=='Left')">View</a>
+              <div
+                *ngIf="headerMap?.config.header.action.DropDown.Action && (!headerMap?.config.header.action.DropDown.Placement || headerMap?.config.header.action.DropDown.Placement=='Left')"
+                class="moreDots">
+                <div *ngIf="data['isShowDots'] === undefined || data['isShowDots']== false" ngbDropdown>
+                  <button class="btn btn-outline-primary" ngbDropdownToggle>{{selectedAllMyRecordFilter}}</button>
+                  <ul ngbDropdownMenu>
+                    <li ngbDropdownItem *ngFor="let actions of headerMap.config.header.action.DropDown.Action">
+                      <a ngbDropdownItem *ngFor="let key of actions | keyvalue" (click)="key.value(data)">
+                        {{(key.key=='Toggle_Active' ? 'Toggle Active' : (key.key=='Make_Featured' ? 'Make Featured': key.key) )}}
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </td>
+            <td *ngIf="headerMap?.config.header.action.Placement=='Left'" style="width: 40px">
+              <a href="javascript:void(0)" (click)="onRowClick(i, data)"
+                *ngIf="headerMap.config.header.action.Link">View</a>
+            </td>
+            <td *ngFor="let key of headerMap?.config.header.columns;" class="column-td">
+              <!-- <div [innerHTML]="getValue(key, data)"></div> -->
+              <span
+                *ngIf="headerMap?.config.header.action.Link && headerMap?.config.header.action.Link.Placement==key.objectKey; else simpledata">
+                <span *ngFor="let action of headerMap.config.header.action.Link.Action | keyvalue">
+                  <a href="javascript:void(0)" (click)="action.value(data)">{{data[key.objectKey]}}</a>
+                </span>
+                <a href="javascript:void(0)" (click)="onRowClick(i, data)"
+                  *ngIf="headerMap.config.header.action.Link && !headerMap.config.header.action.Link.Action">View</a>
+              </span>
+              <ng-template #simpledata>
+                <div [ngSwitch]="key.dataType">
+                  <span *ngSwitchCase="'Currency'">
+                    <ng-container *ngIf="data?.PriceType === '$/head'; else centPrice">
+                      {{data[key.objectKey] | currency:"AUD":"symbol-narrow"}}
+                    </ng-container>
+                    <ng-template #centPrice>
+                      {{+data[key.objectKey]}}&#162;
+                    </ng-template>
+  
+                  </span>
+                  <span *ngSwitchCase="'Date'"
+                    class="wordwrap">{{ convertToLocalDataAndTime(data[key.objectKey],  key.format, key.timeZone,key?.DmoType ) }}</span>
+                  <span *ngSwitchCase="'Link'"><a (click)="onAction(i, 'Link',key.objectKey)" href="javascript:void(0)">
+                      {{ data[key.objectKey] }} </a> </span>
+                  <span *ngSwitchCase="'TextWithColor'" [ngStyle]="{ 'color': getColorName(key,i) }">
+                    <ng-container *ngIf="key?.displayName === 'Pending Approvals'; else defaultTextWithColor">
+                      <span style="cursor: pointer;" (click)="onAction(i, 'Edit')">{{data[key.objectKey]}}</span>
+                    </ng-container>
+                    <ng-template #defaultTextWithColor>
+                      <span>{{data[key.objectKey]}}</span>
+                    </ng-template>
+                  </span>
+                  <span *ngSwitchCase="'LinkWithSpecialCasynchar'"><a href="javascript:void(0)"
+                      (click)="onAction(i, 'SpecialCharClick')"> {{ key.SpecialChar }} </a>
+                  </span>
+                  <span *ngSwitchCase="'LinkWithSpecialChar'"><a href="javascript:void(0)"
+                      (click)="onAction(i, 'SpecialCharClick',key.objectKey)"> {{ key.SpecialChar }} </a>
+                  </span>
+                  <span *ngSwitchCase="'RichText'" class="wordwrap" [innerHTML]="data[key.objectKey]"></span>
+                  <span
+                    *ngSwitchCase="'TextWithOtherColumn'">{{ data[key.objectKey] +', ' + data[key.OtherColumn] }}</span>
+                  <span *ngSwitchCase="'TextWithSeparator'">               
+                    <a class="texthover wordwrap" href="javascript:void(0)" placement="bottom" [ngbPopover]="tipContent"
+                      triggers="mouseenter:mouseleave">
+                      {{ textSeprator(data[key.objectKey], key.separator) }} </a>                   
+                  </span>
+                  <span *ngSwitchDefault>     
+                    <span style="white-space: normal" *ngIf="(key.displayName !== 'Status' && key.displayName !== 'Mode')">{{
+                      data[key.objectKey] }} </span>
+                    <span style="white-space: normal" *ngIf="(key.displayName === 'Status' || key.displayName === 'Mode') && data">
+                      <i class="fas fa-circle" [ngStyle]="{
+                           color: (data[key.objectKey] === 'Live' || data[key.objectKey] === 'Edit' ||data[key.objectKey] === 'Active' ) ? 'green' : '#4D4D51'
+                         }" style="font-size: 10px; margin-right: 2px;">
+                      </i>
+                    
+                      <span [ngStyle]="{
+                              color: (data[key.objectKey] === 'Live' || data[key.objectKey] === 'Edit' || data[key.objectKey] === 'Active') ? 'green' : '#4D4D51'
+                            }">
+                        {{ data[key.objectKey] }}
+                      </span>
+                    </span>
+                    
+                    </span>
+                </div>
+              </ng-template>
+              <ng-template #tipContent>
+                <div [innerHTML]="textSepratorHover(data[key.objectKey], key.separator)"></div>
+              </ng-template>
+            </td>
+            <td *ngIf="headerMap?.config.header.action.Placement=='Right'" style="width: 40px">
+              <a href="javascript:void(0)" (click)="onRowClick(i, data)"
+                *ngIf="headerMap.config.header.action.Link">View</a>
+            </td>
+            <td
+              *ngIf="headerMap?.config.header.action.Edit || headerMap?.config.header.action.Copy || headerMap?.config.header.action.Delete || headerMap?.config.header.action.showGenerateJsonBtn">
+              <div class="action-btns d-flex justify-content-center">
+                <a href="javascript:void(0)" (click)="onAction(i, 'Edit')" *ngIf="headerMap?.config.header.action.Edit || headerMap?.config.header.action.showGenerateJsonBtn " title="Edit">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
+                    <path
+                      d="M16.476 4.84999C16.899 4.42712 17.1366 3.85354 17.1367 3.25544C17.1368 2.65733 16.8993 2.0837 16.4764 1.66072C16.0535 1.23774 15.48 1.00008 14.8819 1C14.2838 0.999925 13.7101 1.23745 13.2872 1.66032L2.61028 12.3398C2.42453 12.525 2.28717 12.753 2.21028 13.0038L1.15347 16.4855C1.13279 16.5546 1.13123 16.6281 1.14895 16.6981C1.16667 16.7681 1.203 16.832 1.2541 16.8831C1.30521 16.9341 1.36916 16.9703 1.4392 16.9879C1.50923 17.0055 1.58272 17.0039 1.65187 16.9831L5.1343 15.927C5.38484 15.8508 5.61285 15.7143 5.79831 15.5294L16.476 4.84999Z"
+                      stroke="#333333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </a>
+                <a *ngIf="headerMap?.config.header.action.showGenerateJsonBtn" href="javascript:void(0)" title="Publish" (click)="onAction(i, 'Publish')"><svg xmlns="http://www.w3.org/2000/svg"
+                    width="18" height="18" viewBox="0 0 18 18" fill="none">
+                    <path
+                      d="M17.1369 9.00018C17.1369 6.8784 16.294 4.84352 14.7937 3.3432C13.2934 1.84287 11.2585 1 9.13679 1C6.90028 1.00841 4.75361 1.88111 3.14563 3.43561L1.13672 5.44455"
+                      stroke="#333333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M1.13672 1V5.44455H5.5812" stroke="#333333" stroke-width="1.5" stroke-linecap="round"
+                      stroke-linejoin="round" />
+                    <path
+                      d="M1.13672 9C1.13672 11.1218 1.97958 13.1567 3.47989 14.657C4.98019 16.1573 7.01504 17.0002 9.13679 17.0002C11.3733 16.9918 13.52 16.1191 15.128 14.5646L17.1369 12.5556"
+                      stroke="#333333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M12.6924 12.5557H17.1369V17.0002" stroke="#333333" stroke-width="1.5" stroke-linecap="round"
+                      stroke-linejoin="round" />
+                  </svg></a>
+                <a *ngIf="headerMap?.config.header.action.showGenerateJsonBtn"  href="javascript:void(0)" title="Excel" (click)="onAction(i, 'Excel')" ><svg xmlns="http://www.w3.org/2000/svg"
+                    width="17" height="18" viewBox="0 0 17 18" fill="none">
+                    <path
+                      d="M9.7364 1V4.20007C9.7364 4.62443 9.90497 5.0314 10.205 5.33147C10.5051 5.63153 10.9121 5.80011 11.3364 5.80011H14.5364M10.1364 9.40019L6.13637 13.4003M6.13637 9.40019L10.1364 13.4003M10.5364 1H3.33634C2.91199 1 2.50502 1.16857 2.20496 1.46864C1.9049 1.7687 1.73633 2.17568 1.73633 2.60004V15.4003C1.73633 15.8247 1.9049 16.2317 2.20496 16.5317C2.50502 16.8318 2.91199 17.0004 3.33634 17.0004H12.9364C13.3608 17.0004 13.7678 16.8318 14.0678 16.5317C14.3679 16.2317 14.5364 15.8247 14.5364 15.4003V5.00009L10.5364 1Z"
+                      stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg></a>
+                <a href="javascript:void(0)" (click)="onAction(i, 'Copy')" *ngIf="headerMap?.config.header.action.Copy"
+                  title="Copy">
+                  <i class="far fa-copy"></i>
+                </a>
+                <a href="javascript:void(0)" (click)="onAction(i, 'Delete')" *ngIf="headerMap?.config.header.action.Delete"
+                  title="Delete">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="17" height="16" viewBox="0 0 20 24" fill="none">
+                    <path 
+                      d="M8.77778 11.1539V17.7539M13.2222 11.1539V17.7539M18.7778 5.65391V21.0539C18.7778 21.6374 18.5437 22.197 18.1269 22.6095C17.7102 23.0221 17.1449 23.2539 16.5556 23.2539H5.44444C4.85507 23.2539 4.28984 23.0221 3.8731 22.6095C3.45635 22.197 3.22222 21.6374 3.22222 21.0539V5.65391M1 5.65391H21M6.55556 5.65391V3.45391C6.55556 2.87043 6.78968 2.31085 7.20643 1.89827C7.62318 1.48569 8.18841 1.25391 8.77778 1.25391H13.2222C13.8116 1.25391 14.3768 1.48569 14.7936 1.89827C15.2103 2.31085 15.4444 2.87043 15.4444 3.45391V5.65391"
+                      stroke="#333333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </a>
+                <a title="Action Items" href="javascript:void(0)" (click)="openActionsMenu($event, i)" *ngIf="headerMap?.config.header.action.moreInfo">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="17" height="16" viewBox="0 0 17 16" fill="none">
+                    <path
+                      d="M8.13692 8.79977C8.57875 8.79977 8.93693 8.44159 8.93693 7.99975C8.93693 7.55792 8.57875 7.19974 8.13692 7.19974C7.69509 7.19974 7.33691 7.55792 7.33691 7.99975C7.33691 8.44159 7.69509 8.79977 8.13692 8.79977Z"
+                      stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path
+                      d="M8.13692 3.19965C8.57875 3.19965 8.93693 2.84147 8.93693 2.39963C8.93693 1.95779 8.57875 1.59961 8.13692 1.59961C7.69509 1.59961 7.33691 1.95779 7.33691 2.39963C7.33691 2.84147 7.69509 3.19965 8.13692 3.19965Z"
+                      stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path
+                      d="M8.13692 14.3999C8.57875 14.3999 8.93693 14.0417 8.93693 13.5999C8.93693 13.158 8.57875 12.7999 8.13692 12.7999C7.69509 12.7999 7.33691 13.158 7.33691 13.5999C7.33691 14.0417 7.69509 14.3999 8.13692 14.3999Z"
+                      stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </a>
+                <a href="javascript:void(0)" (click)="onAction(i, 'aiSetting',ColumnFilterDropdown)"
+                  *ngIf="headerMap?.config.header.action.aiSetting" title="aiSetting">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="17" height="16" viewBox="0 0 20 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings-icon lucide-settings"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/></svg>
+                </a>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <!--Grid Paging-->
+      <nav aria-label="Page navigation" *ngIf="headerMap?.config.paging && itemsCount != 0" class="alignBottomNav">
+        <div class="filter_pagination">
+          <div>
+            <div class="input-group">
+              <div>Go to page :</div>
+              <input class="gotoPage" #pageSelect type="number" min="1" (change)="goToPage(pageSelect.value)"
+                [value]="currentPage">
+            </div>
+          </div>
+          <div class="selectListing">
+            <div class="input-group">
+              <div>Show Rows:</div>
+              <div ngbDropdown>
+                <button class="btn btn-outline-primary"
+                  ngbDropdownToggle>{{itemsPerPage > 0 ? itemsPerPage : pageSizeOptions[1]}}</button>
+                <ul ngbDropdownMenu aria-labelledby="dropdownCustomFilter" class="show1">
+                  <li *ngFor="let item of pageSizeOptions;let i = index" ngbDropdownItem value={{item}}
+                    id="pageSizeOptionsName" (click)="pageChangeClick(item)">{{item}}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="input-group">
+              <div style="padding-right:0px;"> {{first}} - {{last}} of {{itemsCount}}</div>
+            </div>
+          </div>
+          <!--Previous button-->
+          <div class="nxt_prvWrap">
+            <a [id]="prevName" tabindex="-1" title="Previous" (click)="previousPage($event)"><i aria-label="Left arrow"
+                class="fas fa-angle-left" role="img"></i></a>
+          </div>
+  
+          <!--Next Button-->
+          <div class="nxt_prvWrap">
+            <a [id]="nextName" title="Next" (click)="nextPage($event)" tabindex="-1"><i aria-label="Right arrow"
+                class="fas fa-angle-right" role="img"></i></a>
+          </div>
+        </div>
+      </nav>
+    </ng-container>
+  
+  </div>

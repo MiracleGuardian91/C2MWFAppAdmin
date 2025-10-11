@@ -1,0 +1,60 @@
+
+<div class="container-fluid">
+    <div class="">
+       <div class="">
+        <div class="page-title d-flex align-items-center justify-content-center">User Verification for Business Model Comparision</div>
+        <fieldset class="the-fieldset">
+                    <div class="row">
+
+                        <div class="col-lg-6">
+
+                            <form [formGroup]="userForm">
+                                <div class="form-row">
+                                    <div class="col-9">
+                                        <label class="input-label">Please enter your email address to get the user code</label>
+                                        <input type="text" class="form-control" placeholder=""
+                                         formControlName="email"
+                                         [ngClass]="{'is-invalid': submitted && userForm.controls.email.errors}"
+                                         >
+
+                                        <div *ngIf="userForm.controls.email.invalid && (userForm.controls.email.dirty || userForm.controls.email.touched)" class="text-danger">
+                                            <div *ngIf="userForm.controls.email.errors.required" class="invalid-feedback">Please enter email address to get the user code .</div>
+                                            <div *ngIf="userForm.controls.email.errors.pattern" class="invalid-feedback">Please enter a valid Plasmacomp email address to get the user code .</div>
+                                          </div>
+                                    </div>
+                                    
+                                    <div class="col">
+                                        <button type="button" (click)="getUserCode()"  class="btn btn-primary mr-2">Get Code</button>
+                                    </div>
+                                </div>
+                            </form>
+
+                        </div>
+                        <div class="col-lg-6">
+
+                            <form [formGroup]="userCodeForm">
+                                <div class="form-row">
+                                    <div class="col-9">
+                                        <label class="input-label">Please enter the user code to access the compare and sync feature</label>
+                                        <input type="password" class="form-control" placeholder="" formControlName="userCode"
+                                        [ngClass]="{'is-invalid': isuserCodesubmitted && userCodeForm.controls.userCode.errors}"
+                                        >
+                                        <div *ngIf="userCodeForm.controls.userCode.invalid && !userForm.invalid && (userCodeForm.controls.userCode.dirty || userCodeForm.controls.userCode.touched)" class="text-danger">
+                                            <div *ngIf="userCodeForm.controls.userCode.errors.required" class="invalid-feedback">Please enter user code.</div>
+                                        </div>
+                        
+                                    </div>
+                                    
+                                    <div class="col">
+                                        <button type="button" class="btn btn-primary mr-2" (click)="GoToCompare()" >Submit</button>
+                                    </div>
+                                </div>
+                            </form>
+                            
+                        </div>
+
+                    </div>            
+        </fieldset>
+        </div>
+    </div>
+</div>

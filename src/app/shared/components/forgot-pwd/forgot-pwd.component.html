@@ -1,0 +1,35 @@
+<section class="forgotpwd_wrapper" role="main">
+  <div class="whiteBgSection" style="margin: 0px;">
+    <div class="smallCenteredContainer">
+      <h2 class="FR25">Forgot Password</h2>
+      <div class="corner-button">
+        <button type="button" class="btn-close text-dark" aria-label="Close" style="background-color: transparent; border: none;" (click)="activeModal.close(false)"></button>
+      </div>
+    </div>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="sendResetCode()">
+    <div class="forgotpwd_content">
+      <div class="smallCenteredContainer">
+        <div class="mb-3">
+          <label class="form-label">
+            Please enter the mail address associated with your account.
+          </label>
+          <input formControlName="email" id="" class="form-control col-sm-8" placeholder="Email" [ngClass]="{ 'is-invalid': submitted && f.email.errors }" type="email" />
+          <div *ngIf="submitted && f.email.errors" class="invalid-feedback">
+            <div *ngIf="f.email.errors.required">Email is required</div>
+            <div *ngIf="!f.email.errors.required">Email is incorrect</div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <button type="submit" class="btn btn-primary text-white">Continue</button>
+          
+          <button type="button"  class="btn btn-link" style="text-decoration: none;" (click)="activeModal.close(false)" autofocus>
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</section>

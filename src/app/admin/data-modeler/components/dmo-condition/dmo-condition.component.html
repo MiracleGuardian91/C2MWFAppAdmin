@@ -1,0 +1,71 @@
+<div class="popup">
+  <div class="popup__header">
+    <h2><i [class]="uiData.class" style="margin-right: 5px"> </i>{{ uiData.name }} Conditions</h2>
+    <span class="popup__close"><i class="fas fa-times-circle fa-fw" (click)="ref.close()"></i></span>
+  </div>
+  
+  <mat-expansion-panel [expanded]="false">
+    <mat-expansion-panel-header>
+    Conditions
+    </mat-expansion-panel-header>
+    <table class="basicTable stripped table-bordered">
+      <thead >
+        <tr class="span-row">
+          <th>
+            <span>Condition</span>
+          </th>
+          <th style="width:100px;">
+            <span>Status</span>
+          </th>
+          <th>
+            <span>Sort Description</span>
+          </th>
+          <th class="text-center" style="width: 60px;">
+            <span>Actions</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr *ngFor="let condition of conditions; let i = index">
+            <td><span>{{condition.Name}}</span></td>
+            <td><span>{{condition.Status === '1'?'Active' : 'Inactive'}}</span></td>
+            <td><span>{{condition.ShortDesc}}</span></td>
+            <td class="d-flex align-items-center justify-content-around">
+              <a title="Open" class="save-btn" (click)="editCondition(condition); formPanel.open()"
+                style="color:#4C9E00;cursor: pointer;"><i class="fas fa-pencil-alt"></i>
+              </a>
+              <a title="Delete" class="save-btn" (click)="deleteCondition(i)" *ngIf="!readonly"
+                style="color:#4C9E00;cursor: pointer;"><i class="far fa-trash-alt"></i>
+              </a>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+  </mat-expansion-panel>
+  
+  <mat-expansion-panel #formPanel [hidden]="!conditions.length && readonly">
+    <mat-expansion-panel-header>
+    {{readonly ? 'Select Condition' : newObject ? 'Create Condition' : 'Update Condition'}}
+    </mat-expansion-panel-header>
+    <form [formGroup]="form">
+      <div class="double-column">
+        <ng-container *ngFor="let control of controls">
+          <app-object-control [parentForm]="form" [config]="control" *ngIf="control.show | async"></app-object-control>
+        </ng-container> 
+      </div>
+      <div class="actions">
+        <button class="btn btn-light btn-sm" (click)="onReset()">Cancel</button>
+        <button class="btn btn-primary btn-sm" type="submit" (click)="updateCondition()" *ngIf="!readonly">
+          <ng-container *ngIf="newObject">Create</ng-container>
+          <ng-container *ngIf="!newObject">Update</ng-container>
+        </button>
+      </div>
+      
+    </form>
+  </mat-expansion-panel>
+  
+  <div class="popup__actions">
+    <button class="btn btn-light btn-sm" type="button" (click)="onCancel()">Cancel</button>
+    <button class="btn btn-primary btn-sm" type="submit" (click)="onSubmit()" *ngIf="!readonly">Save</button>
+  </div>
+</div>

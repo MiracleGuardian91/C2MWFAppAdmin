@@ -1,0 +1,310 @@
+
+.page-title {
+  color: black;
+  font-size: 16px;
+  margin: 10px 2px;
+  letter-spacing: 0.5px;
+  /* font-weight: bold; */
+  line-height: 22px;
+}
+.title {
+  letter-spacing: 0.5px;
+  font-size: 14px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  padding: 3px 0px;
+  /* font-weight: bold; */
+  padding: 0px;
+  margin-bottom: 10px;
+}
+    
+    .form-control {
+      height: 24px;
+      border-radius: 3px;
+      font-size: 12px;
+  }
+    .input-label {
+      color: #4D4D51;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+  }
+  .input-label-search{
+    color: #4D4D51;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    padding: 0px;
+    text-align: right;
+    margin-top: 3px;
+    font-weight: 500;
+  }
+  
+  .invalid-feedback{
+      margin-top: 0.20rem;
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: 0.3px;
+      color: #EA485Bed;
+      display: block;
+  }
+  
+  .ng-select {
+  
+    &.form-control {
+        padding: 0;
+       
+    }
+    &.form-control--in-grid::ng-deep .ng-select-container{
+        min-width: unset;
+    }
+    &::ng-deep .ng-select-container{      
+        min-height: 22px;
+        min-width: 100px;
+        height: 22px;
+        border-radius: 3px;
+        border: none;
+      }
+  
+    &::ng-deep .ng-select-container .ng-input {
+        top: 0 !important;
+    }
+  
+    &::ng-deep .ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+        height: 22px;
+        // font-size: 12px;
+        padding: 2px 12px;
+    }
+  
+  }
+  .card-body {
+    flex: 1 1 auto;
+    min-height: 1px;
+    padding: 5px 0px;
+  }
+  .count-container{
+    width: auto;
+    height: auto;
+    padding: 5px;
+    margin: 0px 12px;
+    cursor: pointer;
+    font-size: 12px;
+    margin-right: 42px;
+    border-left: 1px solid #ccc;
+    padding-left: 10px;
+
+    .component-diff-count {
+      text-align: center;
+      letter-spacing: 0.5px;
+      font-size: bold;
+      font-size: 14px;
+      font-weight: bold;
+      margin-top: 0px;
+      margin-left: 22px;
+    }
+   
+  }
+  
+  .btn {
+    /* height: 27px; */
+    outline: none;
+    box-shadow: none;
+    font-size: 11px;
+    line-height: 17px;
+    border: none;
+    color: #fff;
+}
+.btn:active{
+  color: #fff;
+}
+.btn1 {
+  /* height: 27px; */
+  height: 27px;
+  width: 27px;
+  outline: none;
+  box-shadow: none;
+  font-size: 17px;
+  margin-left: 6px;
+  padding: 2px 0px;
+  font-weight: bold;
+  border: 0px;
+}
+.tree-actionbtn-wrapper .Actionbtns .btn1 .Right {
+  color: green;
+}
+  .count-label{
+    position: relative;
+    left: 25px;
+    @extend .input-label-search;
+    text-align: left;
+    font-size: 12px;
+    .counts{
+      font-size: 13px;
+    }
+  }
+  
+  
+  .isDiff{
+  color:rgb(255, 0, 0);
+  }
+  
+  .notDiff{
+    color:rgb(0, 128, 0);
+  }
+
+  
+  .tree-container,.tree-actionbtn-container{
+    max-height: 400px;
+    min-height: 400px;
+    overflow-y:scroll ;
+    overflow-x: hidden;
+  }
+  ::-webkit-scrollbar {
+    width: 7px;
+  
+  }
+  
+  ::-webkit-scrollbar-track {
+    border-radius: 10px;
+    background-color: transparent;
+  }
+   
+  ::-webkit-scrollbar-thumb {
+    background: rgb(0, 0, 0); 
+    border-radius: 10px;
+    display: none;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(0, 0, 0); 
+  }
+  .tree-container:hover::-webkit-scrollbar-thumb{
+    display: block;
+  }
+  .mat-expansion-panel-header {
+    background-color: #e8e8e8;
+    height: 50px;
+  }
+  
+  ::ng-deep .mat-expansion-panel-body{
+      padding:0px !important;
+  }
+  
+  .mat-expansion-panel-header.mat-expanded {
+    height: 14px;
+    background-color: transparent !important;
+    margin-top: 10px;
+  }
+  
+  .landmark{
+    list-style: none;
+    display: flex;
+    flex-direction: row;
+    li{
+      font-size: 14px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      vertical-align: middle;
+      font-weight: 300;
+      margin: 0px 3px;
+      .green{
+        width: 13px;
+        height: 13px;
+        margin: 3px;
+        border-radius: 50%;
+        background-color: green;
+      }
+      .red{
+        @extend .green;
+        background-color: red;
+      }
+      .blue{
+        @extend .green;
+        background-color: blue;
+      }
+  
+    }
+  
+  }
+  .left-divider{
+      border-right: 1px solid rgba(0, 0, 0, 0.125);
+  }
+  
+  
+  .jstree-default .jstree-anchor {
+    color: red;
+    line-height: 24px;
+    height: 24px;
+  }
+  
+  .Tree-wrapper{
+    width: 48% !important;
+  }
+  .tree-actionbtn-wrapper{
+    width: 4% !important;
+    padding: 0px 10px;
+    max-height: 400px;
+    min-height: 400px;
+    .card{
+        background-color: whitesmoke;
+    }
+    .Actionbtns{
+      min-height: 400px;
+      .btn{
+        height: 27px;
+        width: 27px;
+        outline: none;
+        box-shadow: none;
+        font-size: 17px;
+        margin-left: 6px;
+        padding: 2px 0px;
+        .Right{
+          color: green;
+        }
+       .reload{
+        color: gray;
+       }
+      }
+    }
+  }
+  
+ 
+   
+  :host ::ng-deep .jstree-default .jstree-search {
+    font-style: normal;
+    font-weight: bold;
+    color: currentColor !important;
+  }
+
+  ::ng-deep .jstree-anchor.jstree-disabled {
+    color: currentColor !important; 
+  }
+  img {
+    max-width: 100%;
+    height: auto;
+    vertical-align: middle;
+    border: 0;
+    margin-right: 5px;
+}
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+  font-size: 12px;
+  line-height: 10px;
+  padding: 5px 8px;
+
+}
+.mat-expansion-panel{
+  background-color: var(--plx-background-color);
+  color: var( --plx-text-color);
+  box-shadow: none !important;
+}
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  word-wrap: break-word;
+  background-color:var(--plx-background-color);
+  background-clip: border-box;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  border-radius: 0.25rem;
+}
+.text-muted {
+  color: var(--plx-text-color) !important;
+}

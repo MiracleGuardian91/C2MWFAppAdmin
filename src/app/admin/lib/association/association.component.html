@@ -1,0 +1,25 @@
+<div class="actions">
+  <div *ngIf="checkAll && allItems.length" (click)="toggleSelected(true)">Select all</div>
+</div>
+<div class="actions">
+  <div *ngIf="checkAll && selectedItems.length" (click)="toggleSelected(false)">Clear all</div>
+</div>
+
+<app-tree-list
+  [items]="allItems"
+  [displayWith]="displayWith"
+  [checkWith]="checkWith"
+  (action)="onAction($event)"
+  [disableWith]="disableWith"
+  [canDelete]="canDelete"
+  (itemRemoved) = "onItemRemoved($event)"
+></app-tree-list>
+<app-tree-list
+  [items]="selectedItems"
+  [displayWith]="displayWith"
+  [checkWith]="checkWithSelected"
+  (action)="onAction($event)"
+  [dragDrop]="true"
+  (reorder)="reorder.emit($event)"
+  [canDelete]="false"
+></app-tree-list>

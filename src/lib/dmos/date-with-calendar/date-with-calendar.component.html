@@ -1,0 +1,25 @@
+<div 
+    [formGroup]="parentForm"
+    class="input-group" 
+    [ngClass]="{'is-invalid': submitted && f[dmo.Name].errors || triggered && f[dmo.Name].errors && !f[dmo.Name].errors.required && f[dmo.Name].errors}">
+    <div class="input-group-prepend">
+      <button class="btn btn-sm btn-outline-secondary" (click)="d.toggle()" type="button" [disabled]="dmo.IsReadOnly">
+          <i class="far fa-calendar-alt" aria-hidden="true"></i>
+      </button>
+    </div>
+    <input
+      [title]="stringifyDateStruct(f[dmo.Name].value)"
+      [readonly]="dmo.IsReadOnly"
+      [id]="dmo.Type + dmoGUID"
+      class="form-control"
+      ngbDatepicker
+      #d="ngbDatepicker" [minDate]="minDate" [maxDate]="maxDate"
+      formControlName="{{dmo.Name}}"
+      (mousedown) = "d.toggle();$event.preventDefault()"
+      (keyup)="dateMasks($event)"
+      #dp
+    />
+    <span *ngIf="dp.value != ''" class="date-clear-wrapper" title="Clear all" (click)="f[dmo.Name].setValue(null);f[dmo.Name].markAsDirty();">
+      <span aria-hidden="true" class="date-clear">×</span>
+    </span>
+  </div>

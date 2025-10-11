@@ -1,0 +1,421 @@
+<div class="col-lg d-flex justify-content-end position-relative ms-auto me-3">
+    <div class="page-title text-center text-muted">Cross Server WorkFlow Comparision</div>
+    <div class="form-check page-title">
+        <input class="form-check-input" (keydown)="onKeyDown($event)"  type="radio" name="radio" checked (click)="ChageCompareMode('WorkFlow','WorkFlow',0)" >
+        <label class="form-check-label" for>
+        WorkFlow
+        </label>
+      </div>
+      <div class="form-check page-title">
+        <input class="form-check-input" (keydown)="onKeyDown($event)" id="" type="radio" name="radio" (click)="ChageCompareMode('WorkFlow BM','Stage State Condition',1)">
+        <label class="form-check-label" for="">
+            Workflow Condition
+        </label>
+      </div>
+    
+    </div>
+    
+    <div class="container-fluid">
+    
+    
+    
+    
+    
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <mat-expansion-panel [(expanded)]="IsAuthenticationExpaned">
+                        <mat-expansion-panel-header>
+                            <mat-panel-description class="page-title text-muted" *ngIf="!IsAuthenticationExpaned">
+                                Authentication & Process Details
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+                        <div class="card-body">
+                            <div class="col-lg-12">
+                                <div class="title" style="margin-left: 20px;">Authentication Details</div>
+                                <div class="row" style="width:99%; margin-left:5px">
+    
+                                    <!-- Left Authentication Start -->
+                                    <div class="col-lg-6 left-divider">
+                                        <form [formGroup]="formLeft">
+                                            <div class="row" >
+                                                <div class="form-group col-md-4">
+                                                    <label for="Environment" class="input-label">Environment <span
+                                                            class="text-danger">*</span></label>
+                                                    <ng-select class="form-control" [searchable]="true" appendTo="body"
+                                                        [ngClass]="{'is-invalid': submittedLeft && formLeft.controls.EnvironmentLeft.errors}"
+                                                        (change)="getEnvironmentvalueleft($event)"
+                                                        formControlName="EnvironmentLeft" placeholder="Select...">
+                                                        <ng-option *ngFor="let environment of Environments"
+                                                            [value]="environment">{{environment.Name}}</ng-option>
+                                                    </ng-select>
+    
+                                                </div>
+                                                <div class="form-group col-md-4">
+                                                    <label for="UserName" class="input-label">User Name <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="text" formControlName="usernameLeft" class="form-control"
+                                                        id="UserName" placeholder=""
+                                                        [ngClass]="{'is-invalid': submittedLeft && formLeft.controls.usernameLeft.errors}">
+    
+                                                </div>
+    
+                                                <div class="form-group col-md-4">
+                                                    <label for="Password" class="input-label">Password <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="password" class="form-control" id="Password" placeholder=""
+                                                        formControlName="passwordLeft"
+                                                        [ngClass]="{'is-invalid': submittedLeft && formLeft.controls.passwordLeft.errors}">
+    
+                                                </div>
+    
+                                                <div class="form-group col-md-12 d-flex justify-content-end">
+                                                    <button type="submit" class="btn btn-primary mt-3 mb-2"
+                                                        (click)="submitLeft()">Submit</button>
+                                                </div>
+    
+                                            </div>
+    
+                                        </form>
+                                    </div>
+                                    <!-- Left Authentication End -->
+    
+    
+                                    <!-- Right Authentication Start -->
+    
+                                    <div class="col-lg-6">
+                                        <form [formGroup]="formRight">
+                                            <div class="row">
+                                                <div class="form-group col-md-4">
+                                                    <label for="Environment" class="input-label">Environment <span
+                                                            class="text-danger">*</span></label>
+                                                    <ng-select class="form-control" placeholder="Select..."
+                                                        formControlName="EnvironmentRight"
+                                                        (change)="getEnvironmentvalueRight($event)" appendTo="body"
+                                                        [ngClass]="{'is-invalid': submittedRight && formRight.controls.EnvironmentRight.errors}">
+                                                        <ng-option *ngFor="let environment of Environments"
+                                                            [value]="environment">{{environment.Name}}</ng-option>
+                                                    </ng-select>
+    
+                                                </div>
+                                                <div class="form-group col-md-4">
+                                                    <label for="UserName" class="input-label">User Name <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="text" class="form-control" id="UserName" placeholder=""
+                                                        formControlName="usernameRight"
+                                                        [ngClass]="{'is-invalid': submittedRight && formRight.controls.usernameRight.errors}">
+    
+                                                </div>
+    
+                                                <div class="form-group col-md-4">
+                                                    <label for="Password" class="input-label">Password <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="password" class="form-control" id="Password" placeholder=""
+                                                        formControlName="passwordRight"
+                                                        [ngClass]="{'is-invalid': submittedRight && formRight.controls.passwordRight.errors}">
+                                                </div>
+    
+    
+    
+                                                <div class="form-group col-md-12 d-flex justify-content-end">
+                                                    <button type="submit" class="btn btn-primary mt-3 mb-2
+                                                    "
+                                                        (click)="submitRight()">Submit</button>
+                                                </div>
+    
+                                            </div>
+    
+                                        </form>
+                                    </div>
+    
+                                    <!-- Right Authentication End -->
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="row" style="margin:5px">
+                                    <!-- Process Details Start -->
+                                    <div class="col-lg-12">
+    
+                                        <div class="title">Process Details</div>
+                                        <form [formGroup]="ProcessDetails">
+    
+                                            <div class="row mb-2">
+                                                <div class="form-group col-md-3">
+                                                    <label for="Environment" class="input-label">Process name <span
+                                                            class="text-danger">*</span></label>
+                                                    <ng-select placeholder="Select..." [items]="ProcessNamesLeft"
+                                                        bindLabel="NAME" bindValue="ID" (change)="GetLeftWorkFlow($event)"
+                                                        class="form-control" formControlName="PrcessNameLeft"
+                                                        appendTo="body" [dropdownPosition]="'bottom'">
+                                                    </ng-select>
+                                                </div>
+                                                <div class="form-group col-md-3">
+                                                    <label for="UserName" class="input-label">{{ChangeLabel}} <span
+                                                            class="text-danger">*</span></label>
+                                                    <ng-select placeholder="Select..." formControlName="WfNameLeft"
+                                                        class="form-control" appendTo="body" [dropdownPosition]="'bottom'">
+                                                        <ng-option *ngFor="let op of WorkFlowLeft"
+                                                            [value]="op">{{op.WORKFLOWNAME}}</ng-option>
+                                                    </ng-select>
+                                                </div>
+    
+    
+    
+    
+                                                <div class="form-group col-md-3">
+                                                    <label for="Environment" class="input-label">Process  name  <span
+                                                            class="text-danger">*</span></label>
+                                                    <ng-select placeholder="Select..." [items]="ProcessNamesRight"
+                                                        bindLabel="NAME" bindValue="ID" (change)="GetRightWorkFlow($event)"
+                                                        class="form-control" formControlName="PrcessNameRight"
+                                                        appendTo="body" [dropdownPosition]="'bottom'">
+                                                    </ng-select>
+                                                </div>
+                                                <div class="form-group col-md-3">
+                                                    <label for="UserName" class="input-label">{{ChangeLabel}} <span
+                                                            class="text-danger">*</span></label>
+                                                    <ng-select placeholder="Select..." class="form-control"
+                                                        formControlName="WfNameRight" appendTo="body" [dropdownPosition]="'bottom'">
+                                                        <ng-option *ngFor="let op of WorkFlowRight"
+                                                            [value]="op">{{op.WORKFLOWNAME}}</ng-option>
+                                                    </ng-select>
+                                                </div>
+    
+    
+    
+                                            </div>
+    
+                                            <div class="form-row d-flex justify-content-end">
+                                                <button type="submit " class="btn btn-primary mt-2" (click)="GetWorkFlows()"
+                                                    [disabled]="ProcessDetails.invalid">Compare {{CompareButtonName}}</button>
+                                            </div>
+    
+    
+                                        </form>
+    
+    
+                                    </div>
+    
+                                    <!-- Process Details End -->
+                                </div>
+                            </div>
+    
+                        </div>
+                    </mat-expansion-panel>
+                </div>
+    
+            </div>
+    
+        </div>
+    
+    
+    </div>
+    
+    
+    <div class="col-lg-12 mb-2 mt-2" *ngIf="IsShowtree">
+        <div class="">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex">
+    
+                            <div class="count-container" style="border: 0px;">
+                                <div class="logo d-flex"><span class="count-label">Total Difference</span>
+                                </div>
+                                <div class="component-diff-count" matTooltip="Total Difference"  *ngIf="CountData">
+                                    <span class="counts" 
+                                        [ngClass]="CountData['totalCount']>0  ? 'isDiff' : 'notDiff'">({{CountData['totalCount']}})</span>
+                                </div>
+    
+                                <div class="component-diff-count" matTooltip="Total Difference" *ngIf="StageStateCondCount">
+                                    <span class="counts" 
+                                        [ngClass]="StageStateCondCount['totalCount']>0  ? 'isDiff' : 'notDiff'">({{StageStateCondCount['totalCount']}})</span>
+                                </div>
+    
+                                <div class="component-diff-count" matTooltip="Total Difference" *ngIf="PermissionCounts">
+                                    <span class="counts" 
+                                        [ngClass]="PermissionCounts['totalCount']>0  ? 'isDiff' : 'notDiff'">({{PermissionCounts['totalCount']}})</span>
+                                </div>
+    
+                            </div>
+                            
+    
+                          <div class="d-flex" *ngIf="CountData">
+                            <div class="count-container" (click)="ShortTreeByType('STAGE','ShortSTAGE')" id="ShortSTAGE" (keydown)="onKeyDown($event)">
+                                <div class="logo d-flex"><img src="../../../../assets/images/stage.png" alt=""> <strong><span
+                                            class="count-label">STAGE</span></strong></div>
+                                <div class="component-diff-count"
+                                    matTooltip="No of Right Side Missing Stage /No of UnMatched Data Stage/ No of Left Side Missing Stage">
+                                    (<span class="m-0 p-0"
+                                        *ngFor="let value of  CountData['stageCount'].split('/'); let last = last">
+                                        <span [ngClass]="{'isDiff': +value > 0, 'notDiff': +value === 0}"
+                                            class="m-0 p-0">{{value}}</span>
+                                        <span *ngIf="!last" class="m-0 p-0">/</span>
+                                    </span>)
+                                </div>
+                            </div>
+    
+                            <div class="count-container" (click)="ShortTreeByType('STATE','ShortSTATE')" (keydown)="onKeyDown($event)"  id="ShortSTATE">
+                                <div class="logo d-flex"><img src="../../../../assets/images/state.png" alt=""> <strong><span
+                                            class="count-label">STATE</span></strong></div>
+                                <div class="component-diff-count"
+                                    matTooltip="No of Right Side Missing State /No of UnMatched Data State/ No of Left Side Missing State">
+                                    (<span class="m-0 p-0"
+                                        *ngFor="let value of  CountData['stateCount'].split('/'); let last = last">
+                                        <span [ngClass]="{'isDiff': +value > 0, 'notDiff': +value === 0}"
+                                            class="m-0 p-0">{{value}}</span>
+                                        <span *ngIf="!last" class="m-0 p-0">/</span>
+                                    </span>)
+                                </div>
+                            </div>
+    
+                            <div class="count-container" (click)="ShortTreeByType('TRIGGER','ShortTRIGGER')" (keydown)="onKeyDown($event)"  id="ShortTRIGGER">
+                                <div class="logo d-flex"><img src="../../../../assets/images/trigger.png" alt=""> <strong><span
+                                            class="count-label">TRIGGER</span></strong></div>
+                                <div class="component-diff-count"
+                                    matTooltip="No of Right Side Missing Trigger /No of UnMatched Data Trigger/ No of Left Side Missing Trigger">
+                                    (<span class="m-0 p-0"
+                                        *ngFor="let value of  CountData['triggerCount'].split('/'); let last = last">
+                                        <span [ngClass]="{'isDiff': +value > 0, 'notDiff': +value === 0}"
+                                            class="m-0 p-0">{{value}}</span>
+                                        <span *ngIf="!last" class="m-0 p-0">/</span>
+                                    </span>)
+                                </div>
+                            </div>
+    
+                        
+    
+                            <div class="count-container"  (click)="ShortTreeByType('TRIGGER_CONDITION','ShortTRIGGERCONDITION')" (keydown)="onKeyDown($event)"  id="ShortTRIGGERCONDITION">
+                                <div class="logo d-flex"><img src="../../../../assets/images/trigger-cond.png" alt=""> <strong><span
+                                            class="count-label">TRIGGER CONDITION</span></strong></div>
+                                <div class="component-diff-count"
+                                    matTooltip="No of Right Side Missing trigger Condition /No of UnMatched Data Trigger Condition/ No of Left Side Missing Trigger Condition">
+                                    (<span class="m-0 p-0"
+                                        *ngFor="let value of  CountData['triggerCondCount'].split('/'); let last = last">
+                                        <span [ngClass]="{'isDiff': +value > 0, 'notDiff': +value === 0}"
+                                            class="m-0 p-0">{{value}}</span>
+                                        <span *ngIf="!last" class="m-0 p-0">/</span>
+                                    </span>)
+                                </div>
+                            </div>
+                        </div> 
+                        <div class="d-flex" *ngIf="StageStateCondCount">
+                            <div class="count-container"  (click)="ShortTreeByType('TRIGGER_CONDITION','ShortTRIGGERCONDITION')"  (keydown)="onKeyDown($event)" id="ShortTRIGGERCONDITION">
+                                <div class="logo d-flex"><img src="../../../../assets/images/trigger-cond.png" alt=""> <strong><span
+                                            class="count-label">STAGE CONDITIONS</span></strong></div>
+                                <div class="component-diff-count"
+                                    matTooltip="No of Right Side Missing Stage Condition /No of UnMatched Data Stage Condition/ No of Left Side Missing Stage Condition">
+                                    (<span class="m-0 p-0"
+                                        *ngFor="let value of  StageStateCondCount['stageCondCount'].split('/'); let last = last">
+                                        <span [ngClass]="{'isDiff': +value > 0, 'notDiff': +value === 0}"
+                                            class="m-0 p-0">{{value}}</span>
+                                        <span *ngIf="!last" class="m-0 p-0">/</span>
+                                    </span>)
+                                </div>
+                            </div>
+    
+                            <div class="count-container"  (click)="ShortTreeByType('TRIGGER_CONDITION','ShortTRIGGERCONDITION')" (keydown)="onKeyDown($event)"  id="ShortTRIGGERCONDITION">
+                                <div class="logo d-flex"><img src="../../../../assets/images/trigger-cond.png" alt=""> <strong><span
+                                            class="count-label">STATE CONDITIONS</span></strong></div>
+                                <div class="component-diff-count"
+                                    matTooltip="No of Right Side Missing State Condition /No of UnMatched Data State Condition/ No of Left Side Missing State Condition">
+                                    (<span class="m-0 p-0"
+                                        *ngFor="let value of  StageStateCondCount['stateCondCount'].split('/'); let last = last">
+                                        <span [ngClass]="{'isDiff': +value > 0, 'notDiff': +value === 0}"
+                                            class="m-0 p-0">{{value}}</span>
+                                        <span *ngIf="!last" class="m-0 p-0">/</span>
+                                    </span>)
+                                </div>
+                            </div>
+                        </div>
+    
+                        <div class="count-container" *ngIf="PermissionCounts" (click)="ShortTreeByType('PERMISSIONS','ShortPERMISSIONS')" (keydown)="onKeyDown($event)"  id="ShortPERMISSIONS">
+                            <div class="logo d-flex"><img src="../../../../assets/images/stage.png" alt=""> <strong><span
+                                        class="count-label">PERMISSIONS</span></strong></div>
+                            <div class="component-diff-count"
+                                matTooltip="No of Right Side Missing Permissions / No of UnMatched Data Permissions/ No of Left Side Missing Permissions">
+                                (<span class="m-0 p-0"
+                                    *ngFor="let value of  PermissionCounts['permCount'].split('/'); let last = last">
+                                    <span [ngClass]="{'isDiff': +value > 0, 'notDiff': +value === 0}"
+                                        class="m-0 p-0">{{value}}</span>
+                                    <span *ngIf="!last" class="m-0 p-0">/</span>
+                                </span>)
+                            </div>
+                        </div>
+    
+    
+    
+    
+    
+                            <div class="count-container">
+                                <div class="logo d-flex"><strong class="ml-2"><span class="count-label">Search
+                                            Item</span></strong></div>
+                                <div class="component-diff-count" matTooltip="Search tree items">
+                                    <input type="text" class="form-control" placeholder="" (input)="performSearch($event.target.value + '~Search')"
+                                      >
+                                </div>
+                            </div>
+    
+                        </div>
+                    </div>
+    
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-lg-12 d-flex justify-content-end">
+                                <ul class="landmark d-flex">
+                                    <li class="d-flex" (click)="FindTreeByClass('Matched','green')" id="green"><div class="green" ></div>Matched</li>
+                                    <li class="d-flex" id="red" (click)="FindTreeByClass('Unmatched','red')"><div class="red"></div>Unmatched</li>
+                                    <li class="d-flex" id="blue" (click)="FindTreeByClass('Missing','blue')"><div class="blue" ></div>Missing</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+    
+                </div>
+            </div>
+    
+        </div>
+    </div>
+    
+    
+    
+    <div class="container-fluid">
+        <div class="col-lg-12" [ngStyle]="IsShowtree ? {'visibility':'visible'}:{'visibility':'hidden'}">
+            <div class="row">
+                <div class="Tree-wrapper">
+                    <div class="card" [ngClass]="IsShowtree ? 'tree-container' : ''" [scrollTop]="scrollPosition"
+                        (scroll)="syncScroll($event)">
+                        <div class="card-body">
+                            <div id="left_jstree"></div>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="tree-actionbtn-wrapper">
+                    <div class="card " [ngClass]="IsShowtree ? 'tree-actionbtn-container' : ''">
+                        <div class="card-body">
+                            <div class="Actionbtns d-flex flex-column align-items-center justify-content-center">
+    
+                                <button class="btn1" id="SyncLRBtn" disabled (click)="SyncWF()" ><i
+                                        class="fa fa-arrow-right Right"
+                                        matTooltip="Sync Data From Left to Right" ></i></button>
+                                <button class="btn1"><i class="fa fa-redo reload" (click)="GetWorkFlows()"
+                                        matTooltip="Reload"></i></button>
+                                <button class="btn1" (click)="DownloadFile()"><i class="fa fa-download"
+                                    matTooltip="Download"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="Tree-wrapper">
+                    <div class="card" [ngClass]="IsShowtree ? 'tree-container' : ''" [scrollTop]="scrollPosition"
+                        (scroll)="syncScroll($event)">
+                        <div class="card-body">
+                            <div id="right_jstree"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

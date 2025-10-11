@@ -1,0 +1,50 @@
+<div class="modal-header">
+  <h4 class="modal-title" id="modal-basic-title">Upload file</h4>
+  <button type="button" class="close" aria-label="Close" (click)="close()">
+    <span aria-hidden="true" class="fas fa-times-circle fa-fw"></span>
+  </button>
+</div>
+<div class="modal-body">
+  <form>
+    <div class="form-group">
+      <div class="custom-file">
+        <input
+          type="file"
+          (change)="handleFileInput($event.target.files)"
+          id="fileupload"
+          class="custom-file-input"
+          accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+        />
+        <label class="custom-file-label" for="fileupload"></label>
+      </div>
+      <div class="input-group" style="word-break: break-all">
+        <span>{{ file?.name }}</span>
+      </div>
+    </div>
+  </form>
+</div>
+<div class="modal-footer">
+  <button
+    type="button"
+    class="btn btn-primary btn-sm"
+    (click)="downloadTemplate()"
+  >
+    Download Template
+  </button>
+  <button
+    type="button"
+    class="btn btn-primary btn-sm"
+    (click)="viewBulkLogRecord()"
+    *ngIf="viewLog"
+  >
+    View Log
+  </button>
+  <button
+    type="button"
+    class="btn btn-primary btn-sm"
+    [disabled]="!file"
+    (click)="upload(file, processName)"
+  >
+    Upload
+  </button>
+</div>

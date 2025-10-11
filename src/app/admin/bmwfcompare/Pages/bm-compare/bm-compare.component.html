@@ -1,0 +1,372 @@
+<div class="page-title text-center text-muted">Cross Server Business Model Comparision</div>
+
+<div class="container-fluid">
+
+
+
+
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <mat-expansion-panel [(expanded)]="IsAuthenticationExpaned">
+                    <mat-expansion-panel-header>
+                        <mat-panel-description class="page-title text-muted" *ngIf="!IsAuthenticationExpaned">
+                            Authentication & Process Details
+                        </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <div class="card-body">
+                        <div class="col-lg-12">
+                            <div class="title" style="margin-left: 17px;">Authentication Details</div>
+                            <div class="row" style="margin-left:5px;width:99%">
+
+                                <!-- Left Authentication Start -->
+                                <div class="col-lg-6 left-divider">
+                                    <form [formGroup]="formLeft">
+                                        <div class="row">
+                                            <div class="form-group col-md-4">
+                                                <label for="Environment" class="input-label">Environment <span
+                                                        class="text-danger">*</span></label>
+                                                <ng-select class="form-control" [searchable]="true" appendTo="body"
+                                                    [ngClass]="{'is-invalid': submittedLeft && formLeft.controls.EnvironmentLeft.errors}"
+                                                    (change)="getEnvironmentvalueleft($event)"
+                                                    formControlName="EnvironmentLeft" placeholder="Select...">
+                                                    <ng-option *ngFor="let environment of environments"
+                                                        [value]="environment">{{environment.Name}}</ng-option>
+                                                </ng-select>
+
+                                            </div>
+                                            <div class="form-group col-md-4">
+                                                <label for="UserName" class="input-label">User Name <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="text" formControlName="usernameLeft" class="form-control"
+                                                    id="UserName" placeholder=""
+                                                    [ngClass]="{'is-invalid': submittedLeft && formLeft.controls.usernameLeft.errors}">
+
+                                            </div>
+
+                                            <div class="form-group col-md-4">
+                                                <label for="Password" class="input-label">Password <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="password" class="form-control" id="Password" placeholder=""
+                                                    formControlName="passwordLeft"
+                                                    [ngClass]="{'is-invalid': submittedLeft && formLeft.controls.passwordLeft.errors}">
+
+                                            </div>
+
+                                            <div class="form-group col-md-12 d-flex justify-content-end">
+                                                <button type="submit" class="btn btn-primary mt-3 mb-2"
+                                                    (click)="submitLeft()">Submit</button>
+                                            </div>
+
+                                        </div>
+
+                                    </form>
+                                </div>
+                                <!-- Left Authentication End -->
+
+
+                                <!-- Right Authentication Start -->
+
+                                <div class="col-lg-6">
+                                    <!-- <div class="title">Authentication Detail</div> -->
+                                    <form [formGroup]="formRight">
+                                        <div class="row">
+                                            <div class="form-group col-md-4">
+                                                <label for="Environment" class="input-label">Environment <span
+                                                        class="text-danger">*</span></label>
+                                                <ng-select class="form-control" placeholder="Select..."
+                                                    formControlName="EnvironmentRight"
+                                                    (change)="getEnvironmentvalueRight($event)" appendTo="body"
+                                                    [ngClass]="{'is-invalid': submittedRight && formRight.controls.EnvironmentRight.errors}">
+                                                    <ng-option *ngFor="let environment of environments"
+                                                        [value]="environment">{{environment.Name}}</ng-option>
+                                                </ng-select>
+
+                                            </div>
+                                            <div class="form-group col-md-4">
+                                                <label for="UserName" class="input-label">User Name <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" id="UserName" placeholder=""
+                                                    formControlName="usernameRight"
+                                                    [ngClass]="{'is-invalid': submittedRight && formRight.controls.usernameRight.errors}">
+
+                                            </div>
+
+                                            <div class="form-group col-md-4">
+                                                <label for="Password" class="input-label">Password <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="password" class="form-control" id="Password" placeholder=""
+                                                    formControlName="passwordRight"
+                                                    [ngClass]="{'is-invalid': submittedRight && formRight.controls.passwordRight.errors}">
+                                            </div>
+
+
+
+                                            <div class="form-group col-md-12 d-flex justify-content-end">
+                                                <button type="submit" class="btn btn-primary mt-3 mb-2"
+                                                    (click)="submitRight()">Submit</button>
+                                            </div>
+
+                                        </div>
+
+                                    </form>
+                                </div>
+
+                                <!-- Right Authentication End -->
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="row"  style="margin-left:5px;width:99%">
+                                <!-- Process Details Start -->
+                                <div class="col-lg-12">
+
+                                    <div class="title">Process Details</div>
+                                    <form [formGroup]="ProcessDetails">
+
+                                        <div class="row">
+                                            <div class="form-group col-md-3">
+                                                <label for="Environment" class="input-label">Process name <span
+                                                        class="text-danger">*</span></label>
+                                                <ng-select placeholder="Select..." [items]="ProcessNamesLeft"
+                                                    bindLabel="NAME" bindValue="ID" (change)="getbmLeft($event)"
+                                                    class="form-control" formControlName="PrcessNameLeft"
+                                                    appendTo="body" [dropdownPosition]="'bottom'">
+                                                </ng-select>
+                                            </div>
+                                            <div class="form-group col-md-3">
+                                                <label for="UserName" class="input-label">Business Model <span
+                                                        class="text-danger">*</span></label>
+                                                <ng-select placeholder="Select..." formControlName="BmNameLeft"
+                                                    class="form-control" appendTo="body" [dropdownPosition]="'bottom'">
+                                                    <ng-option *ngFor="let op of bmleft"
+                                                        [value]="op">{{op.BMNAME}}</ng-option>
+                                                </ng-select>
+                                            </div>
+
+
+
+
+                                            <div class="form-group col-md-3">
+                                                <label for="Environment" class="input-label">Process name <span
+                                                        class="text-danger">*</span></label>
+                                                <ng-select placeholder="Select..." [items]="ProcessNamesRight"
+                                                    bindLabel="NAME" bindValue="ID" (change)="getbmRight($event)"
+                                                    class="form-control" formControlName="PrcessNameRight"
+                                                    appendTo="body" [dropdownPosition]="'bottom'">
+                                                </ng-select>
+                                            </div>
+                                            <div class="form-group col-md-3">
+                                                <label for="UserName" class="input-label">Business Model <span
+                                                        class="text-danger">*</span></label>
+                                                <ng-select placeholder="Select..." class="form-control"
+                                                    formControlName="BmNameRight" appendTo="body" [dropdownPosition]="'bottom'">
+                                                    <ng-option *ngFor="let op of bmright"
+                                                        [value]="op">{{op.BMNAME}}</ng-option>
+                                                </ng-select>
+                                            </div>
+
+
+
+                                        </div>
+
+                                        <div class="row d-flex justify-content-end mt-2">
+
+                                            <div class="form-group col-md-2">
+                                                <ng-select placeholder="Select..." class="form-control"
+                                                    formControlName="MasterBmgName" appendTo="body" [dropdownPosition]="'bottom'">
+                                                    <ng-option value="All Business Group">All Business Group</ng-option>
+                                                    <ng-option value="AdminView">Admin View</ng-option>
+                                                    <ng-option value="Form">Form View</ng-option>
+                                                </ng-select>
+                                            </div>
+                                            <!-- [disabled]="ProcessDetails.invalid" -->
+                                            <div class="form-row col-md-12 d-flex justify-content-end">
+                                                <button type="submit" class="btn btn-primary mt-3 mb-2" (click)="GetleftRightBM()">Compare</button>
+                                            </div>
+                                        </div>
+
+
+                                    </form>
+
+
+                                </div>
+
+                                <!-- Process Details End -->
+                            </div>
+                        </div>
+
+                    </div>
+                </mat-expansion-panel>
+            </div>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+<div class="col-lg-12 mb-2 mt-2" *ngIf="CountData">
+    <div class="">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="count-container" style="border: 0px;">
+                            <div class="logo d-flex"><span class="count-label">Total Difference</span></div>
+                            <div class="component-diff-count" matTooltip="Total Difference">
+                                <span class="counts"
+                                    [ngClass]="CountData['totalCount']>0  ? 'isDiff' : 'notDiff'">({{CountData['totalCount']}})</span>
+                            </div>
+                        </div>
+
+                        <div class="count-container" (click)="ShortTreeByType('BMOG','ShortBMOG')" id="ShortBMOG">
+                            <div class="logo d-flex"><img src="../../../../assets/images/bmog-icon.png"> <strong><span
+                                        class="count-label">BMOG</span></strong></div>
+                            <div class="component-diff-count"
+                                matTooltip="No of Right Side Missing BMOG /No of UnMatched Data BMOG/ No of Left Side Missing BMOG">
+                                (<span class="m-0 p-0"
+                                    *ngFor="let value of  CountData['bmogCount'].split('/'); let last = last">
+                                    <span [ngClass]="{'isDiff': +value > 0, 'notDiff': +value === 0}"
+                                        class="m-0 p-0">{{value}}</span>
+                                    <span *ngIf="!last" class="m-0 p-0">/</span>
+                                </span>)
+                            </div>
+                        </div>
+
+                        <div class="count-container" (click)="ShortTreeByType('BMO','ShortBMO')" id="ShortBMO">
+                            <div class="logo d-flex"><img src="../../../../assets/images/bmo-icon.png"> <strong><span
+                                        class="count-label">BMO</span></strong></div>
+                            <div class="component-diff-count"
+                                matTooltip="No of Right Side Missing BMO /No of UnMatched Data BMO/ No of Left Side Missing BMO">
+                                (<span class="m-0 p-0"
+                                    *ngFor="let value of  CountData['bmoCount'].split('/'); let last = last">
+                                    <span [ngClass]="{'isDiff': +value > 0, 'notDiff': +value === 0}"
+                                        class="m-0 p-0">{{value}}</span>
+                                    <span *ngIf="!last" class="m-0 p-0">/</span>
+                                </span>)
+                            </div>
+                        </div>
+
+                        <div class="count-container" (click)="ShortTreeByType('DMOG','ShortDMOG')" id="ShortDMOG">
+                            <div class="logo d-flex"><img src="../../../../assets/images/dmog-icon.png"> <strong><span
+                                        class="count-label">DMOG</span></strong></div>
+                            <div class="component-diff-count"
+                                matTooltip="No of Right Side Missing DMOG /No of UnMatched Data DMOG/ No of Left Side Missing DMOG">
+                                (<span class="m-0 p-0"
+                                    *ngFor="let value of  CountData['dmogCount'].split('/'); let last = last">
+                                    <span [ngClass]="{'isDiff': +value > 0, 'notDiff': +value === 0}"
+                                        class="m-0 p-0">{{value}}</span>
+                                    <span *ngIf="!last" class="m-0 p-0">/</span>
+                                </span>)
+                            </div>
+                        </div>
+
+                        <div class="count-container" (click)="ShortTreeByType('DMO','ShortDMO')" id="ShortDMO">
+                            <div class="logo d-flex"><img src="../../../../assets/images/dmo-icon.png"> <strong><span
+                                        class="count-label">DMO</span></strong></div>
+                            <div class="component-diff-count"
+                                matTooltip="No of Right Side Missing DMO /No of UnMatched Data DMO/ No of Left Side Missing DMO">
+                                (<span class="m-0 p-0"
+                                    *ngFor="let value of  CountData['dmoCount'].split('/'); let last = last">
+                                    <span [ngClass]="{'isDiff': +value > 0, 'notDiff': +value === 0}"
+                                        class="m-0 p-0">{{value}}</span>
+                                    <span *ngIf="!last" class="m-0 p-0">/</span>
+                                </span>)
+                            </div>
+                        </div>
+
+                        <div class="count-container" (click)="ShortTreeByType('DMO_CONDITION','ShortDMO_CONDITION')"
+                            id="ShortDMO_CONDITION">
+                            <div class="logo d-flex"><img src="../../../../assets/images/dmo-cond.png"> <strong><span
+                                        class="count-label"> DMO Conditions</span></strong></div>
+                            <div class="component-diff-count"
+                                matTooltip="No of Right Side Missing DMO Conditions /No of UnMatched Data DMO Conditions/ No of Left Side Missing DMO Conditions">
+                                (<span class="m-0 p-0"
+                                    *ngFor="let value of  CountData['dmoCondCount'].split('/'); let last = last">
+                                    <span [ngClass]="{'isDiff': +value > 0, 'notDiff': +value === 0}"
+                                        class="m-0 p-0">{{value}}</span>
+                                    <span *ngIf="!last" class="m-0 p-0">/</span>
+                                </span>)
+                            </div>
+                        </div>
+
+                       
+                        <div class="count-container">
+                            <div class="logo d-flex"><strong class="m-0"><span class="count-label">Search
+                                        Item</span></strong></div>
+                            <div class="component-diff-count" matTooltip="Search tree items">
+                                <input type="text" class="form-control" placeholder=""
+                                    (input)="performSearch($event.target.value + '~Search')">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="col-lg-12">
+                    <div class="row">
+                        <div class="col-lg-12 d-flex justify-content-end">
+                            <ul class="landmark d-flex">
+                                <li class="d-flex" (click)="FindTreeByClass('Matched','green')" id="green">
+                                    <div class="green"></div>Matched
+                                </li>
+                                <li class="d-flex" id="red" (click)="FindTreeByClass('Unmatched','red')">
+                                    <div class="red"></div>Unmatched
+                                </li>
+                                <li class="d-flex" id="blue" (click)="FindTreeByClass('Missing','blue')">
+                                    <div class="blue"></div>Missing
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="col-lg-12" [ngStyle]="IsShowtree ? {'visibility':'visible'}:{'visibility':'hidden'}">
+        <div class="row">
+            <div class="Tree-wrapper">
+                <div class="card" [ngClass]="IsShowtree ? 'tree-container' : ''" [scrollTop]="scrollPosition"
+                    (scroll)="syncScroll($event)">
+                    <div class="card-body">
+                        <div id="left_jstree"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tree-actionbtn-wrapper">
+                <div class="card " [ngClass]="IsShowtree ? 'tree-actionbtn-container' : ''">
+                    <div class="card-body">
+                        <div class="Actionbtns d-flex flex-column align-items-center justify-content-center">
+
+                            <button class="btn1" id="SyncLRBtn" disabled (click)="SyncNodes()"><i
+                                    class="fa fa-arrow-right Right"
+                                    matTooltip="Sync Data From Left to Right"></i></button>
+                            <button class="btn1" (click)="GetleftRightBM()"><i class="fa fa-redo reload"
+                                    matTooltip="Reload"></i></button>
+                            <button class="btn1" (click)="DownloadFile()"><i class="fa fa-download"
+                                matTooltip="Download"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="Tree-wrapper">
+                <div class="card" [ngClass]="IsShowtree ? 'tree-container' : ''" [scrollTop]="scrollPosition"
+                    (scroll)="syncScroll($event)">
+                    <div class="card-body">
+                        <div id="right_jstree"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

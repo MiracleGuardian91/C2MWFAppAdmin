@@ -1,0 +1,97 @@
+<div class="form-view row">
+  <div class="col-sm-12" cdkDropListGroup>
+      
+    <div class="col-sm-3 leftcol" *ngIf="!readonly">
+      <div class="leftlayoutdmotyp">
+        <div class="leftlayout1">
+          <label class="input-label" for="ex2">Data Model Objects</label>
+        </div>
+        <div class="formcomponents">
+          <div 
+            class="list-group drag-list" 
+            id="form-controls"
+            cdkDropList
+            #controlList="cdkDropList"
+            [cdkDropListData]="formsControls"
+            >
+            <li
+              class="list-group-item list-group-item-action list-group-item-success drag-list-item"
+              cdkDrag
+              [cdkDragDisabled]="readonly || checkIsStaticJsonGrid(item)" 
+              *ngFor="let item of formsControls"
+            >
+              <i [class]="item.class" style="margin-right: 5px"></i>{{ item.name }}
+            </li>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div 
+      class="dmo-columns"
+      [class]="readonly ? 'col-sm-12' : 'col-sm-9'" 
+      *ngFor="let row of dmog?.formData?.components"
+      (mouseenter)="row.display = true"
+      (mouseleave)="row.display = false"
+      >
+      <ng-container *ngFor="let column of row?.columns">
+        <div class="drag-container" *ngIf="column?.components as dmos" [class.span-2]="column.width === 100">
+          <div class="col-sm-12 list-group drag-list"
+          cdkDropList
+          [cdkDropListData]="dmos"
+          (cdkDropListDropped)="onDrop($event)">
+          <div *ngIf="dmos.length === 0" class="alert alert-info" role="alert">
+            Drag and Drop a form component
+          </div>
+          <div 
+              *ngFor="let dmo of dmos" 
+              (mouseenter)="dmo.display = true" 
+              (mouseleave)="dmo.display = false" 
+              style="position: relative;">
+              <div class="item-actions dmo-actions" [class.active]="dmo.display">
+                <ng-container *ngTemplateOutlet="itemActions; context: {item: dmo}"></ng-container>    
+              </div>
+              <app-dmo
+                class="drag-list-item"
+                [dmo]="dmo"
+                cdkDrag
+                [cdkDragDisabled]="readonly"
+              ></app-dmo>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+
+  </div>
+</div>
+
+<ng-template #itemActions let-item="item">
+  <ng-container *ngIf="!readonly">
+    <a
+      class="item-action" 
+      style="color: rgb(187, 53, 53);" 
+      ngbTooltip="Remove" 
+      (click)="onDmoDelete(item)">
+      <i class="fa fa-trash-alt"></i>
+    </a> 
+    <a
+      class="item-action" 
+      ngbTooltip="Clone" 
+      (click)="onDmoClone(item)">
+      <i class="fa fa-copy"></i>
+    </a> 
+  </ng-container>  
+  <a
+    class="item-action" 
+    (click)="openConditionPopup(item)" 
+    ngbTooltip="Conditions">
+    <i class="fa fa-cogs"></i>
+  </a>
+  <a
+    class="item-action" 
+    (click)="onDmoEdit(item)" 
+    ngbTooltip="Edit">
+    <i class="fa fa-wrench"></i>
+  </a>                    
+</ng-template>

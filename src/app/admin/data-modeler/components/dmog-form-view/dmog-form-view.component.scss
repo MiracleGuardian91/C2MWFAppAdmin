@@ -1,0 +1,284 @@
+.form-view {
+	position: relative;
+}
+
+
+
+.leftlayout {
+	height: 30px;
+	border: 1px solid #ddd;
+	margin-left: 7px;
+	padding: 4px;
+	font-size: 13px;
+	margin-right: 7px;
+}
+
+.leftlayoutdmotyp {
+	height: 415px;
+	border: 1px solid #ddd;
+	margin-right: 5px;
+	padding: 6px;
+	font-size: 15px;
+}
+
+.leftlayout1 {
+	height: 30px;
+	border-bottom: 1px solid #ddd;
+	font-size: 13px;
+}
+
+.formcomponents {
+	overflow-y: auto;
+	max-height: 358px;
+	overflow-x: hidden;
+}
+
+div.scroll-list {
+	overflow: auto;
+	max-height: 70vh;
+}
+
+
+/* The Close Button */
+.close {
+	color: white;
+	float: right;
+	font-size: 28px;
+	font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+	color: #000;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.list-group {
+	li {
+		font-size: 12px !important;
+		background-color: transparent !important;
+		padding: 7px !important;
+		cursor: pointer;
+	}
+}
+
+.formarea {
+	visibility: visible;
+	position: relative;
+	min-height: 450px;
+	padding: 10px;
+	border: dotted 2px #e8e8e8;
+	float: right;
+}
+
+
+.col {
+	float: left;
+}
+
+.alert {
+	border-radius: 0;
+	padding: 15px;
+	margin-bottom: 20px;
+	border: 1px solid transparent;
+	text-align: center;
+	font-size: 12px;
+}
+
+.alert-info {
+	color: #31708f;
+	background-color: #d9edf7;
+	border-color: #bce8f1;
+	margin: 10px 20px;
+}
+
+.dmo-columns {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 5px;
+	margin-bottom: 5px;
+
+	&>* {
+		align-self: self-start;
+	}
+
+	.span-2 {
+		grid-column: span 2;
+	}
+}
+
+.cdk-drop-list:not(#form-controls) {
+	border: 2px dotted #e8e8e8;
+	transform: translate3d(0, 0, 0);
+}
+
+.cdk-drag-preview {
+	box-sizing: border-box;
+	border-radius: 4px;
+	box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+		0 8px 10px 1px rgba(0, 0, 0, 0.14),
+		0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+
+.cdk-drag-animating {
+	transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+	transform: translate3d(0, 0, 0);
+}
+
+.drag-list-item:last-child {
+	border: none;
+}
+
+.drag-list-item {
+	display: flex;
+	align-items: center;
+	cursor: move;
+	background: white;
+	padding: 0 20px;
+}
+
+.cdk-drag-placeholder {
+	opacity: 0;
+}
+
+.cdk-drop-list-receiving:not(#form-controls) {
+	border: #4c9e00 dotted 2px;
+}
+
+/* Custom CSS to simulate Bootstrap 4.6.2 behavior in Bootstrap 5.0 */
+// .drag-container {
+// 	display: flex; /* Ensure flex layout if it's based on Bootstrap 4's flexbox behavior */
+// 	flex-wrap: wrap;
+// 	gap: 10px;
+//   }
+
+//   .drag-list {
+// 	display: flex;
+// 	flex-direction: column;
+// 	gap: 10px; /* Adds space between the items */
+//   }
+
+//   .list-group-item {
+// 	padding: 10px; /* Match the padding from Bootstrap 4 */
+//   }
+
+//   .item-actions.dmo-actions.active {
+// 	display: block;
+// 	/* You can adjust the styles for actions as per your requirements */
+//   }
+
+//   .alert-info {
+// 	background-color: #d1ecf1;
+// 	color: #0c5460;
+// 	border-color: #bee5eb;
+//   }
+
+//   .drag-list-item {
+// 	cursor: grab;
+// 	/* Add any other styles for draggable items */
+//   }
+// /* Fix layout behavior from Bootstrap 4 */
+// .d-flex {
+// 	display: flex;
+// 	align-items: center;
+// 	justify-content: space-between;  /* Or flex-start, depending on your layout */
+//   }
+//   .cdk-drop-list {
+// 	border: 1px dashed #ccc;  /* Restore the border style if needed */
+// 	min-height: 100px;
+//   }
+
+//   .cdk-drag {
+// 	cursor: grab;
+//   }
+
+//   .cdk-drag-preview {
+// 	/* Customize preview styles here */
+//   }
+// /* Restore Bootstrap 4.6.2 button styles if necessary */
+// .btn-primary {
+// 	background-color: #007bff;
+// 	border-color: #007bff;
+//   }
+
+//   .btn-sm {
+// 	padding: 0.25rem 0.5rem;
+// 	font-size: 0.875rem;
+//   }
+
+//   .form-group {
+//     margin-bottom: 1rem;
+// }
+// .drag-list.cdk-drop-list-dragging .drag-list-item {
+//   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+// 	min-width: 250px;
+// 	transform: translate3d(0,0,0);
+// }
+
+.item-actions {
+	background-color: #FFF;
+	position: absolute;
+	z-index: 999;
+	right: 15px;
+	top: -22px;
+	display: none;
+
+	&.active {
+		display: block;
+	}
+
+	&.dmo-actions {
+		top: 0;
+	}
+}
+
+.item-action {
+	float: right;
+	z-index: 1001;
+	margin: 2px 2px 0 0;
+	border: 1px solid #ccc;
+	min-width: 30px;
+	font-size: 13px;
+	text-align: center;
+}
+
+.list-group-item {
+	display: flex;
+	align-items: center;
+	cursor: move;
+	background: white;
+	padding: 0 20px;
+	border: 1px solid rgba(0, 0, 0, .125);
+}
+
+.list-group-item-success {
+	color: #155724;
+	background-color: #c3e6cb;
+}
+
+.list-group-item:first-child {
+	border-top-left-radius: inherit;
+	border-top-right-radius: inherit;
+}
+
+.modal-body {
+	position: relative;
+	flex: 1 1 auto;
+	padding: 1rem;
+}
+
+.leftcol {
+	min-height: 550px;
+	float: left;
+	padding: 0;
+	position: sticky;
+	top: 0;
+}
+.list-group {
+    display: flex;
+    flex-direction: column;
+    padding-left: 0;
+    margin-bottom: 0;
+    border-radius: .25rem;
+}

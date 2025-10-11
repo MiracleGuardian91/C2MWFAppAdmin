@@ -1,0 +1,485 @@
+<form *ngIf="WFCondForm" [formGroup]="WFCondForm" (ngSubmit)="onSubmit()">
+  <div>
+    <div class="modal-header">
+      <h4 class="modal-titlewf" *ngIf="!isEdit">Create New Record</h4>
+      <h4 class="modal-titlewf" *ngIf="isEdit">Update Record</h4>
+      <button type="button" class="close" aria-label="Close" (click)="activeModal.close(false)">
+        <span aria-hidden="true" class="fas fa-times-circle fa-fw"></span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="contents">
+        <div class="form-group row">
+          <div class="col-sm-6">
+            <label class="input-label" for="ex2">Condition Name*</label>
+            <input class="form-control" id="Name" type="text"
+              [ngClass]="{'is-invalid': (submitted && f.Name.errors?.required)}" formControlName="Name">
+          </div>
+          <div class="col-sm-6">
+            <label class="input-label" for="ex3">Version*</label>
+            <input class="form-control" disabled id="FriendlyName" type="text"
+              [ngClass]="{'is-invalid': (submitted && f.Version.errors?.required)}" formControlName="Version">
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-sm-6">
+            <label class="input-label" for="ex2">Status*</label>
+            <ng-select class="form-control" [ngClass]="{'is-invalid': (submitted && f.Status.value === '-1')}"
+              formControlName="Status">
+              <ng-option value="-1">Select...</ng-option>
+              <ng-option value="1">Active</ng-option>
+              <ng-option value="0">Inactive</ng-option>
+            </ng-select>
+          </div>
+          <div class="col-sm-6">
+            <label class="input-label" for="ex3">Business Model*</label>
+            <ng-container>
+              <ng-select class="form-control" (change)="ChangeBM($event)"
+                [ngClass]="{'is-invalid': (submitted && f.BMID.value === '-1')}" formControlName="BMID">
+                <ng-option value="-1" selected="true">Select...</ng-option>
+                <ng-option *ngFor="let bm of WfBMList" value="{{bm.BMID}}">{{bm.BMNAME}}</ng-option>
+              </ng-select>
+            </ng-container>
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-sm-6">
+            <label class="input-label" for="ex2">Business Model Object Group*</label>
+            <ng-select class="form-control" [ngClass]="{'is-invalid': (submitted && f.BMOGNAM.value === '-1')}"
+              formControlName="BMOGNAM">
+              <ng-option value="-1" selected="true">Select...</ng-option>
+              <ng-option *ngFor="let bmog of BMOGList" value="{{bmog.BMOGNAME}}">{{bmog.BMOGNAME}}</ng-option>
+            </ng-select>
+          </div>
+          <div class="col-sm-6">
+            <label class="input-label" for="ex2">Long Description</label>
+            <textarea class="form-control" formControlName="Description" id="LongDesc" placeholder=""
+              name="Description">
+            </textarea>
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-sm-12">
+            <label class="input-label" for="ex2">Conditional Level*</label>
+          </div>
+          <div class="col-sm-12 d-flex input-group">
+            <label  class="radio-container ng-star-inserted">
+              Stage
+              <input id="stage1" type="radio" formControlName="ConditionLevel"
+              name="ConditionLevel" (change)="ChangeStageState($event)" value="Stage" class="ng-dirty ng-valid ng-touched">
+              <span class="checkmark"></span>
+            </label> 
+            <label  class="radio-container ng-star-inserted">
+              State
+              <input id="state1" formControlName="ConditionLevel" type="radio"
+              (change)="ChangeStageState($event)" name="ConditionLevel" value="State" class="ng-dirty ng-valid ng-touched">
+              <span class="checkmark"></span>
+            </label>                        
+            <ng-container
+              *ngIf="submitted && ((f.ConditionLevel.errors?.required ||
+               (stageState === 'Stage' && StageFilterList.length === 0 )) ||
+                (f.ConditionLevel.errors?.required || (stageState === 'State' && StateFilterList.length === 0 )))">
+              <div class="invalid-feedback1"><span>This field is required</span></div>
+            </ng-container>         
+          </div>
+          <section aria-label="Modal heading text content" *ngIf="(stageState == 'Stage' || stageState == 'State')" class="modal-body" role="document">
+            <div class="fWrap sections">
+              <div class="form-row nomar">
+                <div class="drag_grid state-filter-wrap col-sm-12" *ngIf="(stageState == 'Stage')">
+                  <div class="row">
+                    <div class="left_cell">
+                      <div class="scroll_wrap">
+                        <ul>
+                          <li *ngFor="let stage of StageList">
+                            <span>{{stage.WFOSNAM}}</span>
+                            <span>
+                              <a *ngIf="GridStageFilter[stage.GUID]==undefined ? 'Add' : 'Added'  as btnStageFilterText"
+                                (click)="AddStageFilter(stage)" href="javascript:void(0)">
+                                {{btnStageFilterText}}</a></span>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div class="right_cell">
+                      <div class="scroll_wrap">
+                        <ul cdkDropList (cdkDropListDropped)="dropColumn($event)">
+                          <li class="pop" cdkDrag *ngFor="let stage of StageFilterList; let i = index">
+                            <span>{{stage.WFOSNAM}}</span>
+                            <span><a (click)="DeleteStageFilter(stage)" href="javascript:void(0)">Remove</a></span>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="drag_grid state-filter-wrap col-sm-12" *ngIf="(stageState == 'State')">
+                  <div class="row">
+                    <div class="left_cell">
+                      <div class="scroll_wrap">
+                        <ul>
+                          <li *ngFor="let state of StateList">
+                            <span>{{state.States}}</span>
+                            <span><a
+                                *ngIf="GridStateFilter[state.GUID]==undefined ? 'Add' : 'Added'  as btnStateFilterText"
+                                (click)="AddStateFilter(state)" href="javascript:void(0)">
+                                {{btnStateFilterText}}</a></span>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div class="right_cell">
+                      <div class="scroll_wrap">
+                        <ul cdkDropList (cdkDropListDropped)="dropColumn($event)">
+                          <li class="pop" cdkDrag *ngFor="let state of StateFilterList; let i = index">
+                            <span>{{state.States}}</span>
+                            <span><a (click)="DeleteStateFilter(state)" href="javascript:void(0)">Remove</a></span>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div class="form-group row">
+          <div class="col-sm-12">
+            <section>
+              <table class="basicTable stripped" style="border-top:0;border-right:0;border-left:0;">
+                <thead>
+                  <tr class="span-row">
+                    <th>
+                      <span>Data Model Object name</span>
+                    </th>
+                    <th style="width:134px;">
+                      <span>Condition Exp</span>
+                    </th>
+                    <th>
+                      <span>Comparison Value</span>
+                    </th>
+                    <th style="width: 134px;">
+                      <span>Logical Operator</span>
+                    </th>
+                    <th class="text-center" style="width: 80px;">
+                      <span>Actions</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="span-row">
+                    <td>
+                      <ng-select class="form-control"
+                        [ngClass]="{'is-invalid': (isFilterSubmit && f.DmoName.value==='-1')}"
+                        formControlName="DmoName">
+                        <ng-option value="-1">Select...</ng-option>
+                        <ng-option *ngFor="let dmo of DmoList" value="{{dmo.NAME}}">{{dmo.NAME}}</ng-option>
+                      </ng-select>
+                    </td>
+                    <td style="width: 134px;">
+                      <ng-select class="form-control"
+                        [ngClass]="{'is-invalid': (isFilterSubmit && (Condition.value === '' || Condition.value === 'undefined'))}"
+                        formControlName="Condition">
+                        <ng-option value="Equals to">Equals to</ng-option>
+                        <ng-option value="Not equals to">Not equals to</ng-option>
+                      </ng-select>
+                    </td>
+                    <td>
+                      <input class="form-control"
+                        [ngClass]="{'is-invalid': (isFilterSubmit && (f.ComparisonValue.value === '' || f.ComparisonValue.value === 'undefined'))}"
+                        formControlName="ComparisonValue" id="FriendlyName" type="text">
+                    </td>
+                    <td style="width: 134px;">
+                      <ng-select class="form-control"
+                        [ngClass]="{'is-invalid': (isFilterSubmit&& (LogicalOperator.value === '' || LogicalOperator.value === 'undefined'))}"
+                        formControlName="LogicalOperator">
+                        <ng-option value="AND">AND</ng-option>
+                        <ng-option value="OR">OR</ng-option>
+                      </ng-select>
+                    </td>
+                    <td class="d-flex align-items-center justify-content-around">
+                      <a title="Save" class="save-btn" [disabled]="disableAdd" (click)="AddConditionFilter()"
+                        style="color:#4C9E00;cursor: pointer;">Add
+                      </a>
+                    </td>
+                  </tr>
+                  <ng-container *ngIf="WFConditionFilter">
+                    <tr *ngFor="let filter of WFConditionFilter; let i = index">
+                      <td><span style="padding-left: 10px;">{{filter.DmoName}}</span></td>
+                      <td><span style="padding-left: 10px;">{{filter.ConditionExpression}}</span></td>
+                      <td><span style="padding-left: 10px;">{{filter.ComparisonValue}}</span></td>
+                      <td><span style="padding-left: 10px;">{{filter.Operator}}</span></td>
+                      <td class="d-flex align-items-center justify-content-around">
+                        <a title="Delete" class="save-btn" (click)="DeleteConditionFilter(filter)"
+                          style="color:#4C9E00;cursor: pointer;">Delete
+                        </a>
+                      </td>
+                    </tr>
+                  </ng-container>
+
+                </tbody>
+              </table>
+            </section>
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <div class="col-sm-12">
+            <label class="input-label" for="ex2">Please Select the Condition Area*</label>
+          </div>
+          <div class="col-sm-12 d-flex input-group">
+              <label  class="radio-container ng-star-inserted">
+                Section
+                <input formControlName="ConditionArea" id="bmo1" (change)="ChangeBMO($event)"
+                type="radio" name="ConditionArea" value="BusinessModelObject" class="ng-dirty ng-valid ng-touched">
+                <span class="checkmark"></span>
+              </label>  
+              <label  class="radio-container ng-star-inserted">
+                Card
+                <input formControlName="ConditionArea" id="dmg1" (change)="ChangeDMG($event)"
+                type="radio" name="ConditionArea" value="DataModelGroup" class="ng-dirty ng-valid ng-touched">
+                <span class="checkmark"></span>
+              </label>
+              <label  class="radio-container ng-star-inserted">
+                Data Model Object
+                <input formControlName="ConditionArea" id="dmo1" (change)="Changedmo($event)"
+                type="radio" name="ConditionArea" value="DataModelObject" class="ng-dirty ng-valid ng-touched">
+                <span class="checkmark"></span>
+              </label> 
+              <label  class="radio-container ng-star-inserted">
+                Trigger
+                <input formControlName="ConditionArea" id="inlineRadio1"
+                (change)="ChangeTrigger($event)" type="radio" name="ConditionArea" value="Trigger" class="ng-dirty ng-valid ng-touched">
+                <span class="checkmark"></span>
+              </label>
+            <ng-container
+              *ngIf="submitted &&
+               ((f.ConditionArea.errors?.required || (CondArea === 'BusinessModelObject' && BmoFilterList.length === 0 ))
+               || (f.ConditionArea.errors?.required || (CondArea === 'DataModelGroup' && DmgFilterList.length === 0 ))
+               || (f.ConditionArea.errors?.required || (CondArea === 'DataModelObject' && DmoFilterList.length === 0 ))
+               || (f.ConditionArea.errors?.required || (CondArea === 'Trigger' && TriggerFilterList.length === 0 ))
+               )">
+              <div class="invalid-feedback1"><span>This field is required</span></div>
+            </ng-container>                        
+          </div>
+          <ng-container *ngIf="BmoList && CondArea === 'BusinessModelObject'">
+            <section aria-label="Modal heading text content" class="modal-body" role="document">
+              <div class="fWrap sections">
+                <div class="form-row nomar">
+                  <div class="drag_grid state-filter-wrap col-sm-12">
+                    <div class="row">
+                      <div class="left_cell">
+                        <div class="scroll_wrap">
+                          <ul>
+                            <li *ngFor="let bmo of BmoList">
+                              <span>{{bmo.BMONAME}}</span>
+                              <span>
+                                <a *ngIf="GridBmoFilter[bmo.GUID]==undefined ? 'Add' : 'Added'  as btnBmoFilterText"
+                                  (click)="AddBmoFilter(bmo)" href="javascript:void(0)">
+                                  {{btnBmoFilterText}}</a></span>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                      <div class="right_cell">
+                        <div class="scroll_wrap">
+                          <ul cdkDropList (cdkDropListDropped)="dropColumn($event)">
+                            <li class="pop" cdkDrag *ngFor="let bmo of BmoFilterList; let i = index">
+                              <span>{{bmo.BMONAME}}</span>
+                              <span><a (click)="DeleteBmoFilter(bmo)" href="javascript:void(0)">Remove</a></span>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </ng-container>
+          <ng-container *ngIf="DmgList && CondArea === 'DataModelGroup'">
+            <section aria-label="Modal heading text content" class="modal-body" role="document">
+              <div class="fWrap sections">
+                <div class="form-row nomar">
+                  <div class="drag_grid state-filter-wrap col-sm-12">
+                    <div class="row">
+                      <div class="left_cell">
+                        <div class="scroll_wrap">
+                          <ul>
+                            <li *ngFor="let dmg of DmgList">
+                              <span>{{dmg.BMONAME}}</span>
+                              <span>
+                                <a *ngIf="GridDmgFilter[dmg.GUID]==undefined ? 'Add' : 'Added'  as btnDmgFilterText"
+                                  (click)="AddDmgFilter(dmg)" href="javascript:void(0)">
+                                  {{btnDmgFilterText}}</a></span>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                      <div class="right_cell">
+                        <div class="scroll_wrap">
+                          <ul cdkDropList (cdkDropListDropped)="dropColumn($event)">
+                            <li class="pop" cdkDrag *ngFor="let dmg of DmgFilterList; let i = index">
+                              <span>{{dmg.BMONAME}}</span>
+                              <span><a (click)="DeleteDmgFilter(dmg)" href="javascript:void(0)">Remove</a></span>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </ng-container>
+          <ng-container *ngIf="CondAreaDmoList && CondArea === 'DataModelObject'">
+            <section aria-label="Modal heading text content" class="modal-body" role="document">
+              <div class="fWrap sections">
+                <div class="form-row nomar">
+                  <div class="drag_grid state-filter-wrap col-sm-12">
+                    <div class="row">
+                      <div class="left_cell">
+                        <div class="scroll_wrap">
+                          <ul>
+                            <li *ngFor="let dmo of CondAreaDmoList">
+                              <span>{{dmo.BMONAME}}</span>
+                              <span>
+                                <a *ngIf="GridDmoFilter[dmo.GUID]==undefined ? 'Add' : 'Added'  as btnDmoFilterText"
+                                  (click)="AddDmoFilter(dmo)" href="javascript:void(0)">
+                                  {{btnDmoFilterText}}</a></span>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                      <div class="right_cell">
+                        <div class="scroll_wrap">
+                          <ul cdkDropList (cdkDropListDropped)="dropColumn($event)">
+                            <li class="pop" cdkDrag *ngFor="let dmo of DmoFilterList; let i = index">
+                              <span>{{dmo.BMONAME}}</span>
+                              <span><a (click)="DeleteDmoFilter(dmo)" href="javascript:void(0)">Remove</a></span>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </ng-container>
+          <ng-container *ngIf="TriggerList && CondArea === 'Trigger'">
+            <section aria-label="Modal heading text content" class="modal-body" role="document">
+              <div class="fWrap sections">
+                <div class="form-row nomar">
+                  <div class="drag_grid state-filter-wrap col-sm-12">
+                    <div class="row">
+                      <div class="left_cell">
+                        <div class="scroll_wrap">
+                          <ul>
+                            <li *ngFor="let trigger of TriggerList">
+                              <span>{{trigger.WFONAME}}</span>
+                              <span>
+                                <a *ngIf="GridTriggerFilter[trigger.GUID]==undefined ? 'Add' : 'Added'  as btntriggerFilterText"
+                                  (click)="AddTriggerFilter(trigger)" href="javascript:void(0)">
+                                  {{btntriggerFilterText}}</a></span>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                      <div class="right_cell">
+                        <div class="scroll_wrap">
+                          <ul cdkDropList (cdkDropListDropped)="dropColumn($event)">
+                            <li class="pop" cdkDrag *ngFor="let trigger of TriggerFilterList; let i = index">
+                              <span>{{trigger.WFONAME}}</span>
+                              <span><a (click)="DeleteTriggerFilter(trigger)"
+                                  href="javascript:void(0)">Remove</a></span>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </ng-container>
+        </div>
+        <div class="form-group row">          
+          <div class="col-sm-12 row">           
+            <div class="col-sm-4">
+              <label class="input-label" for="ex2">Enabled?</label>           
+              <div class="d-flex input-group">
+                <label  class="radio-container ng-star-inserted">
+                  Yes
+                  <input id="e1"  type="radio" formControlName="Enabled" name="Enabled" value="1" class="ng-dirty ng-valid ng-touched">
+                  <span class="checkmark"></span>
+                </label>
+                <label class="radio-container ng-star-inserted">
+                  No
+                  <input id="e2"  type="radio" formControlName="Enabled" name="Enabled" value="0" class="ng-dirty ng-valid ng-touched">
+                  <span class="checkmark"></span>
+                </label>
+                <label class="radio-container ng-star-inserted">
+                  NA
+                  <input id="e3"  type="radio" formControlName="Enabled" name="Enabled" value="2" class="ng-dirty ng-valid ng-touched">
+                  <span class="checkmark"></span>
+                </label>              
+                <div class="invalid-feedback1" *ngIf="submitted && f.Enabled.errors?.required"><span>This field
+                    is required</span></div>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <label class="input-label" for="ex2">Mandatory?</label>           
+              <div class="d-flex input-group">
+                <label  class="radio-container ng-star-inserted">
+                  Yes
+                  <input id="m1" type="radio" formControlName="Mandatory" value="1" name="Mandatory" class="ng-dirty ng-valid ng-touched">
+                  <span class="checkmark"></span>
+                </label>
+                <label class="radio-container ng-star-inserted">
+                  No
+                  <input id="m2" type="radio" formControlName="Mandatory" name="Mandatory" value="0" class="ng-dirty ng-valid ng-touched">
+                  <span class="checkmark"></span>
+                </label>
+                <label class="radio-container ng-star-inserted">
+                  NA
+                  <input id="m3" type="radio" formControlName="Mandatory" name="Mandatory" value="2" class="ng-dirty ng-valid ng-touched">
+                  <span class="checkmark"></span>
+                </label>              
+                <div class="invalid-feedback1" *ngIf="submitted && f.Mandatory.errors?.required"><span>This field
+                    is required</span></div>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <label class="input-label" for="ex2">Visible?</label>
+              <div class="d-flex input-group">
+                <label  class="radio-container ng-star-inserted">
+                  Yes
+                  <input id="v1" type="radio" formControlName="Visible" name="Visible" value="1" class="ng-dirty ng-valid ng-touched">
+                  <span class="checkmark"></span>
+                </label>
+                <label class="radio-container ng-star-inserted">
+                  No
+                  <input id="v2" type="radio" formControlName="Visible" name="Visible" value="0" class="ng-dirty ng-valid ng-touched">
+                  <span class="checkmark"></span>
+                </label>
+                <label class="radio-container ng-star-inserted">
+                  NA
+                  <input id="v3" type="radio" formControlName="Visible" name="Visible" value="2" class="ng-dirty ng-valid ng-touched">
+                  <span class="checkmark"></span>
+                </label>              
+                <div class="invalid-feedback1" *ngIf="submitted && f.Visible.errors?.required"><span>This field
+                    is required</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="update_detail">
+          <button type="button" class="btn btn-primary" (click)="activeModal.close(false)">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>

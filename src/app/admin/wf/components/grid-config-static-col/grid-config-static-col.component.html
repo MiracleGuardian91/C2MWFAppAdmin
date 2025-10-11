@@ -1,0 +1,50 @@
+<div>
+    <div class="modal-header">
+        <h4 class="modal-titlewf">Grid Config Static Columns ({{ProcessName}})</h4>
+        <button type="button" class="close" aria-label="Close" (click)="activeModal.close(false)">
+            <span aria-hidden="true" class="fas fa-times-circle fa-fw"></span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="contents">
+            <div class="form-group row">
+                <div class="col-sm-12">                   
+                    <section>
+                        <table class="basicTable stripped" style="border-top:0;border-right:0;border-left:0;">
+                            <thead>
+                                <tr class="span-row">
+                                    <th>
+                                        <span>Grid Columns</span>
+                                    </th>
+                                    <th>
+                                        <span>Display Name</span>
+                                    </th>
+                                    <th class="text-center" style="width: 80px;">
+                                        <span>Actions</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>                         
+                                <ng-container *ngIf="gridColList">
+                                    <tr *ngFor="let col of gridColList; let i = index">
+                                      <td><span style="padding-left: 10px;">{{gridColList[i].ColName}}</span></td>    
+                                      <td>
+                                         <input type="text" class="form-control" (blur)="CheckValidation()"  [(ngModel)]="gridColList[i].DisplayName" [value]="gridColList[i].DisplayName"> 
+                                      </td>                                   
+                                      <td class="d-flex align-items-center justify-content-around">
+                                         <input type="checkbox" [checked]="gridColList[i].IsSelected" [(ngModel)]="gridColList[i].IsSelected" [value]="gridColList[i].IsSelected">                                                               
+                                      </td>
+                                    </tr>
+                                  </ng-container>
+
+                            </tbody>
+                        </table>
+                    </section>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-primary btn-sm" [disabled]="CheckValidation()" (click)="SaveGridConfigStaticCol()">Save</button>
+            <button type="button" class="btn btn-primary btn-sm" (click)="activeModal.close(false)">Cancel</button>            
+        </div>
+    </div>

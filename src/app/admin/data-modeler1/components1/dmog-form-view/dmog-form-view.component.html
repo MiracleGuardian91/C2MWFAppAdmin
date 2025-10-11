@@ -1,0 +1,195 @@
+<div  class="form-view row" (click)="formClick()"  (drop)="OnDropMainPanel($event)" (dropover)="OnDropOverMainPanel($event)" (keydown)="onKeyDown($event)">
+  <div style="width: 100%"  >
+    <!-- [ngClass]="isDrawerOpen && sideNavModel ? 'container-new-open' : 'container-new-close'" -->
+     <div>
+      <div>
+        <!-- <div class="open-side-menu-button"  [ngClass]="isDrawerOpen ? 'drawer-open' : 'drawer-closed' " *ngIf="sideNavModel">
+          <div class="open-close-side-menu-button" [class]="isDrawerOpen ? 'open-close-side-menu-arrow' : 'open-close-side-menu-arrow-black'">
+            <img 
+            [src]="isDrawerOpen ? '../../../../../assets/admin-assets/images/fi-rr-angle-small-left.png' : '../../../../../assets/admin-assets/images/fi-rr-angle-small-right-black.png'" 
+            alt="Toggle Drawer Icon"
+            (click)="toggleDrawer()"
+          />
+          </div>
+        </div> -->
+        <!-- <div class="side-nav stick-side-bar-nav" [ngClass]="{ 'open': isDrawerOpen }">
+        <div *ngIf="isDrawerOpen">
+          <app-left-side-panel [sideNavModel] ="sideNavModel"  (UpdatedDataForSidepanle)="GetUpdatedDataForSidepanle($event)" [selectedItemFromchild]="selectedItemFromchild" ></app-left-side-panel>
+        </div>
+       </div> -->
+       
+    </div>  
+<!--New Logic-->
+<div >
+  <div 
+  class="d-flex flex-wrap main-contanier" 
+  >
+  <ng-container *ngFor="let dmogId of this.customorderDmogItem; let i = index; trackBy: trackByDmogId">
+    <ng-container *ngIf="bm.selectedBMO.childrenMap[dmogId] as dmog">
+      <ng-container *ngIf="shouldShowAsMainCard(dmog)">
+            <app-dmog-container  [resizableGrabWidth]="10"  [isDrawerOpen]="isDrawerOpen"  appResizable (widthChanged)="onResizeDmog($event,dmog)"
+              [ngStyle]="setStyle(dmog)"
+              [title]="dmog.DisplayName"
+              [data]="dmog"
+              [inputAllselectedBMO]="bm.selectedBMO.childrenMap"
+              id="resizeableComponent_{{dmogId}}"
+              [readonly]="readonly"
+              [active]="dmog.id === bm.selectedDMOG?.id"
+              [shared]="bm.selectedBMO.shared || dmog.shared"
+              (tabRemove)="onTabRemove($event)"
+              (tabEdit)="onTabEdit($event)"
+              (OnBMOSave)="OnBMOSave($event)"
+              (onDmoEdit)="onDmoEdit($event)"
+              (onDmoDelete)="onDmoDelete($event)"
+              (openConditionPopup)="openConditionPopup($event)"
+              (openclonePopup)="onDmoClone($event)"
+              (reloadParent)="reloadParent($event)"
+              (dragDmoToAnotherdmog)="dragDmoToAnotherdmog($event)"
+              (OnAddDmogAbove)="AddDmog($event)"
+              (dropDmoToAnotherdmog)="dropDmoToAnotherdmog($event)"
+              (sideNavModel)="getSideNavModel($event)"
+              [UpdatedDataForContainer]="UpdatedData"
+              (SelectdItem)="SelectdItem($event)"
+              [newlyCreatedConatiner]="newlyCreatedConatiner"
+              [SharedDmosList]="SharedDmosList"
+              (OnAddDmogInGroup)="OnAddDmogInGroup($event)"
+              [mode]="dmoMode"
+             
+              [draggable]="!(isChildDragging || isInnerDragging || readonly || dmoMode === 'Published')"
+              
+              (dragstart)="OnDragStarted($event,dmog)"
+              (dragend)="dragEnded($event)"
+              (dragover)="dragHover(dmogId,$event, dmog.GUID)"
+              (drop)="handleContainerDrop($event)"
+              class="Parent-card"
+              [hasChildren]="getChildrenForCardGroup(dmog.DMOGID).length > 0"
+              (mouseover)="onMouseOver($event)"
+              (mouseout)="onMouseOut($event)"
+              (DraggingItemsModel)="DraggingItemsModel($event)"
+              [isDraggingStart]="isDraggingStart"
+              (focus)="handleFocus($event)"
+              (blur)="handleBlur($event)"
+              [UpdatedDataSideNavModel]="UpdatedDataSideNavModel"
+            >
+              <div class="d-flex flex-wrap card-group-inner-children" *ngIf="getChildrenForCardGroup(dmog.DMOGID).length > 0">
+                <ng-container *ngFor="let childDmogId of getChildrenForCardGroup(dmog.DMOGID); let j = index; trackBy: trackByDmogId">
+                  <ng-container *ngIf="bm.selectedBMO.childrenMap[childDmogId] as childDmog">
+                    <app-dmog-container  [resizableGrabWidth]="10"  [isDrawerOpen]="isDrawerOpen"  appResizable (widthChanged)="onResizeDmog($event,childDmog)"
+                      [ngStyle]="setChildStyle(childDmog)"
+                      [title]="childDmog.DisplayName"
+                      [data]="childDmog"
+                      [inputAllselectedBMO]="bm.selectedBMO.childrenMap"
+                      id="resizeableComponent_{{childDmogId}}"
+                      [readonly]="readonly"
+                      [active]="childDmog.id === bm.selectedDMOG?.id"
+                      [shared]="bm.selectedBMO.shared || childDmog.shared"
+                      (tabRemove)="onTabRemove($event)"
+                      (tabEdit)="onTabEdit($event)"
+                      (OnBMOSave)="OnBMOSave($event)"
+                      (onDmoEdit)="onDmoEdit($event)"
+                      (onDmoDelete)="onDmoDelete($event)"
+                      (openConditionPopup)="openConditionPopup($event)"
+                      (openclonePopup)="onDmoClone($event)"
+                      (reloadParent)="reloadParent($event)"
+                      (dragDmoToAnotherdmog)="dragDmoToAnotherdmog($event)"
+                      (OnAddDmogAbove)="AddDmog($event)"
+                      (dropDmoToAnotherdmog)="dropDmoToAnotherdmog($event)"
+                      (sideNavModel)="getSideNavModel($event)"
+                      [UpdatedDataForContainer]="UpdatedData"
+                      (SelectdItem)="SelectdItem($event)"
+                      [newlyCreatedConatiner]="newlyCreatedConatiner"
+                      [SharedDmosList]="SharedDmosList"
+                      (OnAddDmogInGroup)="OnAddDmogInGroup($event)"
+                      [mode]="dmoMode"
+                      class="child-card"
+                      draggable="true"
+                      (dragstart)="OnChildDragStarted($event,childDmog)"
+                      (dragend)="OnChildDragEnded($event)"
+                      (dragover)="OnChilddragHover(childDmogId, $event, dmog.GUID)"
+                      (mouseleave)="globalMouse($event)"
+                      (drop)="handleChildDrop($event)"
+                      [IsDraggedBeing]="IsDraggedBeing"
+                      (mouseover)="onMouseOver($event)"
+                       (mouseout)="onMouseOut($event)"
+                       [isDraggingStart]="isDraggingStart"
+                       (focus)="handleFocus($event)"
+                      (blur)="handleBlur($event)"
+                      [UpdatedDataSideNavModel]="UpdatedDataSideNavModel"
+                    >
+                    </app-dmog-container>
+                  </ng-container>
+                </ng-container>
+              </div>
+            </app-dmog-container>
+        
+      </ng-container>
+    </ng-container>
+  </ng-container>
+
+  
+<div class="mainWrap" *ngIf="!readonly">
+  <div class="d-flex flex-column align-items-center gap-3 mb-5 mt-5 add-section" 
+  (click)="AddDmog()" 
+  (contextmenu)="onRightClick($event)"
+  (keydown)="handleKeyDown($event)"
+  >
+      <div style="border: 1px dashed #A9A9A9;"  class="d-flex flex-column p-4 min-vh-25 w-100">
+          <div class="d-flex flex-column w-100 align-items-center gap-3"    ngbTooltip="Add new card">
+                   <p class="add-container-content">Left-click to add a new card</p>
+          </div>
+      </div>
+  </div>
+</div>
+
+<div class="mainWrap " *ngIf="!readonly">
+<div class="d-flex flex-column align-items-center gap-3 add-section" 
+(click)="AddDmogGroup()" 
+(keydown)="handleKeyDown($event)"
+>
+    <div style="border: 1px dashed #A9A9A9;"  class="d-flex flex-column p-4 min-vh-25 w-100">
+        <div class="d-flex flex-column w-100 align-items-center gap-3"    ngbTooltip="Add new card Group">
+                 <p class="add-container-content">Left-click to add Card Group</p>
+        </div>
+    </div>
+</div>
+</div>
+
+
+
+
+
+
+</div>
+</div>
+   
+
+      </div>
+
+    </div>
+</div>
+
+<ng-template #itemActions let-item="item">
+  <ng-container *ngIf="!readonly">
+    <a
+      class="item-action"
+      style="color: rgb(187, 53, 53)"
+      ngbTooltip="Remove"
+      (click)="onDmoDelete(item)"
+    >
+      <i class="fa fa-trash-alt"></i>
+    </a>
+    <a class="item-action" ngbTooltip="Clone" (click)="onDmoClone(item)">
+      <i class="fa fa-copy"></i>
+    </a>
+  </ng-container>
+  <a
+    class="item-action"
+    (click)="openConditionPopup(item)"
+    ngbTooltip="Conditions"
+  >
+    <i class="fa fa-cogs"></i>
+  </a>
+  <a class="item-action" (click)="onDmoEdit(item)" ngbTooltip="Edit">
+    <i class="fa fa-wrench"></i>
+  </a>
+</ng-template>

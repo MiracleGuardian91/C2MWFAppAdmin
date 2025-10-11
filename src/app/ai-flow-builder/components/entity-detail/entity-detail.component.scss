@@ -1,0 +1,42 @@
+@use '@angular/material' as mat;
+
+.custom-text-area{
+  width: 100%;
+  height: 150px;
+  padding: 12px;
+  border-radius: 6px;
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  resize: vertical;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+
+
+.form-control {
+    height: 30px;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+mat-slider {
+  width: 100%;
+   @include mat.slider-overrides((
+    active-track-color: #5970D5,
+    inactive-track-color: rgb(179, 174, 174),
+    handle-height: 12px,
+    handle-width: 12px,
+    handle-color: rgb(30, 30, 139),
+    hover-handle-color: rgb(30, 30, 139),
+    focus-handle-color: rgb(30, 30, 139)
+  ));
+}
+
+.ng-select.ng-invalid.is-invalid {
+  border: 1px solid red; 
+  border-radius: 6px;
+}
+
+input[type="radio"] {
+  transform: scale(1.5); 
+  accent-color: red;
+}

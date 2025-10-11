@@ -1,0 +1,82 @@
+
+<div class="row card-body">
+  
+  <div class="col-md-6 card-preview">
+    <div class="dmo-val-div">Card Preview</div>
+      <div class="card-box card-container">
+          <div  [innerHTML]="CardHtml"></div>
+
+        
+      </div>
+    
+  </div>
+  <div class="col-md-6 card-dropdwons">
+    <div class="dmo-val-div">Dmo Mapping</div>
+    <div class="card-dmos">
+      <div class="drag_grid" *ngFor="let item of cardWallConfigurationsArray">
+        <div class="" >
+         
+          <div class="left_cell">
+            <span>{{item.PlaceholderId}}</span>
+  
+            <div class="text-right paddingTop-xs">
+     
+            </div>
+          </div>
+            <div _ngcontent-ygv-c469="" class="right_cell">
+             <div class="">
+              <!-- <select  class="card-dmo-dropdwon" (change)="updadatedmouid(item, $event)">
+                <option  >Select...</option>
+                <option *ngFor="let dmo of dmoList" [value]="dmo.GUID" [selected]="dmo.GUID==item.DmoGuid==true">
+                
+                  {{dmo?.DataModelObjectGroup?.Name}} >
+  
+                  {{dmo.DisplayName}}
+                </option>
+            </select> -->
+
+            <ng-select class="card-dmo-dropdwon"
+                [clearable]="false"
+                placeholder="{{showSearch(item.DmoGuid)}}"
+                [(ngModel)]="item.DmoGuid"
+                (change)="updadatedmouid(item, $event)">
+              <!-- <ng-option value="-1">Select...</ng-option> -->
+              <ng-option *ngFor="let dmo of loadforUser(item.PlaceholderId)" [value]="dmo.GUID">
+                {{ dmo?.DataModelObjectGroup?.Name }} > {{ dmo.DisplayName }}
+              </ng-option>
+            </ng-select>
+
+
+
+
+            </div>
+          </div>
+        </div>
+      
+      
+    
+    </div>
+    </div>
+  
+  </div>
+ 
+</div>
+<div class="cta-button-group cstm-btn">
+  <button class="btn-sm text-white cstm-btn-save" data-dismiss="modal" type="button" (click)=" Save()">Save</button>
+  <button class="btn btn-clear btn-small cstm-btn" (click)="activeModal.close(false)" data-dismiss="modal" type="button">Cancel</button>
+  <button class="btn btn-clear btn-small cstm-btn" data-dismiss="modal" type="button" (click)=" onBack()">Back</button>
+   
+</div>
+
+
+
+
+
+
+
+ 
+
+
+
+
+

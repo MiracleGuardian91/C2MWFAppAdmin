@@ -1,0 +1,16 @@
+<div *ngIf="showContextMenu" class="contextMenuContainer" 
+[ngStyle]="style" 
+ [@enterAnimation] [style.left]="contextMenuPositiontest.x"
+    [style.top]="contextMenuPositiontest.y">
+  
+<div class="formcomponents">
+    <!-- <input type="text" class="form-control mb-2" placeholder="Search..." (click)="$event.stopPropagation()"> -->
+    <div class="list-group drag-list" id="form-controls">
+      <li class="list-group-item list-group-item-action list-group-item-success drag-list-item"
+        
+        *ngFor="let item of formsControls"  (click)="FormControlSelect(item)">
+        <i [class]="item.class" style="margin-right: 5px"></i>{{ item.name }}
+      </li>
+    </div>
+  </div>
+</div>

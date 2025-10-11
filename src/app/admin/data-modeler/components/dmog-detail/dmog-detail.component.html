@@ -1,0 +1,73 @@
+<div class="popup">
+  <div class="popup__header">
+    <h2 *ngIf="newObject">New {{ title }}</h2>
+    <h2 *ngIf="!newObject">{{ title }} Details</h2>
+    <span class="popup__close"><i class="fas fa-times-circle fa-fw" (click)="ref.close()"></i></span>
+  </div>
+  <hr />
+
+  <form [formGroup]="form">
+    <div class="double-column">
+      <ng-container *ngFor="let control of controls | slice: 0:7">
+        <app-object-control *ngIf="control.show | async" [config]="control" [parentForm]="form" [class]="control.class">
+        </app-object-control>
+      </ng-container>
+      
+      <div class="span-12">
+        <div class="double-column" style="margin: 0">
+          <label class="span-6" for="">Available DMOs For Left Column</label>
+          <label class="span-6" for="">Selected DMOs For Left Column</label>
+        </div>
+
+        <app-association
+          [items]="allDmos"
+          [associatedItems]="leftSelectedSharedItems"
+          [displayWith]="displayShare"
+          [uniqueWith]="uniqueShare"
+          [checkAll]="false"
+          checkBy="selected"
+          disableBy="disabled"
+          [shouldAdd]="shouldAdd"
+          (add)="onLeftShareAdd($event)"
+          (remove)="onLeftShareRemove($event)"
+          (reorder)="onLeftShareReorder($event)"
+        >
+        </app-association>
+      </div>
+
+      <div class="span-12">
+        <div class="double-column" style="margin: 0">
+          <label class="span-6" for="">Available DMOs For Right Column</label>
+          <label class="span-6" for="">Selected DMOs For Right Column</label>
+        </div>
+        <app-association
+          [items]="allDmos"
+          [associatedItems]="rightSelectedSharedItems"
+          [displayWith]="displayShare"
+          [uniqueWith]="uniqueShare"
+          [checkAll]="false"
+          checkBy="selected"
+          disableBy="disabled"
+          [shouldAdd]="shouldAdd"
+          (add)="onRightShareAdd($event)"
+          (remove)="onRightShareRemove($event)"
+          (reorder)="onRightShareReorder($event)"
+        >
+        </app-association>
+      </div>
+
+      <ng-container *ngFor="let control of controls | slice: 7">
+        <app-object-control *ngIf="control.show | async" [config]="control" [parentForm]="form" [class]="control.class">
+        </app-object-control>
+      </ng-container>
+    </div>
+
+    <div class="popup__actions">
+      <button class="btn btn-light btn-sm" type="button" (click)="onCancel()">Cancel</button>
+      <button class="btn btn-primary btn-sm" type="submit" (click)="onSubmit()" *ngIf="!parent.root.published">
+        <ng-container *ngIf="newObject">Create</ng-container>
+        <ng-container *ngIf="!newObject">Update</ng-container>
+      </button>
+    </div>
+  </form>
+</div>

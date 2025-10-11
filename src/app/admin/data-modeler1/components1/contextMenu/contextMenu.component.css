@@ -1,0 +1,33 @@
+.contextMenuContainer {
+  display: block;
+  position: fixed;
+  border-radius: 5px 5px 0px 0px;
+  transform-origin: top left;
+  background: rgb(0, 89, 150);
+  z-index: 10000;
+}
+
+  .contextMenuContainer.visible {
+    transition: transform 200ms ease-in-out;
+  }
+
+.menu-link {
+  cursor: pointer;
+  height: 23px;
+  color: #fff;
+  font-size: 11px;
+  font-family: "Roboto", sans-serif;
+}
+
+.item-action {
+	float: right;
+	z-index: 1001;
+	margin: 2px 2px 0 0;
+	min-width: 30px;
+	font-size: 13px;
+	text-align: center;
+}
+
+.context-menu-visible{
+display: block !important;
+}

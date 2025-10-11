@@ -1,0 +1,22 @@
+<div
+  *ngIf="!uploading"
+  class="dropzone" 
+  appDropzone 
+  (hovered)="toggleHover($event)" 
+  (dropped)="!disabled && onDrop($event)" 
+  [class.hovering]="isHovering && !disabled">
+
+  <p>Drag and drop <ng-container *ngTemplateOutlet="multipleTemplate"></ng-container></p>
+  <button class="btn btn-sm btn-secondary" (click)="filePicker.click()" [disabled]="disabled">
+    or choose <ng-container *ngTemplateOutlet="multipleTemplate"></ng-container>
+  </button>
+  <input type="file" #filePicker multiple hidden (input)="!disabled && onDrop(filePicker.files)" />
+</div>
+<div class="dropzone" *ngIf="uploading">
+  Uploading...
+</div>
+
+<ng-template #multipleTemplate>
+  <ng-container *ngIf="multiple">files</ng-container>
+  <ng-container *ngIf="!multiple">a file</ng-container>
+</ng-template>

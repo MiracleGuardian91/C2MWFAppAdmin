@@ -1,0 +1,23 @@
+.cms-footer {
+    background-color: #F1F0F2;
+    border-top: 3px solid #E2DFDB;
+    position: relative;  
+    .logoWrap {
+        padding-left: 42px;
+
+        span {
+            margin-top: 8px;
+            font-weight: 500;
+            display: block;
+            color: #57575C;
+            font-size: 12px;
+            letter-spacing: 0.85px;
+            line-height: 14px;
+        }
+    }
+
+}
+.C2M-Black-Logo{
+    width: 3rem;
+    height: 3rem;
+}

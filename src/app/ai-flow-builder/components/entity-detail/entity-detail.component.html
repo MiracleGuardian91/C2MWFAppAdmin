@@ -1,0 +1,127 @@
+<div class="popup">
+  <div class="popup__header">
+    <h2><b>{{ formConfig.Guid }}</b></h2>
+    <span class="popup__close"><i class="fas fa-times-circle fa-fw" (click)="onCancel()"></i></span>
+  </div>
+  <p>{{ formConfig.Description }}</p>
+  <hr>
+  
+  <form [formGroup]="form">
+    <div class="row gy-4">
+          <div *ngFor="let attribute of formConfig?.Attributes" 
+               [ngClass]="getColClass(attribute.Width)" 
+               class="form-group">
+               <ng-container *ngIf="showIfCondition(attribute.Condition)">
+                 <span class="d-flex">
+                   <label>{{ attribute.Label }}</label>
+                   <span *ngIf="attribute.Required" style="color: red">&nbsp;*</span>
+                 </span>
+                 <div>
+                   @if(attribute.ControlType === 'label'){
+                     <div [style.margin-top.px]="-20"></div>
+                   }
+                   @else if(attribute.ControlType === 'textbox'){
+                     <input type="text" 
+                            class="form-control"
+                            [name]="getControlName(attribute)"
+                            [formControlName]="getControlName(attribute)" 
+                            [ngClass]="{'is-invalid': submitted && formControls[getControlName(attribute)].errors }"
+                             />
+                     <span
+                       [style.color]="'red'"
+                       [style.font-size.px]="12" 
+                       *ngIf="submitted && formControls[getControlName(attribute)].errors?.required">
+                       This field is required
+                     </span>
+                   }
+                   @else if (attribute.ControlType === 'textarea') {
+                     <textarea 
+                       class="form-control custom-text-area"
+                       [name]="getControlName(attribute)"
+                       [formControlName]="getControlName(attribute)"
+                       [ngClass]="{'is-invalid': submitted && formControls[getControlName(attribute)].errors }">
+                     </textarea>
+                     <span
+                       [style.color]="'red'"
+                       [style.font-size.px]="12" 
+                       *ngIf="submitted && formControls[getControlName(attribute)].errors?.required">
+                       This field is required
+                     </span>
+                   }
+                   @else if (attribute.ControlType === 'dropdownlist') {
+                     <ng-select
+                       class="select-control"
+                       bindLabel="name"
+                       bindValue="id" 
+                       [items]="attribute.Options"
+                       [name]="getControlName(attribute)"
+                       [formControlName]="getControlName(attribute)"
+                       [ngClass]="{'is-invalid': submitted && formControls[getControlName(attribute)].errors }"
+                       (open)="getAutomaticData(attribute)"
+                       (change)="selectionChange($event, attribute)"
+                       >
+                     </ng-select>
+                     <span
+                       [style.color]="'red'"
+                       [style.font-size.px]="12" 
+                       *ngIf="submitted && formControls[getControlName(attribute)].errors?.required">
+                       This field is required
+                     </span>
+                   }
+                   @else if (attribute.ControlType === 'slider') {
+                     <mat-slider 
+                       [style.margin-left.px]="0"
+                       [style.margin-top.px]="-20"
+                       thumbLabel>
+                       <input matSliderThumb [formControlName]="getControlName(attribute)">
+                     </mat-slider>
+                     <div class="d-flex justify-content-between" 
+                       [style.opacity]="0.4"
+                       [style.margin-top.px]="-15"
+                       [style.font-size.px]="12">
+                       <span>{{ attribute.MinValue | number:'1.1-1' }}</span>
+                       <span>{{ attribute.MaxValue | number:'1.1-1' }}</span>
+                     </div>
+                   }
+                   @else if (attribute.ControlType === 'radio'){
+                     <span>
+                       <span class="me-2">
+                           <input type="radio" [formControlName]="getControlName(attribute)" value="yes" />
+                           <span class="ms-2">Yes</span>
+                         </span>
+                       <span class="ms-2">
+                         <input type="radio" [formControlName]="getControlName(attribute)" value="no" />
+                         <span class="ms-2">No</span>
+                       </span>
+                     </span>
+                   }
+                   @else if (attribute.ControlType === 'custom-dropdownlist'){
+                     <ng-select [items]="[{ 
+                         header: 'C2M Get process Data', 
+                         description: 'Retrieves comprehensive blah blah' 
+                       },
+                       {
+                         header: 'C2MAR Get process Data', 
+                         description: 'Retrieves comprehensive blah blah' 
+                       }]" [clearable]="true" placeholder="Select an option">
+                       <ng-template ng-label-tmp let-item="item">
+                         {{ item.header }}
+                       </ng-template>
+                       <ng-template ng-option-tmp let-item="item">
+                         <div [style.padding.px]="5">
+                           <h6 [style.font-weight]="'bold'">{{ item.header }}</h6>
+                           <p>{{ item.description }}</p>
+                         </div>
+                       </ng-template>
+                     </ng-select>
+                  }
+                 </div>
+              </ng-container>
+              </div>
+    </div>
+    <div class="popup__actions mt-4">
+      <button class="btn btn-light btn-sm" type="button" (click)="onCancel()">Cancel</button>
+      <button class="btn btn-primary btn-sm" type="submit" (click)="onSubmit()">Save</button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,54 @@
+
+
+
+ 
+        <!---------------------Customize Grid columns Section--------------------->
+        <div class="fWrap sections">
+          <div class="heading FR22" [ngClass]="getToggle('SectionGridColumn') ? 'Hide' : ''">Add Configurations
+            <a href="JavaScript:void(0);" (click)="clickEvent('SectionGridColumn')" title="Show Hide">
+              <!-- <i aria-label="close/open" class="fa fa-chevron-up" role="img"></i> -->
+            </a>
+          </div>
+          <div class="showHide">
+            <div class="custom_wrap">
+              <div class="drag_grid" *ngFor="let item of CardWallConfigurArray">
+                <div class="row" >
+                 
+                  <div class="left_cell">
+                    <span>{{item.PlaceholderId}}</span>
+
+                    <div class="text-right paddingTop-xs">
+                      <!-- <a id="aAddAllColumns" href="javascript:void(0)">Add all columns</a> -->
+                    </div>
+                  </div>
+                    <div _ngcontent-ygv-c469="" class="right_cell">
+                     <div class="">
+
+                      <select  class="Dropdwon-cstm" (change)="updadatedmouid(item, $event)">
+                        <option  >Select...</option>
+                        <option *ngFor="let dmo of dmoList" [value]="dmo.GUID"   >
+                          {{dmo?.DataModelObjectGroup?.Name}} >
+
+                          {{dmo.DisplayName}}
+                        </option>
+                       
+                    </select>
+                    </div>
+                  </div>
+                </div>
+              
+              
+            
+            </div>
+          </div>
+  
+        </div>
+      </div>   
+  
+      <div class="cta-button-group">
+        <button class="btn btn-warning btn-sm text-white" data-dismiss="modal" type="button" (click)=" Save()">Save</button>
+        <!-- <button class="btn btn-clear btn-small" (click)="ResetConfig()" data-dismiss="modal" type="button">Reset Grid</button> -->
+        <button class="btn btn-clear btn-small" (click)="activeModal.close(false)" data-dismiss="modal" type="button">Cancel</button>
+      </div>
+
+

@@ -1,0 +1,25 @@
+<div class="popup">
+  <div class="popup__header">
+    <h2>Bulk Trigger</h2>
+    <span class="popup__close"><i class="fas fa-times-circle fa-fw" (click)="ref.close()"></i></span>
+  </div>
+  <hr>
+  
+  <div class="double-column">
+    <app-association
+      class="span-12"
+      *ngIf="associations$ | async as items" 
+      [displayWith]="displayWith" 
+      [uniqueWith]="uniqueWith"
+      [items]="items[0]"
+      [associatedItems]="items[1]"
+      checkBy="selected"
+      (select)="onSelect($event)">
+    </app-association>
+  </div>
+  
+  <div class="popup__actions">
+    <button class="btn btn-light btn-sm" type="button" (click)="ref.close()">Cancel</button>
+    <button [disabled]="!selectedItems" class="btn btn-primary btn-sm" type="submit" (click)="onSubmit()">Save</button>
+  </div>
+</div>

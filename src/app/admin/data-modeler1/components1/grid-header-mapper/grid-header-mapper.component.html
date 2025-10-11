@@ -1,0 +1,118 @@
+<ng-container *ngIf="parentForm" >
+    <div class="actions deleteContainer d-flex justify-content-end mt-1 mb-3">
+        <button type="button" class="btn btn-outline-primary" [disabled]="!shouldAllowCallAPI()"
+            (click)="getColumnsName()">Call API</button>
+    </div>
+
+    <table class="table table-bordered" [ngStyle]="{ 'margin-bottom': '10px' }">
+        <thead class="thead-light">
+            <tr>
+                <th scope="col">Actions</th>
+                <th scope="col">Column</th>
+                <th scope="col">Display Name</th>
+                <th scope="col">Data Type</th>
+                <th scope="col">Width (%)</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr *ngFor="let row of headerMapping; let i = index">
+                <td class="actions">
+                    <ng-container *ngIf="!row.isEditing; else editMode">
+                        <a (click)="editRow(row)"><i class="fas fa-edit ml-1" title="Edit"></i></a>
+                        <a (click)="deleteRow(i)"><i class="fas fa-trash-alt ml-3" title="Delete" ></i></a>
+                    </ng-container>
+                    <ng-template #editMode>
+                        <a (click)="saveRow(row)"><i class="fas fa-save ml-1" title="Edit"></i></a>
+                        <a (click)="cancelEdit(row)"><i class="fas fa-times ml-3" title="Delete"></i></a>
+                    </ng-template>
+                </td>
+                <td>
+                
+                    <ng-container *ngIf="row.isEditing; else objectKeyView">
+                        <ng-select [items]="columnNames" [(ngModel)]="row.objectKey" [readonly]="!row.isEditing" [searchable]="true"
+                            placeholder="Select...">
+                        </ng-select>
+                    </ng-container>
+                
+                    <ng-template #objectKeyView>
+                        <span>{{ row.objectKey }}</span>
+                    </ng-template>
+                
+                
+                </td>
+
+                <td>
+                    <input class="form-control" [(ngModel)]="row.displayName" [readonly]="!row.isEditing" />
+                </td>
+                <td>
+
+                    <ng-container *ngIf="row.isEditing; else dataTypesView">
+                        <ng-select [items]="dataTypes" [(ngModel)]="row.dataType" [disabled]="!row.isEditing"
+                        [searchable]="true" placeholder="Select...">
+                      </ng-select>
+                    </ng-container>
+                
+                    <ng-template #dataTypesView>
+                        <span>{{ row.dataType }}</span>
+                    </ng-template>
+
+                   
+                </td>
+
+                <td>
+                    <input class="form-control" [(ngModel)]="row.width" [readonly]="!row.isEditing" 
+                    (keydown)="preventIfTotalWidthExceeds($event, row)" />
+                </td>
+            </tr>
+
+           <tr>
+                <td class="actions text-end align-middle">
+                    <a (click)="addRow()">
+                    <i class="fas fa-plus ml-2" title="Add" [ngStyle]="{ 'font-size': '10px', 'margin-left' : '10px' }"></i>
+                    </a>
+                </td>
+
+                <td>
+                    <ng-select
+                    [items]="columnNames"
+                    [(ngModel)]="newRow.objectKey"
+                    [searchable]="true"
+                    placeholder="Select..."
+                    >
+                    </ng-select>
+                </td>
+
+                <td>
+                    <input
+                    class="form-control"
+                    [(ngModel)]="newRow.displayName"
+                    placeholder=""
+                    />
+                </td>
+
+                <td>
+                    <ng-select
+                    [closeOnSelect]="true"
+                    [items]="dataTypes"
+                    [(ngModel)]="newRow.dataType"
+                    [searchable]="true"
+                    placeholder="Select..."
+                    >
+                    </ng-select>
+                </td>
+
+                <td>
+                    <input
+                    class="form-control"
+                    [(ngModel)]="newRow.width"
+                    />
+                </td>
+        </tr>
+
+
+        </tbody>
+    </table>
+
+    
+</ng-container>

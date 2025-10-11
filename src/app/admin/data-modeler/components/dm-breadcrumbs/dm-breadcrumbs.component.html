@@ -1,0 +1,9 @@
+<nav aria-label="breadcrumb">
+	<ul class="breadcrumb" style="margin: 0; padding-top: 0; padding-bottom: 0; font-size: 0.8rem; gap: 10px;">
+		<ng-container *ngFor="let obj of [bm, bm.selectedBMOG, bm.selectedBMO, bm.selectedDMOG]">
+			<li class="breadcrumb-item" *ngIf="obj" (click)="select.emit(obj)">
+				<a class="link">{{obj.DisplayName || obj.Name}}</a>
+			</li>
+		</ng-container>
+	</ul>
+</nav>

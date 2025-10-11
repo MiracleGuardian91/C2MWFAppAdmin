@@ -1,0 +1,116 @@
+@use '@angular/material' as mat;
+
+
+
+@include mat.core(); 
+
+$primary-palette: (
+    50 : #eaf3e0,
+    100 : #c9e2b3,
+    200 : #a6cf80,
+    300 : #82bb4d,
+    400 : #67ad26,
+    500 : #4c9e00,
+    600 : #459600,
+    700 : #3c8c00,
+    800 : #338200,
+    900 : #247000,
+    A100 : #b5ff9f,
+    A200 : #8dff6c,
+    A400 : #66ff39,
+    A700 : #52ff1f,
+    contrast: (
+        50 : #000000,
+        100 : #000000,
+        200 : #000000,
+        300 : #000000,
+        400 : #000000,
+        500 : #ffffff,
+        600 : #ffffff,
+        700 : #ffffff,
+        800 : #ffffff,
+        900 : #ffffff,
+        A100 : #000000,
+        A200 : #000000,
+        A400 : #000000,
+        A700 : #000000,
+    )
+);
+
+$accent-palette: (
+    50 : #eaf3e0,
+    100 : #c9e2b3,
+    200 : #a6cf80,
+    300 : #82bb4d,
+    400 : #67ad26,
+    500 : #4c9e00,
+    600 : #459600,
+    700 : #3c8c00,
+    800 : #338200,
+    900 : #247000,
+    A100 : #b5ff9f,
+    A200 : #8dff6c,
+    A400 : #66ff39,
+    A700 : #52ff1f,
+    contrast: (
+        50 : #000000,
+        100 : #000000,
+        200 : #000000,
+        300 : #000000,
+        400 : #000000,
+        500 : #ffffff,
+        600 : #ffffff,
+        700 : #ffffff,
+        800 : #ffffff,
+        900 : #ffffff,
+        A100 : #000000,
+        A200 : #000000,
+        A400 : #000000,
+        A700 : #000000,
+    )
+);
+
+$plasma-palette-primary: mat.m2-define-palette($primary-palette);
+$plasma-palette-accent:  mat.m2-define-palette($accent-palette);
+
+$plasma-theme: mat.m2-define-light-theme(
+    (
+        color: (
+            primary: $plasma-palette-primary,
+            accent: $plasma-palette-accent,
+          ),
+          typography: mat.m2-define-typography-config(),
+          density: 0,
+    ));
+
+@include mat.all-component-themes($plasma-theme);
+
+// @mixin custom-tabs-theme() {
+//     .mat-tab-label-active  {
+//         border-bottom: 4px solid #4c9e00;
+//     }
+//   }
+
+// @include custom-tabs-theme();
+
+.mat-ink-bar {
+    background-color: #71ad1a !important;
+    height: 5px !important;
+}
+
+.mat-tab-label {
+    height: 2.5rem !important;
+    padding: unset !important;
+    min-width: auto !important;
+    color: #212529;
+    font-size: 12px !important;
+    font-weight: bold;
+}
+
+.mat-tab-label-active {
+    color: #4c9e00;
+}
+
+.mat-tab-labels {
+    gap: 10px !important;
+}

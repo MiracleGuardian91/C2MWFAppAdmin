@@ -1,0 +1,473 @@
+<div *ngIf="dmo" [id]="'control_' + dmo?.dmoName" class="form-group" style="width: 100%" [ngStyle]="BindStyle()">
+  <label [ngStyle]="labelControlStyle()" [id]="'label_' + dmo?.dmoName" class="input-label dragtitle" [hidden]="['button', 'roletypehidden'].includes(dmo?.type)">
+    <i [ngStyle]="labelControlStyle2()" class="fas fa-grip-lines dragicon"></i>
+    {{ dmo.label }}
+    <span *ngIf="dmo.validate?.required" style="color: red">*</span>
+  </label>
+ 
+  <ng-container [ngSwitch]="dmo.type">
+    <ng-container *ngSwitchCase="'button'">
+      <button class="btn btn-primary btn-sm btn-mb">{{ dmo.label }}</button>
+    </ng-container>
+    <ng-container *ngSwitchCase="'mediagallery'">
+      <img [src]="galleryImageUrl"
+       alt="dmo.name"
+       [id]="dmo.dmoName"
+       [ngStyle]="formControlStyle()"
+       >
+    </ng-container>
+    <ng-container *ngSwitchCase="'textfield'">
+      <input
+        type="text"
+        [id]="dmo.dmoName"
+        [readonly]="dmo.validate?.disabled"
+        class="form-control"
+        [ngStyle]="formControlStyle()"
+        [placeholder]="dmo.placeholder"
+        [maxlength]="dmo.Length == null || dmo.Length === 0 ? null : dmo.Length"
+      />
+    </ng-container>
+    <ng-container *ngSwitchCase="'colorpicker'">
+      <ng-select
+        [items]="dmo?.data?.values"
+        [searchable]="true"
+        class="form-control"
+        [id]="dmo.dmoName"
+        [ngStyle]="formControlStyle()"
+        [readonly]="dmo.validate?.disabled"
+      >
+        <ng-template ng-label-tmp let-item="item" let-label="label">
+          <span class="color-code-option" [style.background-color]="getColor(item)"></span>
+          <span class="ml-1">{{ label }}</span>
+        </ng-template>
+        <ng-template ng-option-tmp let-item="item" let-index="index">
+          <span class="color-code-option" [style.background-color]="getColor(item)"></span>
+          <span class="ml-1">{{ item.label }}</span>
+        </ng-template>
+      </ng-select>
+    </ng-container>
+    <ng-container *ngSwitchCase="'countrylist'">
+      <ng-select
+        [searchable]="true"
+        [placeholder]="'Select...'"
+        [id]="dmo.dmoName"
+        [readonly]="dmo.validate?.disabled"
+        [ngStyle]="formControlStyle()"
+        class="form-control"
+      >
+        <ng-option *ngFor="let op of dynamicOptions" [value]="op.label">{{ op.label }}</ng-option>
+      </ng-select>
+    </ng-container>
+    <ng-container *ngSwitchCase="'select'">
+      <ng-select [ngStyle]="formControlStyle()" [searchable]="true" [virtualScroll]="true" class="form-control" [id]="dmo.dmoName" [readonly]="dmo.validate?.disabled">
+        <ng-option *ngFor="let op of dmo?.data?.values" [value]="op.value">{{ op.label }}</ng-option>
+      </ng-select>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="'manageddropdown'">
+      <ng-select [ngStyle]="formControlStyle()" [searchable]="true" [virtualScroll]="true" class="form-control" [id]="dmo.dmoName" [readonly]="dmo.validate?.disabled">
+      </ng-select>
+    </ng-container>
+
+
+    <ng-container *ngSwitchCase="'list'" >
+      <select  [id]="dmo.dmoName" [disabled]="dmo.validate?.disabled"class="form-control" [ngStyle]="formControlStyle()" multiple style="height: auto;">
+        <option  *ngFor="let op of dmo?.data?.values">{{ op.value }}</option>
+      </select>
+    </ng-container>
+    <ng-container *ngSwitchCase="'progressbar'">
+      <p>
+        <ngb-progressbar
+          [id]="dmo.dmoName"
+          [readonly]="dmo.validate?.disabled"
+          [animated]="true"
+          [striped]="true"
+          [value]="dmo?.defaultValue"
+          showValue="true"
+          type="success"
+        ></ngb-progressbar>
+      </p>
+    </ng-container>
+    <ng-container *ngSwitchCase="'roletype'">
+      <ng-select
+        [items]="dmo?.data?.values"
+        [multiple]="dmo.multiple"
+        [closeOnSelect]="false"
+        bindLabel="label"
+        bindValue="value"
+        placeholder="Select..."
+        [id]="dmo.dmoName"
+        [readonly]="dmo.validate?.disabled"
+        class="form-control"
+        [ngStyle]="formControlStyle()"
+      >
+      </ng-select>
+    </ng-container>
+    <ng-container *ngSwitchCase="'file'">
+      <div class="custom-file">
+        <input type="file" [disabled]="dmo.validate?.disabled" [disabled]="true" (change)="upload($event, dmo.id, dmo.dmoName)" class="custom-file-input" />
+        <input type="hidden" name="fileHidden" [id]="dmo.dmoName" [readonly]="dmo.validate?.disabled" />
+        <label class="custom-file-label" for="{{ 'TextBox_' + dmo.id }}"></label>
+      </div>
+      <div class="uploadList" *ngIf="fileList.length > 0">
+        <ul>
+          <li *ngFor="let file of getFileList">
+            <span (click)="DownloadFile(file)" title="{{ file.OldFileName }}">{{ file.OldFileName }}</span
+            ><a href="javascript:void(0)" (click)="DeleteFile(file)" title="Delete"><i class="fas fa-trash-alt"></i></a>
+          </li>
+        </ul>
+      </div>
+      <div class="uploadList" *ngIf="fileList.length === 0">
+        <ul>
+          <li *ngFor="let file of fileInfoList">
+            <span (click)="DownloadFile(file)" title="{{ file.OldFileName }}">{{ file.OldFileName }}</span
+            ><a href="javascript:void(0)" (click)="DeleteFile(file)" title="Delete"><i class="fas fa-trash-alt"></i></a>
+          </li>
+        </ul>
+      </div>
+    </ng-container>
+    <ng-container *ngSwitchCase="'uploadimage'">
+      <div class="custom-file">
+        <input type="file" #fileInput [disabled]="true" (click)="fileInput.value = null" class="custom-file-input" (change)="uploadImage($event)" />
+        <input type="text" [id]="dmo.dmoName" [disabled]="dmo.validate?.disabled" style="display: none" />
+        <label class="custom-file-label" for="{{ 'liUploadDiv_' + dmo.id }}"></label>
+      </div>
+
+      <div class="uploadList">
+        <ul>
+          <li *ngFor="let file of fileList">
+            <span (click)="DownloadFile(file)" title="{{ file.OldFileName }}">{{ file.OldFileName }}</span
+            ><a href="javascript:void(0)" (click)="DeleteFile(file)" title="Delete"><i class="fas fa-trash-alt"></i></a>
+          </li>
+        </ul>
+      </div>
+      <div class="uploadList" *ngIf="fileList.length === 0">
+        <ul>
+          <li *ngFor="let file of fileInfoList">
+            <span (click)="DownloadFile(file)" title="{{ file.OldFileName }}">{{ file.OldFileName }}</span
+            ><a href="javascript:void(0)" (click)="DeleteFile(file)" title="Delete"><i class="fas fa-trash-alt"></i></a>
+          </li>
+        </ul>
+      </div>
+    </ng-container>
+    <ng-container *ngSwitchCase="'usstatelist'">
+      <ng-select
+        [searchable]="true"
+        [placeholder]="'Select...'"
+        [id]="dmo.dmoName"
+        [readonly]="dmo.validate?.disabled"
+        class="form-control"
+        [ngStyle]="formControlStyle()"
+      >
+        <ng-option *ngFor="let op of dynamicOptions" [value]="op.label">{{ op.label }}</ng-option>
+      </ng-select>
+    </ng-container>
+    <ng-container *ngSwitchCase="'autocompletesearchbox'">
+      <ng-select [searchable]="true" [virtualScroll]="true" class="form-control" [ngStyle]="formControlStyle()" [id]="dmo.dmoName" [readonly]="dmo.validate?.disabled">
+        <ng-option *ngFor="let op of dmo?.data?.values" [value]="op.value">{{ op.label }}</ng-option>
+      </ng-select>
+    </ng-container>
+    <ng-container *ngSwitchCase="'rangebox'">
+      <div>
+        <span class="range-control">
+          <input
+            type="text"
+            [id]="dmo.dmoName"
+            [readonly]="dmo.validate?.disabled"
+            class="form-control range-control__input"
+            [value]="dmo.default_Value"
+            [ngStyle]="formControlStyle()"
+            appRange
+          />
+        </span>
+      </div>
+    </ng-container>
+    <ng-container *ngSwitchCase="'phoneNumber'">
+      <input
+        type="tel"
+        [textMask]="{ mask: mask }"
+        [id]="dmo.dmoName"
+        [readonly]="dmo.validate?.disabled"
+        class="form-control"
+        [value]="dmo.default_Value"
+        [ngStyle]="formControlStyle()"
+        [maxlength]="dmo.Length == null ? null : dmo.Length"
+      />
+    </ng-container>
+    <ng-container *ngSwitchCase="'roletypehidden'">
+      <input
+        type="text"
+        readonly
+        [id]="dmo.dmoName"
+        class="form-control"
+        [ngStyle]="formControlStyle()"
+        style="border: 2px dashed lightgrey"
+        [placeholder]="dmo.placeholder || 'hidden'"
+      />
+    </ng-container>
+    <ng-container *ngSwitchCase="'email'">
+      <input
+        type="email"
+        [id]="dmo.dmoName"
+        [readonly]="dmo.validate?.disabled"
+        class="form-control"
+        [ngStyle]="formControlStyle()"
+        [value]="dmo.default_Value"
+        [maxlength]="dmo.validate.maxLength == null ? null : dmo.validate.maxLength"
+      />
+    </ng-container>
+    <ng-container *ngSwitchCase="'usergroup'">
+      <input
+        type="text"
+        [id]="dmo.dmoName"
+        [readonly]="dmo.validate?.disabled"
+        class="form-control"
+        [ngStyle]="formControlStyle()"
+        [value]="dmo.default_Value"
+        [value]="dmo.default_Value"
+        [maxlength]="dmo.validate.maxLength == null ? null : dmo.validate.maxLength"
+      />
+    </ng-container>
+    <ng-container *ngSwitchCase="'url'">
+      <input
+        type="text"
+        [id]="dmo.dmoName"
+        [disabled]="dmo.validate?.disabled"
+        class="form-control"
+        [ngStyle]="formControlStyle()"
+        [value]="dmo.default_Value"
+        [value]="dmo.default_Value"
+        [maxlength]="dmo.Length == null ? null : dmo.Length"
+      />
+    </ng-container>
+    <ng-container *ngSwitchCase="'textarea'">
+      <textarea
+        [id]="dmo.dmoName"
+        [readonly]="dmo.validate?.disabled"
+        class="form-control textareaHeight"
+        [ngStyle]="formControlStyle()"
+        [value]="dmo.default_Value"
+        [value]="dmo.default_Value"
+        [maxlength]="dmo.Length == null || dmo.Length === 0 ? null : dmo.Length"
+      ></textarea>
+    </ng-container>
+    <ng-container *ngSwitchCase="'id'">
+      <input type="text" [id]="dmo.dmoName" [ngStyle]="formControlStyle()" class="form-control" readonly [maxLength]="dmo.Length == null ? null : dmo.Length" />
+    </ng-container>
+    <ng-container *ngSwitchCase="'multiselect'">
+      <ng-select
+        [items]="dmo.data?.values"
+        [multiple]="true"
+        [closeOnSelect]="false"
+        bindLabel="label"
+        bindValue="value"
+        placeholder="Select..."
+        [id]="dmo.dmoName"
+        [readonly]="dmo.validate?.disabled"
+        class="form-control"
+        [ngStyle]="formControlStyle()"
+      >
+      </ng-select>
+    </ng-container>
+    <ng-container *ngSwitchCase="'radio'">
+      <div class="d-flex input-group">
+        <ng-container *ngFor="let option of dmo?.values; let i = index">
+          <label class="radio-container"
+            >{{ option.label }}
+            <input type="radio" [disabled]="dmo.disabled" [value]="option.value" [id]="dmo.id + i" [name]="dmo.dmoName" />
+            <span class="checkmark"  [style.background-color]="dmo.disabled?'#e9ecef':'transparent'"></span>
+          </label>
+        </ng-container>
+      </div>
+    </ng-container>
+    <ng-container *ngSwitchCase="'selectboxes'">
+      <div class="d-flex input-group">
+        <ng-container *ngFor="let control of dmo?.values; let i = index">
+          <label class="form-checkbox mr-2">
+            <input
+              type="checkbox"
+              [value]="control.value"
+              [checked]="control.value === dmo.default_Value"
+              [id]="dmo.dmoName"
+              [disabled]="dmo.validate?.disabled"             
+            />
+            <i class="skin"   [style.background-color]="dmo.validate?.disabled ?'#e9ecef':'transparent'"></i>
+            <span>{{ control.value }}</span>
+          </label>
+        </ng-container>
+      </div>
+    </ng-container>
+    <ng-container *ngSwitchCase="'staticdatebox'">
+      <div class="input-group">
+        <div class="input-group-prepend" [style.background-color]="dmo.validate?.disabled?'#e9ecef':'transparent'">
+          <button class="btn btn-sm btn-outline-secondary" type="button" disabled="dmo.validate?.disabled">
+            <i class="far fa-calendar-alt" aria-hidden="true"></i>
+          </button>
+        </div>
+        <input
+          type="text"
+          [placeholder]="dateFormat"
+          [id]="dmo.dmoName"
+          [readonly]="dmo.validate?.disabled"
+          class="form-control"
+          ngbDatepicker
+          #d="ngbDatepicker"
+          [minDate]="minDate"
+          [value]="formatDate(selectedDate)"
+          (dateSelect)="onDateSelect($event)"
+          [maxDate]="maxDate"
+          [ngStyle]="formControlStyle()"
+          (keyup)="dateMasks($event)"
+        />
+      </div>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="'day'">
+      <input
+        type="text"
+        [textMask]="{ mask: dateMask, keepCharPositions: true, pipe: autoCorrectedDatePipe }"
+        pattern="\d{2}/\d{2}/\d{4}"
+        [id]="dmo.dmoName"
+        [readonly]="dmo.validate?.disabled"
+        [ngStyle]="formControlStyle()"
+        class="form-control"
+      />
+    </ng-container>
+    <ng-container *ngSwitchCase="'datetime'">
+      <div class="input-group">
+        <div class="input-group-prepend" [style.background-color]="dmo.validate?.disabled?'#e9ecef':'transparent'">
+          <button class="btn btn-sm btn-outline-secondary" type="button" disabled="dmo.validate?.disabled">
+              <i class="far fa-calendar-alt" aria-hidden="true"></i>
+          </button>
+        </div>
+        <input
+          type="text"
+          [placeholder]="dateFormat"
+          [id]="dmo.dmoName"
+          class="form-control"
+          ngbDatepicker
+          #d="ngbDatepicker" 
+          [value]="formatDate(selectedDate)"
+          (dateSelect)="onDateSelect($event)"
+          [minDate]="minDate" 
+          [maxDate]="maxDate"
+          [ngStyle]="formControlStyle()"
+		  [readonly]="dmo.validate?.disabled"
+        />
+      </div>
+    </ng-container>
+    <ng-container *ngSwitchCase="'datetimezone'">
+      <div [id]="dmo.dmoName" [readonly]="dmo.validate?.disabled" class="d-flex date-tz-picker">
+        <div class="input-group flex-nowrap">
+          <div class="input-group-prepend" [style.background-color]="dmo.validate?.disabled?'#e9ecef':'transparent'">
+            <button class="btn btn-sm btn-outline-secondary"  type="button" disabled="dmo.validate?.disabled">
+              <i class="far fa-calendar-alt" aria-hidden="true"></i>
+            </button>
+          </div>
+          <input
+            type="text"
+            [ngStyle]="formControlStyle()"
+            [placeholder]="dateFormat"
+            class="form-control date-picker"
+            ngbDatepicker
+            #d="ngbDatepicker"
+            [value]="formatDate(selectedDate)"
+            (dateSelect)="onDateSelect($event)"
+            [readonly]="dmo.validate?.disabled"
+          />
+        </div>
+        <ng-select [readonly]="dmo.validate?.disabled" [items]="timeOptions" [ngStyle]="formControlStyle()" [readonly]="dmo.validate?.disabled" class="form-control"></ng-select>
+      </div>
+    </ng-container>
+    <ng-container *ngSwitchCase="'datagrd'">
+      <img
+        name="dmo.dmoName"
+        type="img"
+        class="img-responsive"
+        lang="en"
+        id="dmo.dmoName"
+        [src]="gridViewImageUrl"
+        disabled="true"
+        style="height: 30px; width: 100%"
+      />
+    </ng-container>
+
+    <ng-container *ngSwitchCase="'jsonstaticgrid'">
+      <img
+        name="dmo.dmoName"
+        type="img"
+        class="img-responsive"
+        lang="en"
+        id="dmo.dmoName"
+        [src]="gridViewImageUrl"
+        disabled="true"
+        style="height: 30px; width: 100%"
+      />
+    </ng-container>
+
+    <ng-container *ngSwitchCase="'datetimebox'">
+    <div class="input-group">
+        <div class="input-group-prepend">
+          <button class="btn btn-sm btn-outline-secondary" type="button">
+            <i class="far fa-calendar-alt" style="user-select: none;" aria-hidden="true"></i>
+          </button>
+        </div>
+        <input
+          type="text"
+          [placeholder]="dateTimeFormat"
+          [id]="dmo.dmoName"
+          [readonly]="dmo.validate?.disabled"
+          class="form-control"
+          ngbDatepicker
+          #d="ngbDatepicker"
+          [minDate]="minDate"
+          [value]="formatDate(selectedDate)"
+          (dateSelect)="onDateSelect($event)"
+          [maxDate]="maxDate"
+          [ngStyle]="formControlStyle()"
+          (keyup)="dateMasks($event)"
+        />
+      </div>
+    </ng-container>
+    <ng-container *ngSwitchCase="'hidden'">
+      <div class="custom-file">
+        <input type="hidden" name="fileHidden" [id]="dmo.dmoName" [readonly]="dmo.validate?.disabled" />
+      </div>
+    </ng-container>
+    <ng-container *ngSwitchCase="'createdby'">
+      <input type="text" [id]="dmo.dmoName" [readonly]="dmo.validate?.disabled" [ngStyle]="formControlStyle()" class="form-control" disabled [value]="dmo.default_Value" />
+    </ng-container>
+    <ng-container *ngSwitchCase="'createddate'">
+      <input type="text" [id]="dmo.dmoName" [readonly]="dmo.validate?.disabled" [ngStyle]="formControlStyle()" class="form-control" disabled [value]="dmo.default_Value" />
+    </ng-container>
+    <ng-container *ngSwitchCase="'keyvaluesearchbox'">
+      <input
+        type="text"
+        [id]="dmo.dmoName"
+        [disabled]="dmo.validate?.disabled"
+        class="form-control"
+        [ngStyle]="formControlStyle()"
+        [value]="dmo.default_Value"
+        matInput
+      />
+      <mat-autocomplete [displayWith]="displayWith" showPanel="true"> </mat-autocomplete>
+    </ng-container>
+    <ng-container *ngSwitchCase="'keyvaluedropdownlist'">
+      <mat-select class="form-control input-group" [id]="dmo.dmoName" [ngStyle]="formControlStyle()" [disabled]="dmo.validate?.disabled"> </mat-select>
+    </ng-container>
+     
+    <ng-container *ngSwitchCase="'notificationflag'">
+      <div class="d-flex input-group">
+        <mat-radio-group>
+          <mat-radio-button value="On">
+            <span style="font-size: 12px">On</span>
+          </mat-radio-button>
+          <mat-radio-button value="Off">
+            <span style="font-size: 12px">Off</span>
+          </mat-radio-button>
+        </mat-radio-group>
+      </div>
+    </ng-container>
+    <ng-container *ngSwitchDefault></ng-container>
+  </ng-container>
+</div>

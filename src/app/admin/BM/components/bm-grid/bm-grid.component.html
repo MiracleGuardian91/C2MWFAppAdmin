@@ -1,0 +1,335 @@
+<!--Header-->
+<div class="">
+  <div class="d-flex justify-content-between flex-column flex-md-row align-items-center">
+    <div class="display-name">{{DisplayName}}</div>
+  </div>
+
+  <div></div>
+
+  <div class="p-1"></div>
+
+  <!-- Hidden button group - will be shown in popup -->
+  <div class="table-filters-group align-items-start" style="display: none;">
+    <form [formGroup]="BMForm" class="m-0 p-0">
+      <div class="button-group BMForm-Actions" style="padding: 3px 5px;">
+        <select name='ChangeStatus' formControlName="ChangeStatus" (change)="ChangeStatus($event)"
+          class="btn btn-primary-special btn-small">
+          <option value="-1">Change Status</option>
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+        <!-- <button (click)="CreateNewVersion()" class="btn btn-primary-special btn-small" type="button">New
+                Version</button> -->
+        <!-- <button class="btn btn-primary-special btn-small" type="button" (click)="generateXML()">Generate -->
+        <!-- JSON</button> -->
+        <!-- <button class="btn btn-primary-special btn-small" type="button"  (click)="ExportBM()">Export BM</button> -->
+        <!-- <button class="btn btn-primary-special btn-small" type="button" (click)="UniqueConstraint()">Unique Constraint</button>
+            <button class="btn btn-primary-special btn-small" type="button" (click)="BatchUpdate()">Batch Update</button>
+            <button class="btn btn-primary-special btn-small" type="button" (click)="BulkTrigger()">Bulk Trigger</button>
+            <button class="btn btn-primary-special btn-small" type="button" (click)="onCompanyAssociation()">Company Association</button>
+            <select name='ChangeMode' formControlName="ChangeMode" (change)="ChangeMode($event)" class="btn btn-primary-special btn-small">
+                <option value="-1">Change Mode</option>
+                <option value="Edit">Edit</option>
+                <option value="Published">Published</option>
+            </select>
+            <button class="btn btn-primary-special btn-small" type="button" (click)="onTopCornerDetail()">Top Corner Detail</button>
+            <button class="btn btn-primary-special btn-small" type="button" (click)="GridViewMasterConfig('','')">Grid Master Config</button>
+            <button class="btn btn-primary-special btn-small" type="button" (click)="openJsonImportModal(jsonModalTemplate)">
+              Import BM JSON
+            </button>
+            <input #jsonFileInput type="file" accept=".json" style="display: none;" (change)="ImportJsonBM()" />
+            <button class="btn btn-primary-special btn-small" type="button" (click)="GenerateDMOGPROPS()">Migrate to New Model</button>
+            <button class="btn btn-primary-special btn-small" type="button" (click)="goToVersionGrid()">Live Version</button>
+            <button class="btn btn-primary-special btn-small" type="button" (click)="onPublishToEnvironment()">Publish To Environment</button> -->
+
+      </div>
+    </form>
+        <div class="export-btns-group mt-1" style="white-space: nowrap;">
+            <button type="button" (click)="openBulkUpload(bulkUpload)" title="BM Upload" class="linklike"><i class="fas fa-edit"></i>BM Upload Excel</button>
+            <button type="button" title="Excel" (click)="openExportGridConfigurationPopup('GridConfiguration','View1', 'Excel')" class="linklike"><i
+                    class="far fa-file-excel" role="img" aria-label="Excel"></i>Excel</button>
+        </div>
+    </div>
+    <div class="Strip">
+     
+      <button (click)="CreateNewRecord(null)" *ngIf="!isLoading && (!dataSource?.length && (!bodyData?.GridFilters || bodyData.GridFilters.length === 0))" title="Add Data Model" class="icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="18" viewBox="0 0 19 18" fill="none">
+          <path
+            d="M16.851 7.07143H11.0653V1.28571C11.0653 0.575759 10.4895 0 9.77958 0H8.49386C7.78391 0 7.20815 0.575759 7.20815 1.28571V7.07143H1.42243C0.712478 7.07143 0.136719 7.64719 0.136719 8.35714V9.64286C0.136719 10.3528 0.712478 10.9286 1.42243 10.9286H7.20815V16.7143C7.20815 17.4242 7.78391 18 8.49386 18H9.77958C10.4895 18 11.0653 17.4242 11.0653 16.7143V10.9286H16.851C17.561 10.9286 18.1367 10.3528 18.1367 9.64286V8.35714C18.1367 7.64719 17.561 7.07143 16.851 7.07143Z"
+            fill="white" />
+        </svg>
+      </button>
+      
+      <button (click)="CardWallTemplateConfig('')"  title="Add Card Designer" class="icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="25" viewBox="0 0 24 24" fill="none">
+         <rect x="2" y="4" width="20" height="16" rx="3" ry="3" stroke="white" stroke-width="2" fill="none"/>
+         <rect x="2" y="7" width="20" height="2.5" fill="white"/>
+         <line x1="6" y1="15" x2="12" y2="15" stroke="white" stroke-width="2" stroke-linecap="round"/>
+       </svg>
+       </button>
+
+      <button (click)="openExportGridConfigurationPopup('GridConfiguration','View1', 'Excel')" title="Export this Grid" class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="19" height="24" viewBox="0 0 19 24" fill="none">
+          <path
+            d="M10.6367 6.375V0H1.26172C0.638281 0 0.136719 0.501562 0.136719 1.125V22.875C0.136719 23.4984 0.638281 24 1.26172 24H17.0117C17.6352 24 18.1367 23.4984 18.1367 22.875V7.5H11.7617C11.143 7.5 10.6367 6.99375 10.6367 6.375ZM13.4539 11.3672L10.6367 15.75L13.4539 20.1328C13.693 20.5078 13.4258 21 12.9805 21H11.3445C11.1383 21 10.9461 20.8875 10.8477 20.7047C9.92891 19.0078 9.13672 17.4844 9.13672 17.4844C8.83672 18.1781 8.66797 18.4219 7.42109 20.7094C7.32266 20.8922 7.13516 21.0047 6.92891 21.0047H5.29297C4.84766 21.0047 4.58047 20.5125 4.81953 20.1375L7.64609 15.7547L4.81953 11.3719C4.57578 10.9969 4.84766 10.5047 5.29297 10.5047H6.92422C7.13047 10.5047 7.32266 10.6172 7.42109 10.8C8.64453 13.0875 8.35859 12.375 9.13672 14.0109C9.13672 14.0109 9.42266 13.4625 10.8523 10.8C10.9508 10.6172 11.143 10.5047 11.3492 10.5047H12.9805C13.4258 10.5 13.693 10.9922 13.4539 11.3672ZM18.1367 5.71406V6H12.1367V0H12.4227C12.7227 0 13.0086 0.117188 13.2195 0.328125L17.8086 4.92188C18.0195 5.13281 18.1367 5.41875 18.1367 5.71406Z"
+            fill="white" />
+        </svg></button>
+      <button (click)="openJsonImportModal(jsonModalTemplate); closeActionsPopup()" title="Import BM" class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="19" height="22" viewBox="0 0 19 22" fill="none">
+          <path
+            d="M0.699219 15.125C0.389844 15.125 0.136719 15.3781 0.136719 15.6875V16.8125C0.136719 17.1219 0.389844 17.375 0.699219 17.375H4.63672V15.125H0.699219ZM17.8906 4.19141L14.4488 0.746094C14.2906 0.587891 14.0762 0.5 13.8512 0.5H13.6367V5H18.1367V4.78555C18.1367 4.56406 18.0488 4.34961 17.8906 4.19141ZM12.5117 5.28125V0.5H5.48047C5.01289 0.5 4.63672 0.876172 4.63672 1.34375V15.125H9.13672V12.8328C9.13672 12.3301 9.74492 12.0805 10.1 12.4355L11.7805 14.1318L13.4609 15.8281C13.693 16.0637 13.693 16.4398 13.4609 16.6719L10.0965 20.0609C9.74141 20.416 9.1332 20.1664 9.1332 19.6637V17.375H4.63672V20.6562C4.63672 21.1238 5.01289 21.5 5.48047 21.5H17.293C17.7605 21.5 18.1367 21.1238 18.1367 20.6562V6.125H13.3555C12.8914 6.125 12.5117 5.74531 12.5117 5.28125Z"
+            fill="white" />
+        </svg></button>
+      <button (click)="goToVersionGrid(); closeActionsPopup()" title="Change Mode" class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="16" viewBox="0 0 22 16" fill="none">
+          <g clip-path="url(#clip0_11061_81599)">
+            <path
+              d="M11.9428 9.32366C11.7619 9.50674 11.5552 9.64405 11.3323 9.73559C11.1094 9.82713 10.8736 9.8729 10.6378 9.8729C10.4019 9.8729 10.1661 9.82713 9.94325 9.73559C9.72036 9.64405 9.51362 9.50674 9.33272 9.32366C9.15183 9.14058 9.01616 8.93134 8.92571 8.70576C8.83526 8.48018 8.79004 8.24152 8.79004 8.00286C8.79004 7.7642 8.83526 7.52554 8.92571 7.29996C9.01616 7.07437 9.15183 6.86514 9.33272 6.68206C9.51362 6.49898 9.72036 6.36166 9.94325 6.27012C10.1661 6.17858 10.4019 6.13281 10.6378 6.13281C10.8736 6.13281 11.1094 6.17858 11.3323 6.27012C11.5552 6.36166 11.7619 6.49898 11.9428 6.68206C12.1237 6.86514 12.2594 7.07437 12.3498 7.29996C12.4402 7.52554 12.4855 7.7642 12.4855 8.00286C12.4855 8.24152 12.4402 8.48018 12.3498 8.70576C12.2594 8.93134 12.1237 9.14058 11.9428 9.32366Z"
+              fill="white" />
+            <path
+              d="M12.6862 11.1445C12.6862 10.9778 12.7476 10.8111 12.8735 10.6836C13.2321 10.3207 13.5099 9.89892 13.6973 9.42814C13.8782 8.97371 13.9718 8.49312 13.9718 7.99945C13.9718 7.50579 13.8782 7.0252 13.6973 6.57076C13.5099 6.09998 13.2321 5.67824 12.8735 5.31535C12.6216 5.06034 12.6216 4.64841 12.8735 4.3934C13.1255 4.1384 13.5325 4.1384 13.7845 4.3934C14.2658 4.88053 14.6373 5.44612 14.8925 6.08037C15.138 6.69173 15.2607 7.33578 15.2607 7.99945C15.2607 8.66312 15.138 9.30718 14.8925 9.91854C14.6373 10.5528 14.2658 11.1184 13.7845 11.6055C13.5325 11.8605 13.1255 11.8605 12.8735 11.6055C12.7476 11.478 12.6862 11.3113 12.6862 11.1445Z"
+              fill="white" />
+            <path
+              d="M14.7663 13.2473C14.7663 13.0806 14.8276 12.9138 14.9536 12.7863C15.5932 12.139 16.0874 11.3871 16.4234 10.5468C16.7497 9.73606 16.9144 8.8795 16.9144 8.00005C16.9144 7.12061 16.7497 6.26405 16.4234 5.45326C16.0874 4.61305 15.5932 3.86111 14.9536 3.21379C14.7017 2.95878 14.7017 2.54685 14.9536 2.29184C15.2056 2.03683 15.6126 2.03683 15.8646 2.29184C16.6269 3.0634 17.2148 3.95919 17.6154 4.96287C18.003 5.93058 18.2 6.95061 18.2 8.00005C18.2 9.0495 18.003 10.0695 17.6154 11.0372C17.2148 12.0377 16.6237 12.9367 15.8646 13.7083C15.6126 13.9633 15.2056 13.9633 14.9536 13.7083C14.8276 13.5808 14.7663 13.414 14.7663 13.2473Z"
+              fill="white" />
+            <path
+              d="M16.8434 15.3491C16.8434 15.1824 16.9048 15.0156 17.0308 14.8881C17.9514 13.9564 18.6621 12.8742 19.1466 11.6646C19.615 10.4974 19.8508 9.2649 19.8508 7.99968C19.8508 6.73446 19.615 5.50193 19.1466 4.33479C18.6621 3.12514 17.9514 2.043 17.0308 1.11125C16.7788 0.856241 16.7788 0.444308 17.0308 0.189301C17.2827 -0.0657047 17.6897 -0.0657047 17.9417 0.189301C18.9819 1.24202 19.7894 2.47128 20.3386 3.84439C20.8683 5.16846 21.1364 6.56446 21.1364 7.99968C21.1364 9.43491 20.8683 10.8309 20.3386 12.155C19.7894 13.5248 18.9819 14.7541 17.9417 15.8101C17.6897 16.0651 17.2827 16.0651 17.0308 15.8101C16.9048 15.6826 16.8434 15.5158 16.8434 15.3491Z"
+              fill="white" />
+            <path
+              d="M8.58692 4.85438C8.58692 5.02111 8.52555 5.18785 8.39957 5.31535C8.04101 5.67824 7.7632 6.09998 7.57585 6.57076C7.39495 7.0252 7.30127 7.50579 7.30127 7.99945C7.30127 8.49312 7.39495 8.97371 7.57585 9.42814C7.7632 9.89892 8.04101 10.3207 8.39957 10.6836C8.65153 10.9386 8.65153 11.3505 8.39957 11.6055C8.1476 11.8605 7.74059 11.8605 7.48863 11.6055C7.00732 11.1184 6.63584 10.5528 6.38388 9.91854C6.13838 9.30718 6.01562 8.66312 6.01562 7.99945C6.01562 7.33578 6.13838 6.69173 6.38388 6.08037C6.63584 5.44612 7.01055 4.88053 7.48863 4.3934C7.74059 4.1384 8.1476 4.1384 8.39957 4.3934C8.52555 4.52091 8.58692 4.68764 8.58692 4.85438Z"
+              fill="white" />
+            <path
+              d="M6.50995 2.75281C6.50995 2.91955 6.44858 3.08628 6.3226 3.21379C5.683 3.86111 5.18877 4.61305 4.85282 5.45326C4.52656 6.26405 4.36182 7.12061 4.36182 8.00005C4.36182 8.8795 4.52656 9.73606 4.85282 10.5468C5.18877 11.3871 5.683 12.139 6.3226 12.7863C6.57456 13.0413 6.57456 13.4533 6.3226 13.7083C6.07063 13.9633 5.66362 13.9633 5.41166 13.7083C4.64931 12.9367 4.0614 12.0409 3.66085 11.0372C3.27322 10.0695 3.07617 9.0495 3.07617 8.00005C3.07617 6.95061 3.27322 5.93058 3.66085 4.96287C4.0614 3.96246 4.65254 3.0634 5.41166 2.29184C5.66362 2.03683 6.07063 2.03683 6.3226 2.29184C6.44858 2.41934 6.50995 2.58608 6.50995 2.75281Z"
+              fill="white" />
+            <path
+              d="M4.43268 0.650274C4.43268 0.817009 4.3713 0.983744 4.24532 1.11125C3.3247 2.043 2.61404 3.12514 2.1295 4.33479C1.66111 5.50193 1.4253 6.73446 1.4253 7.99968C1.4253 9.2649 1.66111 10.4974 2.1295 11.6646C2.61404 12.871 3.3247 13.9564 4.24532 14.8881C4.49728 15.1431 4.49728 15.5551 4.24532 15.8101C3.99336 16.0651 3.58635 16.0651 3.33439 15.8101C2.29424 14.7573 1.48667 13.5281 0.937526 12.155C0.407761 10.8309 0.139648 9.43491 0.139648 7.99968C0.139648 6.56445 0.407761 5.16846 0.937526 3.84439C1.48344 2.47455 2.29101 1.24529 3.33116 0.189301C3.58312 -0.0657047 3.99013 -0.0657047 4.24209 0.189301C4.36807 0.316805 4.42945 0.483539 4.42945 0.650274H4.43268Z"
+              fill="white" />
+          </g>
+          <defs>
+            <clipPath id="clip0_11061_81599">
+              <rect width="21" height="16" fill="white" transform="translate(0.136719)" />
+            </clipPath>
+          </defs>
+        </svg></button>
+    </div>
+    <!-- Actions Popup Menu -->
+    <div class="actions-popup" *ngIf="showActionsPopup" [style.left.px]="popupPosition.x" [style.top.px]="popupPosition.y">
+        <!-- <div class="popup-header">
+            <span>Actions</span>
+            <button class="close-btn" (click)="closeActionsPopup()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div> -->
+
+    <form [formGroup]="BMForm" class="m-0 p-0">
+      <!-- Version Management Section -->
+      <div class="popup-section">
+        <div class="section-title">Version Management</div>
+        <div class="popup-button" (click)="CreateNewVersion(); closeActionsPopup()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path
+              d="M16.7143 7.07143H10.9286V1.28571C10.9286 0.575759 10.3528 0 9.64286 0H8.35714C7.64719 0 7.07143 0.575759 7.07143 1.28571V7.07143H1.28571C0.575759 7.07143 0 7.64719 0 8.35714V9.64286C0 10.3528 0.575759 10.9286 1.28571 10.9286H7.07143V16.7143C7.07143 17.4242 7.64719 18 8.35714 18H9.64286C10.3528 18 10.9286 17.4242 10.9286 16.7143V10.9286H16.7143C17.4242 10.9286 18 10.3528 18 9.64286V8.35714C18 7.64719 17.4242 7.07143 16.7143 7.07143Z"
+              fill="black" />
+          </svg>
+          <span>New Version</span>
+        </div>
+        <div class="popup-button" (click)="onPublishToEnvironment(); closeActionsPopup();">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="10" viewBox="0 0 20 10" fill="none">
+            <path
+              d="M14.7219 0C12.6562 0 11.0406 1.29063 10 2.45625C8.95938 1.29063 7.34375 0 5.27812 0C2.36875 0 0 2.24375 0 5C0 7.75625 2.36875 10 5.27812 10C7.34375 10 8.95938 8.70937 10 7.54375C11.0406 8.70937 12.6562 10 14.7219 10C17.6313 10 20 7.75625 20 5C20 2.24375 17.6313 0 14.7219 0ZM5.27812 7C4.02187 7 3 6.10313 3 5C3 3.89687 4.02187 3 5.27812 3C6.47187 3 7.57187 4.12813 8.21562 5C7.57812 5.8625 6.46875 7 5.27812 7ZM14.7219 7C13.5281 7 12.4281 5.87187 11.7844 5C12.4219 4.1375 13.5312 3 14.7219 3C15.9781 3 17 3.89687 17 5C17 6.10313 15.9781 7 14.7219 7Z"
+              fill="black" />
+          </svg>
+          <span>Publish To Environment</span>
+        </div>
+        <div class="popup-button" (click)="GenerateDMOGPROPS(); closeActionsPopup();">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="16" viewBox="0 0 13 16" fill="none">
+            <path
+              d="M1.3 16L0 14.7556L4.48036 10.4444C4.83631 10.1037 5.10714 9.71852 5.29286 9.28889C5.47857 8.85926 5.57143 8.40741 5.57143 7.93333V3.4L4.08571 4.8L2.78571 3.55556L6.5 0L10.2143 3.55556L8.91429 4.8L7.42857 3.4V7.93333C7.42857 8.40741 7.52143 8.85926 7.70714 9.28889C7.89286 9.71852 8.16369 10.1037 8.51964 10.4444L13 14.7556L11.7 16L6.5 11.0222L1.3 16Z"
+              fill="black" />
+          </svg>
+          <span>Migrate to New Modeler</span>
+        </div>
+      </div>
+
+      <!-- Manage Access Section -->
+      <div class="popup-section">
+        <div class="section-title">Manage Access</div>
+        <div class="popup-button" (click)="onCompanyAssociation(); closeActionsPopup();">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path
+              d="M17.5714 17.875H16.8571V1.84375C16.8571 1.37775 16.4734 1 16 1H4C3.52661 1 3.14286 1.37775 3.14286 1.84375V17.875H2.42857C2.19189 17.875 2 18.0639 2 18.2969V19H18V18.2969C18 18.0639 17.8081 17.875 17.5714 17.875ZM6.57143 3.67188C6.57143 3.43889 6.76332 3.25 7 3.25H8.42857C8.66525 3.25 8.85714 3.43889 8.85714 3.67188V5.07812C8.85714 5.31111 8.66525 5.5 8.42857 5.5H7C6.76332 5.5 6.57143 5.31111 6.57143 5.07812V3.67188ZM6.57143 7.04688C6.57143 6.81389 6.76332 6.625 7 6.625H8.42857C8.66525 6.625 8.85714 6.81389 8.85714 7.04688V8.45312C8.85714 8.68611 8.66525 8.875 8.42857 8.875H7C6.76332 8.875 6.57143 8.68611 6.57143 8.45312V7.04688ZM8.42857 12.25H7C6.76332 12.25 6.57143 12.0611 6.57143 11.8281V10.4219C6.57143 10.1889 6.76332 10 7 10H8.42857C8.66525 10 8.85714 10.1889 8.85714 10.4219V11.8281C8.85714 12.0611 8.66525 12.25 8.42857 12.25ZM11.1429 17.875H8.85714V14.9219C8.85714 14.6889 9.04904 14.5 9.28571 14.5H10.7143C10.951 14.5 11.1429 14.6889 11.1429 14.9219V17.875ZM13.4286 11.8281C13.4286 12.0611 13.2367 12.25 13 12.25H11.5714C11.3348 12.25 11.1429 12.0611 11.1429 11.8281V10.4219C11.1429 10.1889 11.3348 10 11.5714 10H13C13.2367 10 13.4286 10.1889 13.4286 10.4219V11.8281ZM13.4286 8.45312C13.4286 8.68611 13.2367 8.875 13 8.875H11.5714C11.3348 8.875 11.1429 8.68611 11.1429 8.45312V7.04688C11.1429 6.81389 11.3348 6.625 11.5714 6.625H13C13.2367 6.625 13.4286 6.81389 13.4286 7.04688V8.45312ZM13.4286 5.07812C13.4286 5.31111 13.2367 5.5 13 5.5H11.5714C11.3348 5.5 11.1429 5.31111 11.1429 5.07812V3.67188C11.1429 3.43889 11.3348 3.25 11.5714 3.25H13C13.2367 3.25 13.4286 3.43889 13.4286 3.67188V5.07812Z"
+              fill="black" />
+          </svg>
+          <span>Company Access</span>
+        </div>
+        <!-- <div class="popup-button" (click)="onTopCornerDetail();">
+                <i class="fas fa-users"></i>
+                <span>Roles</span>
+            </div> -->
+      </div>
+
+      <!-- Bulk Operations Section -->
+      <div class="popup-section">
+        <div class="section-title">Bulk Operations</div>
+        <div class="popup-button" (click)="BatchUpdate(); closeActionsPopup();">
+          <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"
+            fill="none">
+            <path
+              d="M8.56 7.35999L7.4 6.22C7.25333 6.07333 7.07013 6 6.8504 6C6.63067 6 6.44053 6.08 6.28 6.24C6.13333 6.38666 6.06 6.57333 6.06 6.8C6.06 7.02666 6.13333 7.21333 6.28 7.35999L8 9.07999C8.16 9.23999 8.34667 9.31999 8.56 9.31999C8.77333 9.31999 8.96 9.23999 9.12 9.07999L12.52 5.68C12.68 5.52 12.7568 5.33333 12.7504 5.12C12.744 4.90666 12.6672 4.72 12.52 4.56C12.36 4.4 12.1701 4.3168 11.9504 4.3104C11.7307 4.304 11.5405 4.38053 11.38 4.54L8.56 7.35999ZM4.8 12.8C4.36 12.8 3.98347 12.6435 3.6704 12.3304C3.35733 12.0173 3.20053 11.6405 3.2 11.2V1.6C3.2 1.16 3.3568 0.783466 3.6704 0.4704C3.984 0.157333 4.36053 0.000533333 4.8 0H14.4C14.84 0 15.2168 0.1568 15.5304 0.4704C15.844 0.784 16.0005 1.16053 16 1.6V11.2C16 11.64 15.8435 12.0168 15.5304 12.3304C15.2173 12.644 14.8405 12.8005 14.4 12.8H4.8ZM1.6 16C1.16 16 0.783467 15.8435 0.4704 15.5304C0.157333 15.2173 0.000533333 14.8405 0 14.4V4C0 3.77333 0.0768001 3.58346 0.2304 3.4304C0.384 3.27733 0.573867 3.20053 0.8 3.2C1.02613 3.19946 1.21627 3.27626 1.3704 3.4304C1.52453 3.58453 1.60107 3.7744 1.6 4V14.4H12C12.2267 14.4 12.4168 14.4768 12.5704 14.6304C12.724 14.784 12.8005 14.9739 12.8 15.2C12.7995 15.4261 12.7227 15.6163 12.5696 15.7704C12.4165 15.9245 12.2267 16.0011 12 16H1.6Z"
+              fill="black" />
+          </svg>
+          <span>Batch Changes</span>
+        </div>
+        <div class="popup-button" (click)="BulkTrigger(); closeActionsPopup();">
+          <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"
+            fill="none">
+            <path
+              d="M8.44953 10.8517L3.59096 15.6845C3.35664 15.9176 2.97674 15.9176 2.74244 15.6845L2.17574 15.1209C1.94181 14.8882 1.94136 14.5111 2.17474 14.2778L6.02528 10.4297L2.17476 6.58152C1.94139 6.34829 1.94184 5.97117 2.17576 5.73849L2.74244 5.17481C2.97676 4.94173 3.35666 4.94173 3.59096 5.17481L8.44953 10.0077C8.68386 10.2407 8.68386 10.6186 8.44953 10.8517ZM18 15.4032V14.6074C18 14.2778 17.7314 14.0106 17.4 14.0106H9.80001C9.46863 14.0106 9.20001 14.2778 9.20001 14.6074V15.4032C9.20001 15.7328 9.46863 16 9.80001 16H17.4C17.7314 16 18 15.7328 18 15.4032Z"
+              fill="black" />
+          </svg>
+          <span>Trigger Input on Fields</span>
+        </div>
+      </div>
+
+      <!-- Additional Actions Section -->
+      <div class="popup-section">
+        <div class="section-title">Configuration</div>
+        <div class="popup-button" (click)="onTopCornerDetail(); closeActionsPopup();">
+          <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="16" viewBox="0 0 18 16"
+            fill="none">
+            <path
+              d="M16.3125 0H1.6875C0.755859 0 0 0.767857 0 1.71429V14.2857C0 15.2321 0.755859 16 1.6875 16H16.3125C17.2441 16 18 15.2321 18 14.2857V1.71429C18 0.767857 17.2441 0 16.3125 0ZM15.75 5.71429H2.25V2.71429C2.25 2.47857 2.43984 2.28571 2.67188 2.28571H15.3281C15.5602 2.28571 15.75 2.47857 15.75 2.71429V5.71429Z"
+              fill="black" />
+          </svg>
+          <span>Record Header</span>
+        </div>
+        <div class="popup-button" (click)="GridViewMasterConfig('',''); closeActionsPopup();">
+          <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="14" viewBox="0 0 18 14"
+            fill="none">
+            <path
+              d="M11.0812 0.00012169H1.51875C0.679957 0.00012169 0 0.671684 0 1.50012V12.5001C0 13.3286 0.679957 14.0001 1.51875 14.0001H11.0812C11.92 14.0001 12.6 13.3286 12.6 12.5001V1.50012C12.6 0.671684 11.92 0.00012169 11.0812 0.00012169ZM5.2875 12.0001H2.025V4.00012H5.2875V12.0001ZM10.575 12.0001H7.3125V4.00012H10.575V12.0001Z"
+              fill="black" />
+            <path
+              d="M16.3687 0H6.80625C5.96746 0 5.2875 0.671563 5.2875 1.5V12.5C5.2875 13.3284 5.96746 14 6.80625 14H16.3687C17.2075 14 17.8875 13.3284 17.8875 12.5V1.5C17.8875 0.671563 17.2075 0 16.3687 0ZM10.575 12.0001H7.3125V4.00012H10.575V12.0001ZM15.8625 12H12.6V4H15.8625V12Z"
+              fill="black" />
+          </svg>
+          <span>Grid Master Config</span>
+        </div>
+        <div class="popup-button" (click)="UniqueConstraint(); closeActionsPopup();">
+          <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"
+            fill="none">
+            <path
+              d="M11.6071 17.8527L6.14286 16.338V8.74344H7.51429C7.61429 8.74344 7.71429 8.7541 7.81429 8.77541C7.91429 8.79673 8.01429 8.82114 8.11429 8.84863L14.05 11.0155C14.25 11.0856 14.4109 11.2119 14.5326 11.3942C14.6543 11.5765 14.7149 11.7658 14.7143 11.9622C14.7143 12.2567 14.6106 12.4951 14.4031 12.6775C14.1957 12.8598 13.9566 12.951 13.6857 12.951H11.4357C11.3643 12.951 11.3109 12.9476 11.2754 12.9409C11.24 12.9341 11.1934 12.9165 11.1357 12.8879L10.1714 12.5302C10.0571 12.4881 9.94286 12.4951 9.82857 12.5512C9.71429 12.6074 9.64286 12.6845 9.61429 12.7827C9.58571 12.8949 9.59286 13.0001 9.63571 13.0982C9.67857 13.1964 9.75714 13.2665 9.87143 13.3086L11.1357 13.7504C11.1643 13.7644 11.2071 13.7751 11.2643 13.7824C11.3214 13.7897 11.3714 13.793 11.4143 13.7925H17.2857C17.7429 13.7925 18.1429 13.9538 18.4857 14.2763C18.8286 14.5989 19 14.9986 19 15.4755L12.6786 17.8107C12.5357 17.8668 12.3609 17.8985 12.154 17.9058C11.9471 17.913 11.7649 17.8954 11.6071 17.8527ZM1 16.317V10.4264C1 9.96362 1.168 9.56755 1.504 9.23824C1.84 8.90893 2.24343 8.744 2.71429 8.74344C3.18514 8.74288 3.58886 8.90781 3.92543 9.23824C4.262 9.56867 4.42971 9.96474 4.42857 10.4264V16.317C4.42857 16.7798 4.26086 17.1762 3.92543 17.506C3.59 17.8359 3.18629 18.0006 2.71429 18C2.24229 17.9994 1.83886 17.8348 1.504 17.506C1.16914 17.1773 1.00114 16.7809 1 16.317ZM11.2214 6.40826L15.4857 2.24281C15.6429 2.08853 15.8394 2.00775 16.0754 2.00045C16.3114 1.99316 16.5149 2.07394 16.6857 2.24281C16.8429 2.39708 16.9214 2.59343 16.9214 2.83186C16.9214 3.07029 16.8429 3.26664 16.6857 3.42091L11.8214 8.19646C11.65 8.36476 11.45 8.44891 11.2214 8.44891C10.9929 8.44891 10.7929 8.36476 10.6214 8.19646L8.17857 5.79817C8.00714 5.62987 7.92486 5.43352 7.93171 5.20911C7.93857 4.98471 8.028 4.78836 8.2 4.62006C8.37143 4.46578 8.57143 4.385 8.8 4.37771C9.02857 4.37041 9.22857 4.4512 9.4 4.62006L11.2214 6.40826Z"
+              fill="black" />
+          </svg>
+          <span>Require Unique Value</span>
+        </div>
+        <!-- <div class="popup-button" (click)="openJsonImportModal(jsonModalTemplate);">
+                <i class="fas fa-upload"></i>
+                <span>Import BM JSON</span>
+            </div>
+            <div class="popup-button" (click)="goToVersionGrid();">
+                <i class="fas fa-eye"></i>
+                <span>Live Version</span>
+            </div> -->
+      </div>
+      <div class="popup-section">
+        <div class="popup-button" (click)="showDeleteMessage(); closeActionsPopup();">
+          <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="20" viewBox="0 0 18 20"
+            fill="none">
+            <path
+              d="M1.71429 18.125C1.71429 18.6223 1.90619 19.0992 2.24777 19.4508C2.58935 19.8025 3.05264 20 3.53571 20H14.4643C14.9474 20 15.4106 19.8025 15.7522 19.4508C16.0938 19.0992 16.2857 18.6223 16.2857 18.125V5H1.71429V18.125ZM12.0357 8.125C12.0357 7.95924 12.0997 7.80027 12.2135 7.68306C12.3274 7.56585 12.4818 7.5 12.6429 7.5C12.8039 7.5 12.9583 7.56585 13.0722 7.68306C13.186 7.80027 13.25 7.95924 13.25 8.125V16.875C13.25 17.0408 13.186 17.1997 13.0722 17.3169C12.9583 17.4342 12.8039 17.5 12.6429 17.5C12.4818 17.5 12.3274 17.4342 12.2135 17.3169C12.0997 17.1997 12.0357 17.0408 12.0357 16.875V8.125ZM8.39286 8.125C8.39286 7.95924 8.45682 7.80027 8.57069 7.68306C8.68455 7.56585 8.83898 7.5 9 7.5C9.16103 7.5 9.31545 7.56585 9.42932 7.68306C9.54318 7.80027 9.60714 7.95924 9.60714 8.125V16.875C9.60714 17.0408 9.54318 17.1997 9.42932 17.3169C9.31545 17.4342 9.16103 17.5 9 17.5C8.83898 17.5 8.68455 17.4342 8.57069 17.3169C8.45682 17.1997 8.39286 17.0408 8.39286 16.875V8.125ZM4.75 8.125C4.75 7.95924 4.81397 7.80027 4.92783 7.68306C5.04169 7.56585 5.19612 7.5 5.35714 7.5C5.51817 7.5 5.6726 7.56585 5.78646 7.68306C5.90032 7.80027 5.96429 7.95924 5.96429 8.125V16.875C5.96429 17.0408 5.90032 17.1997 5.78646 17.3169C5.6726 17.4342 5.51817 17.5 5.35714 17.5C5.19612 17.5 5.04169 17.4342 4.92783 17.3169C4.81397 17.1997 4.75 17.0408 4.75 16.875V8.125ZM16.8929 1.25001H12.3393L11.9826 0.519538C11.907 0.363372 11.7906 0.232008 11.6465 0.140225C11.5024 0.0484421 11.3362 -0.00011828 11.1667 6.84872e-06H6.82946C6.66037 -0.000662313 6.49451 0.047717 6.35089 0.139602C6.20726 0.231487 6.09169 0.363161 6.01741 0.519538L5.66071 1.25001H1.10714C0.946119 1.25001 0.791689 1.31585 0.677828 1.43306C0.563967 1.55027 0.5 1.70925 0.5 1.87501L0.5 3.12501C0.5 3.29077 0.563967 3.44974 0.677828 3.56695C0.791689 3.68416 0.946119 3.75001 1.10714 3.75001H16.8929C17.0539 3.75001 17.2083 3.68416 17.3222 3.56695C17.436 3.44974 17.5 3.29077 17.5 3.12501V1.87501C17.5 1.70925 17.436 1.55027 17.3222 1.43306C17.2083 1.31585 17.0539 1.25001 16.8929 1.25001Z"
+              fill="#EB583B" />
+          </svg>
+          <span style="color: #EB583B;">Delete</span>
+        </div>
+      </div>
+
+    </form>
+  </div>
+  <div class="p-1"></div>
+
+
+
+
+  <div class="grid">
+    <generic-grid [dataSource]="dataSource" [headerMap]="HeaderMap" [itemsCount]="itemsCount" [sNo]="false"
+      [pageNum]="pageNum" (pageChange)="pageChange($event)" (rowClick)="OnRowClick($event)"
+      (actionClick)="actionClick($event)" (actionsMenuOpen)="onActionsMenuOpen($event)"
+      (actionsMenuOpen)="openActionsPopupAt($event)" #genericgridcomponent>
+    </generic-grid>
+
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <ng-template #bulkUpload let-modal>
+    <div class="modal-header">
+      <h4 class="modal-titlewf" id="modal-basic-title">Upload BM File</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true" class="fas fa-times-circle fa-fw"></span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form>
+        <div class="form-group">
+          <div class="custom-file">
+                <input type="file" class="form-control" id="fileupload" (change)="handleAnyFileInput($event, bulkUpload, jsonModalTemplate)"
+                accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/json">
+              </div>
+              <div class="input-group">
+                <span>{{fileName}}</span>
+              </div>
+              <div class="input-group">
+                <span style="color: #dc3545;" *ngIf="IsValidFile">{{errorMsg}}</span>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" style="color:white" class="btn btn-primary btn-sm" (click)="downloadTemplate()" >Download Excel
+            Template</button>
+          <button type="button" style="color:white" class="btn btn-primary btn-sm" [disabled]="IsValidFile" (click)="upload()">Upload</button>
+        </div>
+      </ng-template>
+       <ng-template #jsonModalTemplate let-modal>
+        <div class="modal-header">
+          <h4 class="modal-titlewf" id="modal-basic-title">Upload BMJson File</h4>
+          <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+            <span aria-hidden="true" class="fas fa-times-circle fa-fw"></span>
+          </button>
+        </div>
+                  <div class="accordion"></div>
+        <div class="modal-body">
+          <form>
+            <div class="form-group">
+              <div class="custom-file">
+                <input 
+                  type="file" 
+                  (change)="validateJsonFile($event)" 
+                  id="fileupload" 
+                  class="form-control" 
+                  accept="application/json">
+                <label class="custom-file-label" for="fileupload"></label>
+              </div>
+              <div class="input-group">
+                <span>{{ fileName }}</span>
+              </div>
+              <div class="input-group">
+                <span style="color: #dc3545;" *ngIf="IsValidFile">{{ errorMsg }}</span>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" style="color: white;" class="btn btn-primary btn-sm" [disabled]="IsValidFile" (click)="ImportJsonBM()">Upload</button>
+        </div>
+      </ng-template>
+</div>

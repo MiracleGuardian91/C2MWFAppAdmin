@@ -1,0 +1,26 @@
+
+
+
+<div *ngIf="sideNavModel && sideNavModel.type=='dmog'">
+	<app-dmog-settings 
+	[sideNavModel]="sideNavModel" 
+	(reloadParent)="reloadParent()"
+	(UpdatedDataEmitter)="updatedDataForParent($event)"
+	>
+	</app-dmog-settings>
+</div>
+<div *ngIf="sideNavModel && sideNavModel.type=='ParentRow'">
+	<app-contier-parent-row-settings [sideNavModel]="sideNavModel" ></app-contier-parent-row-settings>
+</div>
+<div *ngIf="sideNavModel && sideNavModel.type=='Column' && !DraggingStatus">
+	<app-container-column-settings [DraggingStatus]="DraggingStatus" [sideNavModel]="sideNavModel" [selectedItems]="selectedItems" ></app-container-column-settings>
+</div>
+<div *ngIf="sideNavModel && sideNavModel.type=='NestedcolumnRow'">
+	<app-dmog-sub-row-settings [sideNavModel]="sideNavModel" ></app-dmog-sub-row-settings>
+</div>
+<div *ngIf="sideNavModel && sideNavModel.type=='columnRow' && !DraggingStatus">
+	<app-dmog-sub-column-settings  [DraggingStatus]="DraggingStatus" [sideNavModel]="sideNavModel" ></app-dmog-sub-column-settings>
+</div>
+
+
+

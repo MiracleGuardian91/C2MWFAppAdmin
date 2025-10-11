@@ -1,0 +1,50 @@
+<div class="container" [style.top]="transformy">
+  <div class="row-settings-header">Row Setting</div>
+    <label class="main-heading">Settings</label>
+    <div class="continer-header">
+      <div class="continer-heading">Card Name</div>
+      <div class="continer-Name-bold">{{sideNavModel!.dmog!.DisplayName}}</div>
+    </div>
+    <div class="continer-header">
+      <div class="continer-heading">Columns</div>
+      <div class="continer-Name">
+        <div class="settings-range"> 
+            <div class="range-box">
+              <input class="range-line"
+                 type="range"
+                (input)="changeWidth($event)"
+                (change)="SaveWidthWidth($event)"
+                min="{{Existingcolumn}}" 
+                max="12"
+                step="1" 
+               displayWith="formatLabel" [(ngModel)]="column"
+              >
+            </div>
+
+            <div class=" range-counter">
+              <input min="Existingcolumn" max="12"  class="input" (change)="SaveWidthWidth($event)" [(ngModel)]="column"
+             
+            />
+          </div>
+        </div>
+        
+      </div>
+    </div>
+    <hr class="break-line" />
+    <!-- <div class="slider-nav">
+    <div>
+    <mat-slider (input)="changeWidth($event)" (change)="SaveWidthWidth($event)" min="{{Existingcolumn}}" max="12" step="1"  [displayWith]="formatLabel" [(ngModel)]="column">
+      <input matSliderThumb>
+      </mat-slider>
+    </div>
+      <div>
+      <input  min="Existingcolumn" max="12"  class="input" (change)="SaveWidthWidth($event)" [(ngModel)]="column">
+      </div>
+    </div> -->
+    
+    
+   
+    </div>
+    
+
+   

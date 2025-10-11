@@ -1,0 +1,144 @@
+<div class="popup">
+  <div class="popup__header">
+    <h2>Company Association</h2>
+    <span class="popup__close"><i class="fas fa-times-circle fa-fw" (click)="ref.close()"></i></span>
+  </div>
+  <hr>
+
+  <div class="row mb-4">
+    <div class="col-lg-3">
+      <form [formGroup]="selectGroup" class="span-6" *ngIf="grouplist$ | async as items">
+        <div class="form-group">
+          <label>Groups</label>
+          <ng-container *ngIf="!isAdd ; else addNew">
+            <app-custom-select [items]="items" [parentForm]="selectGroup" controlName="group"></app-custom-select>
+          </ng-container>
+        </div>
+      </form>
+
+      <ng-template #addNew>
+        <input type="text" [(ngModel)]="newGroupItem" class="form-control">
+      </ng-template>
+    </div>
+    <div class="col-lg-4 align-items-center mt-2">
+      <div class="form-group">
+        <ng-container *ngIf="!isAdd ; else addItem">
+          <button type="button" class="btn btn-link mt-3 btn-sm" (click)="isAddAction()">Add new group</button>
+        </ng-container>
+        <ng-template #addItem>
+          <button type="button" class="btn btn-link mt-3 btn-sm" (click)="isAdd=false;">Cancel</button>
+        </ng-template>
+      </div>  
+    </div>
+  </div>
+
+  <div *ngIf="associations$ | async as items">
+
+    <!-- All Companies Checkbox -->
+    <div class="mb-1">
+      <label class="checkbox">
+        <input
+         type="checkbox"
+         [checked]="allAssociationCheck"
+         (change)="toggleAllCompanyAssociation()"
+         />
+          <i class="skin"></i>
+         <span >All Companies</span> 
+        </label>
+    </div>
+  
+    <!-- Search, Select/Clear Actions -->
+    <div class="row mb-3" *ngIf="!allAssociationCheck">
+      <div class="col-lg-6 d-flex justify-content-between">  
+        <div class="search-container">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Search Company"
+            [(ngModel)]="CompanyName"
+          />
+        </div>
+  
+        <div class="actions">
+          <div
+            class="action-btn"
+            *ngIf="_allItems.length > 0"
+            (click)="toggleSelected(true)"
+          >
+            Select all
+          </div>
+        </div>
+      </div>
+  
+      <div class="col-lg-6">
+        <div class="actions">
+          <div
+            class="action-btn"
+            *ngIf="_allItems.length > 0 && selectedCompItems.length > 0"
+            (click)="toggleSelected(false)"
+          >
+            Clear all
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Dual Column UI -->
+    <div class="container" *ngIf="_allItems.length > 0 && !allAssociationCheck">
+      <div class="row">
+  
+        <!-- Left: Available Companies -->
+        <div class="col-lg-6 scrollable-column" style="border: 1px solid #dfdfdf;">
+          <div
+            class="item"
+            *ngFor="let item of _allItems | searchColumn: CompanyName : 'CompanyName'"
+          >
+            <div class="item__content">{{ item.CompanyName }}</div>
+            <span>
+              <a
+                class="action-btn"
+                href="javascript:void(0)"
+                (click)="onAction(item)"
+              >
+                {{ item.isSelected ? 'Added' : 'Add' }}
+              </a>
+            </span>
+          </div>
+        </div>
+  
+        <!-- Right: Selected Companies -->
+        <div class="col-lg-6 scrollable-column">
+          <div class="item" *ngFor="let item of selectedCompItems">
+            <div class="item__content">{{ item.CompanyName }}</div>
+            <span>
+              <a
+                class="action-btn"
+                href="javascript:void(0)"
+                (click)="onAction(item)"
+              >
+                {{ item.isSelected ? 'Remove' : '' }}
+              </a>
+            </span>
+          </div>
+        </div>
+  
+      </div>
+    </div>
+  
+  </div>
+
+
+
+  <div class=" mt-3" [ngClass]="{'d-none': allAssociationCheck, 'd-block': !allAssociationCheck}" >
+    <app-association class="row" *ngIf="associations$ | async as items" [displayWith]="displayWith"
+      [uniqueWith]="uniqueWith" [items]="items[0]" [associatedItems]="items[1]" [checkBy]="checkBy"
+      (select)="onSelect($event)">
+    </app-association>
+  </div>
+
+  <div class="popup__actions mt-4">
+    <button class="btn btn-light btn-sm" type="button" (click)="ref.close()">Cancel</button>
+    <button  class="btn btn-primary btn-sm" type="submit"
+      (click)="onSubmit()">Save</button>
+  </div>
+</div>

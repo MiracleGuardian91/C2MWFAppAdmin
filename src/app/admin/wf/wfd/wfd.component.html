@@ -1,0 +1,33 @@
+<div class="breadcrumbs p-1 mb-1" style="background-color: #fff;">
+    <a (click)="routeBack()">
+      <img [src]="backsImageUrl" style="filter: var(--plx-app-list-icon-filter);" width="20px">
+      <span>Back</span>
+    </a> 
+  </div>
+<div class="diagram-parent">
+  <!-- <div class="enableDisable" [ngStyle]="{ 'background-color': serviceBpmn.paletteIsOpen ? '#005996' : '#F2F2F2' }">
+    <div style=" padding: 8px 7px;" (click)="serviceBpmn.togglePalette()">
+    <div *ngIf="serviceBpmn.paletteIsOpen">
+       <svg xmlns="http://www.w3.org/2000/svg" width="26" height="24" viewBox="0 0 26 24" fill="none">
+        <rect x="0.75" y="0.75" width="22.3095" height="16.3571" fill="#005996" stroke="white" stroke-width="1.5"/>
+        <circle cx="17.5" cy="15.5" r="7.75" fill="#005996" stroke="white" stroke-width="1.5" />
+      </svg>
+      </div>
+      <div *ngIf="!serviceBpmn.paletteIsOpen">
+      <svg xmlns="http://www.w3.org/2000/svg" width="26" height="24" viewBox="0 0 26 24" fill="none">
+        <rect x="0.75" y="0.75" width="22.3095" height="16.3571" stroke="black" stroke-width="1.5"/>
+        <circle cx="17.5" cy="15.5" r="7.75" fill="white" stroke="black" stroke-width="1.5"/>
+        </svg>
+        </div>
+    </div>
+  
+  </div> -->
+  
+  <app-diagram 
+    *ngIf="metadata$ | async as metadata"
+    [metadata]="metadata"
+    (workflowDeleted)="handleDelete()"
+  ></app-diagram>
+</div>
+
+<div class="modeler"></div>

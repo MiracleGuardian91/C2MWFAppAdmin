@@ -1,0 +1,130 @@
+<form *ngIf="WFSaveUpdateForm" [formGroup]="WFSaveUpdateForm">
+  <div>
+<div class="modal-header" style="justify-content: space-between;">
+    <h4 class="modal-titlewf" *ngIf="!isEdit">Create New Record</h4>
+    <h4 class="modal-titlewf" *ngIf="isEdit">Update Record</h4>
+    <button type="button" aria-label="Close" class="close-button" (click)="activeModal.close(false)">
+      <span aria-hidden="true" class="fas fa-times-circle fa-fw"></span>
+  </button>   
+  </div>
+  <div class="modal-body">
+    <div class="contents">   
+      <div style="text-align: center;">
+        <span *ngIf="currentMode === 'Published'" style="text-align: center;color: red;">WF is in Publish Mode. No changes are allowed.</span>
+      </div>   
+      <div class="form-group row">       
+        <div class="col-sm-6">
+          <label class="input-label" for="ex2">Workflow Name*</label>
+          <input class="form-control" id="Name"
+          [ngClass]="{'is-invalid': (submitted && (f.Name.errors?.required || f.Name.errors?.pattern))}"
+          formControlName="Name"
+          [value]="WFSaveUpdateForm.get('Name').value"
+          type="text">
+        </div>
+        <div class="col-sm-6">
+          <label class="input-label" for="ex3">Workflow Friendly Name*</label>
+          <input class="form-control" id="FriendlyName"
+          [ngClass]="{'is-invalid': (submitted && f.FriendlyName.errors?.required)}"
+          formControlName="FriendlyName"
+          [value]="WFSaveUpdateForm.get('FriendlyName').value"
+          type="text">
+        </div>
+      </div>
+      <div class="form-group row" *ngIf="isEdit">       
+        <div class="col-sm-6">
+          <label class="input-label" for="ex2">Workflow Version</label>
+          <input class="form-control" id="Version"
+          [ngClass]="{'is-invalid': (submitted && f.Version.errors?.required)}"
+          formControlName="Version"
+          [value]="WFSaveUpdateForm.get('Version').value"
+          type="text" disabled="isEdit">
+        </div>
+        <div class="col-sm-6">
+          <label class="input-label" for="ex3">Workflow Mode</label>
+          <input class="form-control" id="Mode"
+          [ngClass]="{'is-invalid': (submitted && f.Mode.errors?.required)}"
+          formControlName="Mode"
+          [value]="WFSaveUpdateForm.get('Mode').value"
+          type="text" disabled="isEdit">
+        </div>
+      </div>
+      <div class="form-group row">       
+        <div class="col-sm-6">
+          <label class="input-label" for="ex2">Short Description*</label>
+          <input class="form-control" id="ShortDesc"
+          [ngClass]="{'is-invalid': (submitted && f.ShortDesc.errors?.required)}"
+          formControlName="ShortDesc" 
+          [value]="WFSaveUpdateForm.get('ShortDesc').value"
+          type="text">
+        </div>
+        <div class="col-sm-6">
+          <label class="input-label" for="ex3">Certification Type*</label>          
+          <input class="form-control" id="ProcessName"
+          [ngClass]="{'is-invalid': (submitted && f.ProcessName.errors?.required)}"
+          formControlName="ProcessName" 
+          [value]="WFSaveUpdateForm.get('ProcessName').value"
+          type="text" disabled="true">
+        </div>
+      </div>
+      <div class="form-group row">       
+        <div class="col-sm-6">
+          <label class="input-label" for="ex2">Email From*</label>
+          <input class="form-control" id="EmailFrom"
+          [ngClass]="{'is-invalid': (submitted && f.EmailFrom.errors?.required) || (submitted && f.EmailFrom.errors?.email) || (submitted && f.EmailFrom.errors?.pattern) }"
+          formControlName="EmailFrom" 
+          [value]="WFSaveUpdateForm.get('EmailFrom').value"
+          type="email">
+        </div>
+        <div class="col-sm-6">
+          <label class="input-label" for="ex3">OBE Email Subject Line</label>
+          <input class="form-control" id="OBEMailSublect"
+          [ngClass]="{'is-invalid': (submitted && f.OBEMailSublect.errors?.required)}"
+          formControlName="OBEMailSublect" 
+          [value]="WFSaveUpdateForm.get('OBEMailSublect').value"
+          type="text">
+        </div>
+      </div>    
+      <div class="form-group row">       
+        <div class="col-sm-12">
+          <label class="input-label" for="ex2">Long Description</label>
+          <textarea class="form-control"
+          [ngClass]="{'is-invalid': (submitted && f.LongDesc.errors?.required)}"
+          formControlName="LongDesc"
+          [value]="WFSaveUpdateForm.get('LongDesc').value"
+          rows="4" id="LongDesc" placeholder="" name="Description">
+          </textarea>
+        </div>                       
+      </div>
+      <div class="form-group row"  *ngIf="stageList">       
+        <div class="col-sm-3">
+          <label class="input-label"  for="ex2">States</label>          
+        </div>
+        <div class="col-sm-3">
+          <label class="input-label" for="ex3">(%)</label>          
+        </div>
+      </div>
+      <div class="form-group row" *ngIf="stageList">
+        <div class="col-sm-12">
+          <ng-container *ngFor="let stgCtrl of WFSaveUpdateForm.controls.StatePercentage.value;let i = index;">            
+            <div class="form-group row">               
+            <div class="col-sm-3" style="width: 25%;">
+              <label class="input-label" for="ex2">{{stgCtrl.StateName}}</label>            
+            </div>
+            <div class="col-sm-3" style="width: 25%;">
+              <input class="form-control" id="per_{{i}}"                            
+              [value]="stgCtrl.Percentage"                                   
+              type="number"  (keyup)="ValidateStatgePercent(stgCtrl,$event,i)">
+              <span *ngIf="error!=='' && currState === i" style="color: red;font-size: 10px;">{{error}}</span>
+            </div>
+          </div>           
+        </ng-container>
+        </div>          
+    </div>
+      <div class="update_detail">
+        <button type="button" class="btn btn-primary"  (click)="activeModal.close(false)">Cancel</button>
+        <button type="submit" *ngIf="currentMode !== 'Published'" (click)="onSubmit()" class="btn btn-primary">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+</form>

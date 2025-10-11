@@ -1,0 +1,31 @@
+<div class="header-row col-sm-12 pt-2 pb-2">
+	<!-- <button class="btn btn-outline-white btn-sm" (click)="newVersion.emit()"><i class="fas fa-code-branch" ></i> New Version</button> -->
+	<div class="heading-section">
+		<div class="buss-heading">{{ businessModel?.DisplayName || 'Business Model' }} ({{ businessModel?.Version || 'Version' }})</div>
+		<div class="gear-icon" (click)="CreateNewRecord()"><svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 19 19" fill="none">
+			<path d="M18.3469 11.6609L16.7453 10.7283C16.907 9.8488 16.907 8.94657 16.7453 8.06708L18.3469 7.13451C18.5311 7.02837 18.6138 6.8085 18.5536 6.60379C18.1363 5.25423 17.4258 4.03356 16.4972 3.01759C16.3543 2.86217 16.1212 2.82426 15.9407 2.9304L14.3392 3.86297C13.6662 3.27917 12.8917 2.82805 12.0533 2.53236V0.671025C12.0533 0.458735 11.9067 0.272981 11.6999 0.22749C10.3202 -0.0833643 8.90658 -0.0682007 7.59449 0.22749C7.38771 0.272981 7.24109 0.458735 7.24109 0.671025V2.53615C6.40646 2.83563 5.63199 3.28675 4.95527 3.86676L3.35745 2.93419C3.17323 2.82805 2.94389 2.86217 2.80103 3.02139C1.87241 4.03356 1.16185 5.25423 0.744541 6.60758C0.680628 6.81229 0.767098 7.03216 0.951317 7.13831L2.5529 8.07087C2.39123 8.95036 2.39123 9.85259 2.5529 10.7321L0.951317 11.6646C0.767098 11.7708 0.684387 11.9907 0.744541 12.1954C1.16185 13.5449 1.87241 14.7656 2.80103 15.7816C2.94389 15.937 3.17699 15.9749 3.35745 15.8688L4.95902 14.9362C5.63199 15.52 6.40646 15.9711 7.24485 16.2668V18.1319C7.24485 18.3442 7.39147 18.53 7.59825 18.5755C8.97801 18.8863 10.3916 18.8711 11.7037 18.5755C11.9105 18.53 12.0571 18.3442 12.0571 18.1319V16.2668C12.8917 15.9673 13.6662 15.5162 14.3429 14.9362L15.9445 15.8688C16.1287 15.9749 16.3581 15.9408 16.5009 15.7816C17.4295 14.7694 18.1401 13.5487 18.5574 12.1954C18.6138 11.9869 18.5311 11.767 18.3469 11.6609ZM9.64722 12.4304C7.98924 12.4304 6.63956 11.0695 6.63956 9.39768C6.63956 7.7259 7.98924 6.36496 9.64722 6.36496C11.3052 6.36496 12.6549 7.7259 12.6549 9.39768C12.6549 11.0695 11.3052 12.4304 9.64722 12.4304Z" fill="#EB583B"/>
+		  </svg></div>
+	</div>
+	<div class="btn-section">
+		<button class="btn btn-outline-white btn-sm" (click)="generateXml.emit()">
+			<svg xmlns="http://www.w3.org/2000/svg" width="20" height="18" viewBox="0 0 20 18" fill="none">
+				<path d="M10.8497 0.35862L12.77 0.742681L9.14066 17.6414L7.22036 17.2573L10.8497 0.35862ZM17.2828 9L13.8358 5.55305V2.83582L20 9L13.8358 15.1546V12.4374L17.2828 9ZM0 9L6.15458 2.83582V5.55305L2.70763 9L6.15458 12.4374V15.1546L0 9Z" fill="white"/>
+				</svg>
+			 Generate JSON</button>
+			 <button class="btn btn-outline-white btn-sm compAssContainer" type="button" (click)="onCompanyAssociation()"><i class="fa fa-link"></i>Company Association</button>
+		<div class="mode d-none" ngbDropdown>
+		<button class="btn btn-sm" [class]="mode === 'Edit' ? 'btn-outline-white-edit' : 'btn-primary'" ngbDropdownToggle>
+			<i class="fas fa-edit" *ngIf="mode === 'Edit'"></i>
+			<i class="fas fa-lock" *ngIf="mode === 'Published'"></i>
+			{{mode}}
+		</button>
+		<ul ngbDropdownMenu style="min-width: auto !important;">
+			<li ngbDropdownItem *ngFor="let mode of ['Edit', 'Published']" (click)="modeChange.emit(mode)">
+			{{mode}}
+			</li>
+		</ul>
+		</div>
+	</div>
+	
+
+</div>

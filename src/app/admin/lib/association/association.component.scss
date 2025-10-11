@@ -1,0 +1,14 @@
+:host {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  font-size: 0.8em;
+  padding: 0 1em;
+  color: var(--primary);
+  font-weight: 500;
+  cursor: pointer;
+}

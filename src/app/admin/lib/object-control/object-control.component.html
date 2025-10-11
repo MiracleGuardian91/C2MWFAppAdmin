@@ -1,0 +1,70 @@
+<div [formGroup]="parentForm">
+  <label>
+    {{config.label || config.name}} 
+    <i *ngIf="config.hint" class="fa fa-question-circle" [title]="config.hint"></i>
+    <span style="color: red" *ngIf="config.required">*</span>
+  </label>
+  <br>
+  <ng-container *ngIf="(config.group || parentForm) as group">
+    <div [formGroup]="group" class="form-group">
+      <input  
+      class="form-control"
+      type="text"
+      [placeholder]="config.placeholder"
+      *ngIf="config.type === 'text'"
+      [formControlName]="config.name"
+      [readonly]="config.readonly"
+      [attr.disabled]="config.readonly ? true : null"
+      [ngClass]="{'is-invalid': submitted && group.controls[config.name].errors || group.controls[config.name].errors && !group.controls[config.name].errors.required}"
+      [ngStyle]="{'background-color': config.readonly ? '#e9ecef' : 'white' }"
+  />
+  
+    </div>
+    <div [formGroup]="group">
+      <textarea *ngIf="config.type === 'textarea'" class="form-control" rows="5" [formControlName]="config.name"
+      [ngClass]="{'is-invalid': submitted && group.controls[config.name].errors || group.controls[config.name].errors && !group.controls[config.name].errors.required}">
+    </textarea>
+    </div>
+    <div class="Ql-container" *ngIf="config.type === 'rich' && config.name">
+      <quill-editor
+      [modules]="{ toolbar: editorConfig.toolbar }"
+      class="Ql-InsideContainer"
+        [formControlName]="config.name"
+    ></quill-editor>
+    </div>
+    <div [formGroup]="group">
+      <mat-radio-group *ngIf="config.type === 'radio'" class="radio-group" [formControlName]="config.name">
+        <mat-radio-button *ngFor="let option of config.options | async" [value]="option?.key || option" >
+          <span style="font-size: 12px">{{option?.value || option}}</span>
+        </mat-radio-button>
+      </mat-radio-group>
+      <mat-slide-toggle *ngIf="config.type === 'switch'" [formControlName]="config.name"></mat-slide-toggle>
+    </div>
+    <ng-container *ngIf="config.type === 'dropdown'">
+      <app-custom-select
+      *ngIf="config.options | async as options"
+      [parentForm]="group"
+      [controlName]="config.name"
+      [items]="options"
+      [groupBy]="config.groupOptionsBy || ''"
+      [multiple]="config.multiple"
+      [readonly]="config.readonly"
+      [fixedHeight]="!config.multiple"
+      [submitted]="submitted">
+    </app-custom-select>
+  </ng-container>
+    <app-list 
+      *ngIf="config.type === 'list'"
+      [parentForm]="group"
+      [controlName]="config.name" 
+      [config]="config.config">
+    </app-list>
+    <div *ngIf="group.controls[config.name].errors as errors" class="invalid-feedback" style="display: block;">
+      <div *ngIf="errors.nameExists">{{errors.message}}</div>
+      <div *ngIf="errors.maxlength">More than {{errors.maxlength.requiredLength}} characters entered</div>
+      <div *ngIf="errors.minlength">Less than {{errors.minlength.requiredLength}} characters entered</div>
+      <div *ngIf="errors.pattern">Invalid characters entered  </div>
+      <div *ngIf="submitted && errors.required">This is a required field</div>
+    </div>
+  </ng-container>
+</div>

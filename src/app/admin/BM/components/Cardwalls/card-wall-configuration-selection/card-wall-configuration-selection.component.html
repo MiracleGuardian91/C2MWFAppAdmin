@@ -1,0 +1,139 @@
+<section class="configurePop">
+  <div class="pop_box largePop">
+    <section class="modal-header">
+      <h3 class="FR22 padding-0">{{ PopupTitle }}</h3>
+
+      <div class="corner-button">
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Close"
+          (click)="activeModal.close(false)"
+        >
+          <!-- <span aria-hidden="true" >&times;</span> -->
+          <span aria-hidden="true" class="popup__close">
+            <i class="fas fa-times-circle fa-fw"></i>
+          </span>
+        </button>
+      </div>
+    </section>
+
+    <section
+      *ngIf="!isNextClicked"
+      aria-label="Modal heading text content"
+      class="modal-body"
+      role="document"
+    >
+      <!---------------------Customize Grid columns Section--------------------->
+      <div class="fWrap sections">
+        <div
+          class="heading FR22"
+          [ngClass]="getToggle('SectionGridColumn') ? 'Hide' : ''"
+        >
+          Select Template
+          <a
+            href="JavaScript:void(0);"
+            (click)="clickEvent('SectionGridColumn')"
+            title="Show Hide"
+          >
+            <!-- <i aria-label="close/open" class="fa fa-chevron-up" role="img"></i> -->
+          </a>
+        </div>
+        <div class="showHide">
+          <div class="custom_wrap">
+            <div class="drag_grid trans-border">
+              <div class="row trans-border d-flex">
+                 <div
+                  class="col-md-6 pad-10"
+                  *ngFor="let item of data"
+                  (click)="cardWallSelected(item)"
+                >
+                  <div 
+                      [innerHTML]="bindHtml(item)" 
+                       
+                      [ngClass]="selectedCard == item.cardId ? 'selected' : 'card-container'"
+                     
+                      >
+              
+                    </div>
+
+
+
+                </div> 
+
+          
+               
+
+
+            
+
+
+                
+                
+                
+                
+
+                
+
+             
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cta-button-group d-flex d-flex-justify">
+       
+        <div class="right-buttons">
+          <button
+          class="btn btn-clear btn-small btn-cancel"
+          (click)="activeModal.close(false)"
+          data-dismiss="modal"
+          type="button"
+        >
+          Cancel
+        </button>
+        <button
+        class="btn btn-warning btn-sm text-white"
+        data-dismiss="modal"
+        type="button" 
+        (click)="nevigateToCardWall()"
+      >
+        Next
+      </button>
+      <!-- <button class="btn btn-clear btn-small" (click)="ResetConfig()" data-dismiss="modal" type="button">Reset Grid</button> -->
+     
+        </div>
+
+
+
+
+
+        <div class="left-buttons">
+          <button 
+          class="btn btn-warning btn-sm text-white"
+          data-dismiss="modal"
+          type="button" 
+         
+          [disabled]="!enableActivate"
+          (click)="ActivateCard()"
+        >
+         Change Template
+        </button>
+        </div>
+      </div>
+    </section>
+
+    <div [ngStyle]="EnableSelect()">
+      <section
+        aria-label="Modal heading text content"
+        class="modal-body modal-body-cardwall"
+        role="document"
+      >
+        <!-- <app-card-wall-view-configuration></app-card-wall-view-configuration> -->
+          <app-card-wall-view-configuration (backToPrevious)="onBackFromChild()"></app-card-wall-view-configuration>
+      </section>
+    </div>
+  </div>
+</section>

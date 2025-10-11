@@ -1,0 +1,52 @@
+<div class="popup">
+<div class="modal-header">
+    <h5 class="modal-title">Node Details</h5>
+    <span type="button" class="fas fa-times-circle fa-fw" aria-label="Close" (click)="activeModal.close()">
+    </span>
+</div>
+
+
+
+<div class="container">
+<div class="row mt-2 mb-3">
+  <div class="col-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Left Tree Node Details</h5>
+        <div *ngFor="let item of LeftData | keyvalue" class="d-flex justify-content-between popuplist">
+          <div class="key-container"><span class="nodekey"
+            [ngClass]="{ 'key-container': item.value === RightData[item.key]  && RightNodeText!='Missing Node' && LeftNodeText!='Missing Node', 
+            'text-danger': item.value !== RightData[item.key]  && RightNodeText!='Missing Node' && LeftNodeText!='Missing Node' }"
+            >{{ item.key }}:</span></div>
+          <div class="value-container"><span class="nodevalue"
+            [ngClass]="{ 'text-success': item.value === RightData[item.key] && RightNodeText!='Missing Node' && LeftNodeText!='Missing Node',
+             'text-danger': item.value !== RightData[item.key] && RightNodeText!='Missing Node' && LeftNodeText!='Missing Node' ,
+             'text-blue': LeftNodeText==='Missing Node' || RightNodeText==='Missing Node' }"
+            >{{ item.value }}</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Right Tree Node Details</h5>
+        <div *ngFor="let item of RightData | keyvalue" class="d-flex justify-content-between popuplist">
+          <div class="key-container"><span class="nodekey"
+            [ngClass]="{ 'key-container': item.value === LeftData[item.key]  && RightNodeText!='Missing Node' && LeftNodeText!='Missing Node',
+            'text-danger': item.value !== LeftData[item.key]  && RightNodeText!='Missing Node' && LeftNodeText!='Missing Node' }"
+            >{{ item.key }}:</span></div>
+           
+          <div class="value-container"><span class="nodevalue"
+           [ngClass]="{ 'text-success': item.value === LeftData[item.key] && RightNodeText!='Missing Node' && LeftNodeText!='Missing Node',
+            'text-danger': item.value !== LeftData[item.key] && RightNodeText!='Missing Node' && LeftNodeText!='Missing Node' , 
+            'text-blue': LeftNodeText==='Missing Node' || RightNodeText==='Missing Node'  }">{{ item.value }}</span></div>
+          </div>
+       
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+

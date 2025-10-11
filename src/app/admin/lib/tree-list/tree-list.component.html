@@ -1,0 +1,21 @@
+<div class="container" cdkDropList (cdkDropListDropped)="drop($event)" [style.height.px]="height" [cdkDropListDisabled]="!dragDrop">
+  <ng-container *ngFor="let item of items">
+    <ng-container *ngTemplateOutlet="treeListItemTemplate || defaultTreeListItem; context: {item: item}"></ng-container>
+  </ng-container>
+  
+  <ng-template #defaultTreeListItem let-item="item">
+    <div class="item" cdkDrag>
+      <div class="item__content">
+        <i *ngIf="dragDrop" class="fas fa-grip-lines" cdkDragHandle style="cursor: move"></i>
+        <span>
+          {{displayWith(item)}}
+        </span>
+      </div>
+       <div class="item__content">
+        <span class="item__action mr-2" [class.disabled]="disableWith(item)"
+          (click)="onAction(item)">{{checkWith(item)}}</span>
+         <div  title="To permanently delete the object, please click on Update." class="item__action" ><i  class="far fa-trash-alt"  *ngIf="canDelete" (click)="onItemRemoved(item)"></i></div>
+      </div>
+    </div>
+  </ng-template>
+</div>

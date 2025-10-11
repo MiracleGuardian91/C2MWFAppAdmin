@@ -1,0 +1,17 @@
+<div *ngIf="showContextMenu" class="contextMenuContainer" 
+[ngStyle]="style" 
+ [@enterAnimation] [style.left]="contextMenuPositiontest.x"
+    [style.top]="contextMenuPositiontest.y">
+  
+<div class="formcomponents">
+    <div class="list-group drag-list" id="form-controls">
+    <input type="text" class="form-control sticky-search"  style="font-size: 13px;"  placeholder="Search..." (input)="searchDmo($event.target.value)">
+
+      <li class="list-group-item list-group-item-action list-group-item-success drag-list-item"
+        
+        *ngFor="let item of shareDmoList"  (click)="DmoSelect(item)">
+        <i  style="margin-right: 5px"></i>{{item.label}} ({{ item.dmoName }})
+      </li>
+    </div>
+  </div>
+</div>

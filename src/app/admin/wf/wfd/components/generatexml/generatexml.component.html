@@ -1,0 +1,31 @@
+<div class="xml-dialog">
+    <div class="xml-dialog-header">
+      <h3 style="margin-top:5px; margin-bottom: 5px;">Unable to Generate JSON</h3>
+      <button type="button" class="close" aria-label="Close" (click)="cancel()">
+        <span aria-hidden="true" class="fas fa-times-circle fa-fw"></span>
+      </button>
+    </div>
+    <div class="xml-dialog-body">
+      <p>
+        We couldn't generate the JSON because the Business Model and Workflow
+        are not yet associated in the Live Version.
+      </p>
+      <p><strong>To Resolve this :</strong></p>
+      <ol *ngIf="!alertMsgTxt || alertMsgTxt.length === 0">
+        <li>Go to the Live Version</li>
+        <li>Select the Business Model and Workflow in the dropdowns</li>
+        <li>Select Change Zone to set the Live Version to Live</li>
+      </ol>
+      <ol *ngIf="alertMsgTxt && alertMsgTxt.length">
+        <li *ngFor="let msg of alertMsgTxt">{{ msg }}</li>
+      </ol>
+
+      <p style="margin-top:20px; margin-bottom: 20px;">Once complete, retry generating the JSON.</p>
+    </div>
+    <div class="xml-dialog-footer">
+      <button class="btn btn-warning" style="margin: 10px;" (click)="goToLiveVersion()">Go to Live Version</button>
+      <button class="btn btn-success invisible" style="margin-left: 10px;margin-right: 265px;" (click)="tryAgain()">Try Again</button>
+      <button class="btn btn-secondary" style="align-content: right;" (click)="cancel()">Cancel</button>
+    </div>
+  </div>
+  

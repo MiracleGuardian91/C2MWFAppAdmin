@@ -1,0 +1,54 @@
+export type DmoType =
+| 'AutoCompleteSearchBox'
+| 'CheckBox'
+| 'CheckBoxList'
+| 'ColorCodeStatus'
+| 'CountryList'
+| 'CreatedBy'
+| 'CreatedDate'
+| 'CreatedDateTime'
+| 'CurrentStage'
+| 'DateTimeZone'
+| 'DateWithCalendar'
+| 'DateEditBox'
+| 'DateTimeBox'
+| 'DropDownList'
+| 'EmailEditBox'
+| 'ID'
+| 'KeyValueSearchBox'
+| 'KeyValueDropdownList'
+| 'ListBox'
+| 'LastUpdatedBy'
+| 'LastUpdatedDate'
+| 'LastUpdatedDateTime'
+| 'MultiSelectDropDownList'
+| 'ProgressBar'
+| 'PhoneTextBox'
+| 'RadioButtonList'
+| 'RangeBox'
+| 'RoleType'
+| 'StaticDateBox'
+| 'TextArea'
+| 'TextBox'
+| 'UrlTextBox'
+| 'UploadDocument'
+| 'UploadImage'
+| 'USAStateList'
+
+export interface BaseDmo {
+  DisplayName: string;
+  Name: string;
+  Type: DmoType;
+  IsReadOnly: boolean;
+  IsRequired: boolean;
+  IsVisible: boolean;
+  IsShowDetails: boolean;
+  IsTooltip: boolean;
+  Length: number;
+  LongDescription: string;
+  Placeholder: string;
+  Rows: number;
+  SortDescription: string;
+  StageStateConditions: any;
+  Conditions: any;
+}

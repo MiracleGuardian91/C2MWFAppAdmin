@@ -1,0 +1,9 @@
+<div class="diagram-parent">
+  <app-ai-diagram 
+    *ngIf="metadata$ | async as metadata"
+    [metadata]="metadata"
+    (workflowDeleted)="handleDelete()"
+  ></app-ai-diagram>
+</div>
+
+<div class="modeler"></div>

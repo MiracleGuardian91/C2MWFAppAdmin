@@ -1,0 +1,139 @@
+<form *ngIf="BMSaveUpdateForm" [formGroup]="BMSaveUpdateForm">
+    <div>
+  <div class="modal-header">
+      <h4 class="modal-titlewf" *ngIf="isEdit">Update Record</h4>
+      <h4 class="modal-titlewf" *ngIf="!isEdit">Create New Record</h4>
+      <button type="button" class="close" aria-label="Close"  (click)="activeModal.close(false)">
+        <span aria-hidden="true" class="fas fa-times-circle fa-fw"></span>
+      </button>    
+    </div>
+    <div class="modal-body">
+      <div class="contents">   
+        <div style="text-align: center;">
+          <span *ngIf="currentMode === 'Published'" style="text-align: center;color: red;">BM is in Publish Mode. No changes are allowed.</span>
+        </div>   
+        <div class="form-group row">       
+          <div class="col-sm-6">
+            <label class="input-label" for="ex2">Business Model Name*</label>
+            <input class="form-control" id="name"
+            maxlength="25"
+            [ngClass]="{'is-invalid': (submitted && (f.name.errors?.required ||  f.name.errors?.pattern ||  f.name.errors?.maxlength))}"
+            formControlName="name"
+            [value]="BMSaveUpdateForm.get('name').value"
+            type="text">
+          </div>
+          <div class="col-sm-6">
+            <label class="input-label" for="ex3">Friendly Name*</label>
+            <input class="form-control" id="displayName"
+            [ngClass]="{'is-invalid': (submitted && f.displayName.errors?.required)}"
+            formControlName="displayName"
+            [value]="BMSaveUpdateForm.get('displayName').value"
+            type="text">
+          </div>
+        </div>
+        <div class="form-group row">       
+          <div class="col-sm-6">
+            <label class="input-label" for="ex2">Version</label>
+            <input class="form-control" id="version"
+            [ngClass]="{'is-invalid': (submitted && f.version.errors?.required)}"
+            formControlName="version"
+            [value]="BMSaveUpdateForm.get('version').value"
+            type="text" disabled="isEdit">
+          </div>
+          <div class="col-sm-6">
+            <label class="input-label" for="ex3">Mode</label>
+            <input class="form-control" id="mode"
+            [ngClass]="{'is-invalid': (submitted && f.mode.errors?.required)}"
+            formControlName="mode"
+            [value]="BMSaveUpdateForm.get('mode').value"
+            type="text" disabled="isEdit">
+          </div>
+        </div>
+        <div class="form-group row" *ngIf="isEdit">   
+          <div class="col-sm-12">
+            <label class="input-label" for="ex2">All Views</label>
+          </div>
+          <section aria-label="Modal heading text content" class="modal-body" role="document">
+            <div class="fWrap sections">
+              <div class="form-row nomar">
+                <div class="drag_grid state-filter-wrap col-sm-12">
+                  <div class="row">
+                    <div class="left_cell">
+                      <div class="scroll_wrap">
+                        <ul>
+                          <li *ngFor="let bmog of BMOGList">
+                            <span>{{bmog.BmoGroupName}}</span>
+                            <span>
+                              <a *ngIf="GridBMOGFilter[bmog.bmoGroupID]==undefined ? 'Add' : 'Added'  as btnBmogFilterText"
+                                (click)="AddBmogFilter(bmog)" href="javascript:void(0)">
+                                {{btnBmogFilterText}}</a></span>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div class="right_cell">
+                      <div class="scroll_wrap">
+                        <ul cdkDropList (cdkDropListDropped)="dropColumn($event)">
+                          <li class="pop" cdkDrag *ngFor="let bmog of BMOGFilterList; let i = index">
+                            <span>{{bmog.BmoGroupName}}</span>
+                            <span><a (click)="DeleteBmogFilter(bmog)" href="javascript:void(0)">Remove</a></span>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+          </div>
+        <div class="form-group row">       
+          <div class="col-sm-6 d-none">
+            <label class="input-label" for="ex2">Integrate Workspace?</label>
+            <div class="d-flex input-group">
+            <label  class="radio-container ng-star-inserted">
+                Yes
+                <input id="IntegrateWorkspace" type="radio" 
+                formControlName = "IntegrateWorkspace"
+                name="IntegrateWorkspace"  value="Yes" class="ng-dirty ng-valid ng-touched">
+                <span class="checkmark"></span>
+              </label> 
+              <label  class="radio-container ng-star-inserted">
+                No
+                <input id="IntegrateWorkspace1"  type="radio"
+                formControlName = "IntegrateWorkspace"
+                 name="IntegrateWorkspace" value="No" class="ng-dirty ng-valid ng-touched">
+                <span class="checkmark"></span>
+              </label>   
+             </div>
+          </div>
+          <div class="col-sm-6">
+            <label class="input-label" for="ex3">Certification Type</label>          
+            <input class="form-control" id="processName"
+            [ngClass]="{'is-invalid': (submitted && f.processName.errors?.required)}"
+            formControlName="processName" 
+            [value]="BMSaveUpdateForm.get('processName').value"
+            type="text" disabled="true">
+          </div>
+        </div>  
+        <div class="form-group row">       
+          <div class="col-sm-12">
+            <label class="input-label" for="ex2">Long Description</label>
+            <textarea class="form-control"
+            [ngClass]="{'is-invalid': (submitted && f.description.errors?.required)}"
+            formControlName="description"
+            [value]="BMSaveUpdateForm.get('description').value"
+            rows="4" id="description" placeholder="" name="Description">
+            </textarea>
+          </div>                       
+        </div>
+        
+        <div class="update_detail modal-footer">
+          <button type="button" class="btn btn-primary"  (click)="activeModal.close(false)">Cancel</button>
+          <button type="submit" style="color: white;" *ngIf="currentMode !== 'Published'" (click)="onSubmit()" class="btn btn-primary">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  </form>
+  

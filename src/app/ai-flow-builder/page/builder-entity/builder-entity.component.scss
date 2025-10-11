@@ -1,0 +1,43 @@
+.diagram-parent {
+  height: 100vh;
+  border: solid 3px #EEE;
+  position: relative;
+  .enableDisable{
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    border-radius: 3px;
+   background: #005996;
+   .svg{
+  
+    width: 26px;
+  height: 24px;
+  flex-shrink: 0;
+   }
+   }
+}
+
+.import-error {
+  color: red;
+  padding: 20px;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.diagram-container {
+  display: flex; /* Enable Flexbox */
+  justify-content: space-between; /* Space elements evenly with one on each side */
+  align-items: center; /* Align items vertically */
+  width: 100%; /* Full width container */
+}
+
+.diagram-parent {
+  flex: 0 0 auto; /* Prevent resizing */
+}
+
+.modeler {
+  flex: 1; /* Grow to occupy remaining space */
+  text-align: right; /* Align the content to the right */
+}

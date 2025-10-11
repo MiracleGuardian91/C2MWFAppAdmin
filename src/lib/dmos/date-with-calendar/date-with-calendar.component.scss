@@ -1,0 +1,52 @@
+.date-clear-wrapper {
+    cursor: pointer;
+    position: absolute;
+    right: 8px;
+}
+
+.date-clear {
+    pointer-events: none;
+}
+
+.form-control:disabled, .form-control[readonly] {
+    background-color: #e9ecef;
+    color: #495057;
+    opacity: 1;
+}
+
+.form-control {
+    height: 24px;
+    border-radius: 3px;
+    font-size: 12px;
+}
+
+.input-group {
+    align-items: center;
+    flex-wrap: nowrap;
+
+    .input-group-prepend {
+        .btn {
+            height: 24px;
+            display: flex;
+            outline: none;
+            box-shadow: none;
+        }
+    }
+
+    &.is-invalid {
+        .input-group-prepend {
+            button {
+                border: 1px solid red;
+            }
+        }
+
+        input.form-control {
+            border: 1px solid red;
+        }
+
+        & ~ .invalid-feedback {
+            display: block;
+        }
+    }
+    
+}

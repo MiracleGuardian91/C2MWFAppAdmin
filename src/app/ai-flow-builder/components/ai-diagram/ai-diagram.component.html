@@ -1,0 +1,121 @@
+
+<div #ref class="diagram-container" style="position: relative;">
+  <div>
+    <div class="header W-100 d-flex align-items-center">
+      <div class="headerText">{{ 'Agentic Flow Designer' + ' ' + '(' + titleService.getTitle() + ')' }}</div>
+      <div class="d-flex justify-content-between w-100">   
+      <div class=" d-flex ">
+       <div class="d-none">
+        <button style="  border-left: 1px solid #E0E0E0;  border-right: 1px solid #E0E0E0;">
+          <svg width="20" height="35" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 7.54383V3.81576C18 2.58039 17.0486 1.57892 15.875 1.57892H12.3334M18 7.54383H12.3334M18 7.54383V13.5088M12.3334 1.57892V7.54383M12.3334 1.57892H6.66666M12.3334 7.54383H6.66666M12.3334 7.54383V13.5088M18 13.5088V17.2368C18 18.4722 17.0486 19.4737 15.875 19.4737H12.3334M18 13.5088H12.3334M1 7.54383V3.81576C1 2.58039 1.95139 1.57892 3.125 1.57892H6.66666M1 7.54383H6.66666M1 7.54383V13.5088M6.66666 1.57892V7.54383M6.66666 7.54383V13.5088M1 13.5088V17.2368C1 18.4722 1.95139 19.4737 3.125 19.4737H6.66666M1 13.5088H6.66666M12.3334 13.5088H6.66666M12.3334 13.5088V19.4737M6.66666 13.5088V19.4737M12.3334 19.4737H6.66666" stroke="#555555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>            
+        </button>
+       </div>
+       <div class="mt-1 d-none" *ngIf="service.paletteIsOpen"> 
+        <button  style="border-left: 1px solid #E0E0E0; cursor: pointer;" (click)="this.IsUndoAllowed ?UndoRedo('Undo'):null"  [title]="IsUndoAllowed ? 'Undo' : 'Undo not allowed'">
+          <svg width="20" height="14" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1 5.18422H13.375C16.4816 5.18422 19 7.83516 19 11.1053C19 14.3754 16.4816 17.0263 13.375 17.0263H5.50001M1 5.18422L4.375 1.63159M1 5.18422L4.375 8.73686" stroke="#555555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="newBtnDesin">Undo</span>          
+        </button>
+       </div>
+       <div class="mt-1 d-none" *ngIf="service.paletteIsOpen">
+        <button  style="border-right: 1px solid #E0E0E0; cursor: pointer;" (click)="this.IsRedoAllowed ?UndoRedo('Redo'):null"  [title]="IsRedoAllowed ? 'Redo' : 'Redo not allowed'">
+          <svg width="20" height="14" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 5.18422H6.625C3.51843 5.18422 1 7.83516 1 11.1053C1 14.3754 3.51843 17.0263 6.625 17.0263H14.5M19 5.18422L15.625 1.63159M19 5.18422L15.625 8.73686" stroke="#555555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="newBtnDesin">Redo</span>      
+        </button>
+       </div>
+       <div class="d-none">
+        <button>
+          <svg width="20" height="38" viewBox="0 0 21 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <line y1="0.881592" x2="16" y2="0.881592" stroke="#555555" stroke-width="1.5"/>
+            <path d="M8.53033 2.99602C8.23744 2.70312 7.76256 2.70312 7.46967 2.99602L2.6967 7.76899C2.40381 8.06188 2.40381 8.53675 2.6967 8.82965C2.98959 9.12254 3.46447 9.12254 3.75736 8.82965L8 4.58701L12.2426 8.82965C12.5355 9.12254 13.0104 9.12254 13.3033 8.82965C13.5962 8.53675 13.5962 8.06188 13.3033 7.76899L8.53033 2.99602ZM8.75 20.579L8.75 3.52635L7.25 3.52635L7.25 20.579L8.75 20.579Z" fill="#555555"/>
+            </svg>
+        </button>
+       </div>
+       <div class="d-none">
+        <button >
+          <svg width="20" height="38" viewBox="0 0 21 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <line y1="-0.75" x2="14" y2="-0.75" transform="matrix(1 0 0 -1 0 11.1659)" stroke="#555555" stroke-width="1.5"/>
+            <path d="M6.46967 9.2935C6.76256 9.58639 7.23744 9.58639 7.53033 9.2935L12.3033 4.52053C12.5962 4.22763 12.5962 3.75276 12.3033 3.45987C12.0104 3.16697 11.5355 3.16697 11.2426 3.45987L7 7.70251L2.75736 3.45987C2.46447 3.16697 1.98959 3.16697 1.6967 3.45987C1.40381 3.75276 1.40381 4.22763 1.6967 4.52053L6.46967 9.2935ZM6.25 0.473694L6.25 8.76317L7.75 8.76317L7.75 0.473694L6.25 0.473694Z" fill="#555555"/>
+            <path d="M7.53033 14.6802C7.23744 14.3873 6.76256 14.3873 6.46967 14.6802L1.6967 19.4532C1.40381 19.7461 1.40381 20.2209 1.6967 20.5138C1.98959 20.8067 2.46447 20.8067 2.75736 20.5138L7 16.2712L11.2426 20.5138C11.5355 20.8067 12.0104 20.8067 12.3033 20.5138C12.5962 20.2209 12.5962 19.7461 12.3033 19.4532L7.53033 14.6802ZM7.75 23.5L7.75 15.2105L6.25 15.2105L6.25 23.5L7.75 23.5Z" fill="#555555"/>
+            </svg>
+        </button>
+       </div>
+       <div class="d-none">
+        <button style="border-right: 1px solid #E0E0E0;" >
+        <svg width="20" height="38" viewBox="0 0 21 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <line y1="-0.75" x2="16" y2="-0.75" transform="matrix(1 0 0 -1 0 19.4737)" stroke="#555555" stroke-width="1.5"/>
+          <path d="M8.53033 18.1093C8.23744 18.4022 7.76256 18.4022 7.46967 18.1093L2.6967 13.3363C2.40381 13.0434 2.40381 12.5685 2.6967 12.2756C2.98959 11.9827 3.46447 11.9827 3.75736 12.2756L8 16.5183L12.2426 12.2756C12.5355 11.9827 13.0104 11.9827 13.3033 12.2756C13.5962 12.5685 13.5962 13.0434 13.3033 13.3363L8.53033 18.1093ZM8.75 0.526306L8.75 17.5789L7.25 17.5789L7.25 0.526306L8.75 0.526306Z" fill="#555555"/>
+          </svg>
+       </button>
+       </div>
+      </div>
+
+      <div div="d-flex">
+        <div class="row mr-1" style="margin-right: 7px;">
+        <button class="btn btn-light me-4" (click)="generateXML()" title="Generate JSON"><svg class="svgDesign" xmlns="http://www.w3.org/2000/svg" width="20" height="18" viewBox="0 0 20 18" fill="none">
+          <path d="M10.8497 0.358643L12.77 0.742704L9.14066 17.6414L7.22036 17.2573L10.8497 0.358643ZM17.2828 9.00002L13.8358 5.55307V2.83584L20 9.00002L13.8358 15.1546V12.4374L17.2828 9.00002ZM0 9.00002L6.15458 2.83584V5.55307L2.70763 9.00002L6.15458 12.4374V15.1546L0 9.00002Z" fill="white"/>
+          </svg><span> Generate JSON</span></button>
+         <button class="btn btn-primary-special btn-small compAssocation" title="Webhook Settings" type="button" (click)="openWebhook()" ><i class= "linkPadding">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings-icon lucide-settings"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/></svg>
+         </i>Webhook settings</button>
+      </div>
+      </div>
+      </div>
+    </div>
+    <!-- <div class="enableDisable">
+      <div style=" padding: 8px 7px;" (click)="service.togglePalette()">
+      <div *ngIf="service.paletteIsOpen">
+         <svg xmlns="http://www.w3.org/2000/svg" width="26" height="24" viewBox="0 0 26 24" fill="none">
+          <rect x="0.75" y="0.75" width="22.3095" height="16.3571" fill="#005996" stroke="white" stroke-width="1.5"/>
+          <circle cx="17.5" cy="15.5" r="7.75" fill="#005996" stroke="white" stroke-width="1.5" />
+        </svg>
+        </div>
+        <div *ngIf="!service.paletteIsOpen">
+        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="24" viewBox="0 0 26 24" fill="none">
+          <rect x="0.75" y="0.75" width="22.3095" height="16.3571" stroke="black" stroke-width="1.5"/>
+          <circle cx="17.5" cy="15.5" r="7.75" fill="white" stroke="black" stroke-width="1.5"/>
+          </svg>
+          </div>
+      </div>
+    
+    </div> -->
+  </div>
+
+<!-- <ng-container *ngTemplateOutlet="actions"></ng-container>
+   -->
+</div>
+
+<ng-template #actions>
+  <div class="actions">
+    <div class="mode" ngbDropdown>
+      <button class="btn btn-light" ngbDropdownToggle>
+        <i class="fas fa-edit" *ngIf="!actionsDisabled"></i>
+        <i class="fas fa-lock" *ngIf="actionsDisabled"></i>
+        {{metadata?.Workflow?.WorkflowMode}}
+      </button>
+      <ul ngbDropdownMenu>
+        <li ngbDropdownItem *ngFor="let mode of ['Edit', 'Published']" (click)="changeMode(mode)">
+          {{mode}}
+        </li>
+      </ul>
+    </div>
+    <ng-container *ngIf="!actionsDisabled">
+      <ng-container *ngIf="actionsVisible">
+        <button class="btn btn-light" (click)="service.togglePalette()">
+          <i class="fas fa-toggle-on" title="Hide palette" *ngIf="service.paletteIsOpen"></i>
+          <i class="fas fa-toggle-off" title="Show palette" *ngIf="!service.paletteIsOpen"></i>
+        </button>
+        <button class="btn btn-light" (click)="generateXML()" title="Generate JSON"><i class="fas fa-code"></i></button>
+        <button class="btn btn-light" (click)="toggleActions()" title="Hide actions"><i class="fas fa-chevron-right"></i></button>
+      </ng-container>
+      <ng-container *ngIf="!actionsVisible">
+        <button class="btn btn-light" (click)="toggleActions()" title="Show actions"><i class="fas fa-chevron-left"></i></button>
+      </ng-container>  
+    </ng-container>
+  </div>
+</ng-template>

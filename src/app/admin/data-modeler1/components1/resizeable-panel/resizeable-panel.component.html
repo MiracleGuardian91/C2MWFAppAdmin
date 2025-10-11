@@ -1,0 +1,235 @@
+
+<!-- <div
+  cdkDrag
+  [cdkDragDisabled]="cdkDragDisabled"
+  cdkDragBoundary=".form-view"
+  class="rectangle"
+  mwlResizable
+  [ngStyle]="style"
+  [enableGhostResize]="true"
+  (resizeEnd)="onResizeEnd($event)"
+  (mouseenter)="dmo.display = true"
+  (mouseleave)="dmo.display = false"
+> -->
+
+<div
+
+  cdkDragBoundary=".form-view"
+  class="rectangle resizePanel"
+  id="main_{{title}}"
+  [ngStyle]="style"
+ 
+  (mouseenter)="dmo.display = true"
+  (mouseleave)="dmo.display = false"
+>
+  <div
+    class="row"
+    (mouseover)="hoveredRowIndex = data"
+    (mouseout)="hoveredRowIndex = null"
+  >
+    <div class="col-md-6">
+      <label class="input-label">{{ title }}</label>
+     
+    </div>
+    <div class="col-md-2">
+      <!-- <button class="btn btn-primary btn-sm" type="button">Save Changes</button> -->
+    </div>
+    <div class="col-md-4">
+      <ng-container
+        *ngTemplateOutlet="itemActions; context: { item: data }"
+      ></ng-container>
+    </div>
+  </div>
+
+  <div (drop)="dropdmo($event)" *ngFor="let r of rows; let rowIndex = index" class="colouredDiv rightpadding row rowBorder sub-row dmo.display row-colour" (click)="showContextMenu($event,{'type':'parentRow', r,rowIndex})">
+    
+    
+    <div class="row-container">
+      <div *ngFor="let c of r.columns; let colIndex = index"
+      
+      class="columnBorder sub-column pr-1 colouredDiv column-colour" [ngStyle]="styleObject(c)" (click)="(c.dmoguid == null || c.dmoguid.length<2)?showContextMenu($event,{'type':'column',r,c,rowIndex,colIndex}):null"
+    
+    >
+      <div (dragover)="onDragOver($event)" (drop)="dropdmo($event)" *ngIf="c.rows.length==0" id="{{data.id}}_column_{{rowIndex}}_{{colIndex}}"  class="colouredDiv column-colour column-row-column-Border pr-1 list-dmo">
+        
+        <div (drop)="dropdmo($event)"
+        (dragover)="onDragOver($event)" class="width" *ngIf="c.dmoguid == null || c.dmoguid.length==0"  id="{{data.id}}_column_{{rowIndex}}_{{colIndex}}"  >
+          Drop component
+        </div>
+        
+        <div
+        
+        class="width" *ngFor="let rdmg of c.dmoguid;" class="width" id="{{data.id}}_column_{{rowIndex}}_{{colIndex}}"   
+        (click)="(c.dmoguid.length>1)?showContextMenu($event,{'type':'column','dmoguid':rdmg,r,c,rowIndex,colIndex}):null"
+        >
+          <app-dmo
+          
+       (dragover)="onDragOver($event)"
+        draggable="true"
+        (dragstart)="dragdmo($event,rdmg)"
+        [attr.data-dmoguid]="rdmg"
+          class="drag-list-item"
+                [dmo]="getCurrentDMO(rdmg)"
+              ></app-dmo>
+          
+        </div>
+      </div>
+       <!-- ******Nestedrow -->
+    
+       <div *ngFor="let cr of c.rows;let colRowIndex = index"
+       class="columnrowBorder rightpadding colouredDiv row-colour"
+       (click)="showContextMenu($event,{'type':'NestedcolumnRow',cr,r,c,rowIndex,colIndex,colRowIndex})"
+       >
+
+       <div  *ngFor="let rcr of cr.columns;let colRowcolumnIndex = index" 
+       (click)="(rcr.dmoguid == null || rcr.dmoguid.length<2)?showContextMenu($event,{'type':'columnRow',cr,r,c,rowIndex,colIndex,colRowIndex,colRowcolumnIndex}):null"
+        class="list-dmo column-row-column-Border colouredDiv column-colour" [ngStyle]="styleObjectChild(cr)"
+        (drop)="dropdmo($event)"
+        id="{{data.id}}_columnRow_{{rowIndex}}_{{colIndex}}_{{colRowIndex}}_{{colRowcolumnIndex}}"
+        (dragover)="onDragOver($event)"
+        >
+        <div (drop)="dropdmo($event)"
+        (dragover)="onDragOver($event)" class="width"  *ngIf="rcr.dmoguid == null || rcr.dmoguid.length==0" id="{{data.id}}_columnRow_{{rowIndex}}_{{colIndex}}_{{colRowIndex}}_{{colRowcolumnIndex}}"   >
+          Drop component
+        </div>
+      
+        <div  
+        
+        
+        class="width" *ngFor="let rdmgs of rcr.dmoguid;let dmoguidIndex = index;" id="{{data.id}}_columnRow_{{rowIndex}}_{{colIndex}}_{{colRowIndex}}_{{colRowcolumnIndex}}" 
+        (click)="(rcr.dmoguid.length>1)?showContextMenu($event,{'type':'columnRow','dmoguid':rdmgs,cr,r,c,rowIndex,colIndex,colRowIndex,colRowcolumnIndex}):null"
+        >
+        <app-dmo
+        
+        (dragover)="onDragOver($event)"
+        draggable="true"
+        [attr.data-dmoguid]="rdmgs"
+        (dragstart)="dragdmo($event,rdmgs)"
+        class="drag-list-item"
+              [dmo]="getCurrentDMO(rdmgs)"
+              
+            ></app-dmo>
+        </div>
+      
+      </div>
+
+      
+      </div>
+     
+    </div>
+    </div>
+
+      <i class=""></i>
+    
+  </div>
+
+
+  <ng-template #itemActions let-item="item">
+    <ng-container *ngIf="!readonly">
+      <div
+        class="panel-item-actions dmo-actions"
+        [class.active]="hoveredRowIndex == item"
+      >
+       
+        <a
+          class="item-action"
+          ngbTooltip="Delete DMOG"
+          style="color: rgb(187, 53, 53)"
+          (click)="onTabRemove(this)"
+        >
+          <i class="far fa-trash-alt"></i>
+        </a>
+        <a
+          class="item-action"
+          (click)="onEditDMOGRemove(this)"
+          ngbTooltip="Edit DMOG"
+        >
+          <i class="fas fa-pencil-alt"></i>
+        </a>
+        <a
+        class="item-action"
+        (click)="ShowDmogSettings(this)"
+        ngbTooltip="DMOG Settings"
+      >
+        <i class="fas fa-arrows-alt"></i>
+      </a>
+        <a class="item-action" ngbTooltip="Add Row" (click)="onAddRow(item)">
+          <i class="fa fa-plus"></i>
+        </a>
+      </div>
+    </ng-container>
+  </ng-template>
+
+ 
+
+  <ng-template #itemActionColumn let-item="item">
+    <ng-container *ngIf="!readonly">
+      <div
+        class="item-actions dmo-actions active"
+        [class.active]="
+        hoveredRowIndex === item.rowIndex &&
+        hoveredColumnIndex === item.colIndex
+      ">
+      <a  
+      class="item-action"
+      ngbTooltip="Add Row"
+      (click)="onAddRowInColumn(item)"
+    >
+      <i class="fa fa-plus"></i>
+    </a>
+        <a *ngIf="item.current.rows.length==0"
+          class="item-action mr-0"
+          style="color: rgb(187, 53, 53); margin-right: 10px"
+          ngbTooltip="Data Model Objects"
+          [matMenuTriggerFor]="menu"
+          (click)="GetSelectMenu(item.rowIndex, item.colIndex)"
+        >
+          <i class="fa fa-ellipsis-v"></i>
+        </a>
+        <a *ngIf="item.current.rows.length==0"
+          class="item-action"
+          style="color: rgb(187, 53, 53)"
+          ngbTooltip="Remove Column"
+          (click)="onRemoveColumn(item.rowIndex, item.colIndex)"
+        >
+          <i class="fa fa-trash-alt"></i>
+        </a>
+      
+     
+      </div>
+    </ng-container>
+  </ng-template>
+
+
+  
+</div>
+<!-- </div> -->
+
+<div>
+  <app-contextMenu [object]="contextMenuData"
+                   [showContextMenuFor]="contextMenuData"
+                   [contextMenuPosition]="contextMenuPosition"
+                   (contextMenuSelected)="OperateContextMenu($event)"
+                  
+                   ></app-contextMenu>
+              
+                 <app-dmo-form-controls [showContextMenuFor]="contextMenuData"
+                   [contextMenuPosition]="contextMenuPosition"
+                   [showContextMenu]="showFormContextMenu"
+                  (formControlSelect) ="FormControlSelect($event)"
+                   >
+                   </app-dmo-form-controls>
+             
+                   <app-sharedmo-controls [showContextMenuFor]="contextMenuData"
+                   [contextMenuPosition]="contextMenuPosition"
+                   [showContextMenu]="showSharedmoContextMenu"
+                   [shareDmoList]="availableDmoToShare!.components"
+                   [rows]="rows"
+                  (shareDmoSelect) ="shareDmoSelect($event)"
+                   >
+                   </app-sharedmo-controls>
+                  
+                 
+</div>
+
+

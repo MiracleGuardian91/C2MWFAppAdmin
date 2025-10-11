@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../../../../node_modules/inherits-browser/dist/index.es.js"],
+  "sourcesContent": ["function e(e, t) {\n  t && (e.super_ = t, e.prototype = Object.create(t.prototype, {\n    constructor: {\n      value: e,\n      enumerable: !1,\n      writable: !0,\n      configurable: !0\n    }\n  }));\n}\nexport { e as default };\n"],
+  "mappings": ";AAAA,SAAS,EAAEA,IAAG,GAAG;AACf,QAAMA,GAAE,SAAS,GAAGA,GAAE,YAAY,OAAO,OAAO,EAAE,WAAW;AAAA,IAC3D,aAAa;AAAA,MACX,OAAOA;AAAA,MACP,YAAY;AAAA,MACZ,UAAU;AAAA,MACV,cAAc;AAAA,IAChB;AAAA,EACF,CAAC;AACH;",
+  "names": ["e"]
+}

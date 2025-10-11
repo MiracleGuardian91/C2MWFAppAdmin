@@ -1,0 +1,175 @@
+<div class="popup">
+  <div class="popup__header">
+    <h2 *ngIf="newElement">New Trigger Condition</h2>
+    <h2 *ngIf="!newElement">Trigger Condition Details</h2>
+    <span class="popup__close"><i class="fas fa-times-circle fa-fw" (click)="ref.close()"></i></span>
+  </div>
+  <hr>
+  
+  <form [formGroup]="form">
+    <div class="double-column">
+      <div class="form-group span-6">
+        <label>Name <span style="color: red">*</span></label>
+        <br />
+        <input 
+          type="text" 
+          class="form-control" 
+          formControlName="conditionName"
+          [style.background-color]="!newElement ? '#e9ecef' : 'white'" 
+          [readonly]="!newElement"
+          (blur)="CheckValidationWF()"
+          [ngClass]="{'is-invalid': submitted && f.conditionName.errors || f.conditionName.errors && !f.conditionName.errors.required|| f.conditionName.errors?.duplicate}"
+        />
+        <div *ngIf="f.conditionName?.errors?.duplicate" class="invalid-feedback">
+          Duplicate name
+        </div>
+      </div>
+    
+      <div class="form-group span-6">
+        <label>Description <span style="color: red">*</span></label>
+        <br />
+        <input 
+        type="text" 
+        class="form-control" 
+        formControlName="conditionDescription"
+        maxlength="100"
+        [ngClass]="{'is-invalid': submitted && f.conditionDescription.errors || f.conditionDescription.errors && !f.conditionDescription.errors.required}"
+         />
+      </div>
+    
+
+    
+      <div class="form-group span-6">
+        <label>Status <span style="color: red">*</span></label>
+        <br />
+        <select 
+          class="form-control" 
+          formControlName="status"
+          [ngClass]="{'is-invalid': submitted && f.status.errors || f.status.errors && !f.status.errors.required}"
+        >
+          <option value="1">Active</option>
+          <option value="0">Inactive</option>
+        </select>
+      </div>
+    
+      <div class="form-group span-6">
+        <label>End Stage</label>
+        <br />
+        <app-custom-select
+          [parentForm]="form"
+          controlName="endWfoId"
+          [items]="[]"
+          [submitted]="submitted"
+          [readonly]="true"
+        ></app-custom-select>
+      </div>
+    
+      <div class="form-group span-6">
+        <label>End State</label>
+        <br />
+        <app-custom-select
+          [parentForm]="form"
+          controlName="endWfosId"
+          [items]="[]"
+          [submitted]="submitted"
+          [readonly]="true"
+        ></app-custom-select>
+      </div>
+
+      <div class="form-group span-12">
+        <label>Filters</label>
+        <br />
+        <app-list
+          [parentForm]="form"
+          controlName="filter"
+          [config]="filters"
+        ></app-list>
+      </div>
+    </div>
+
+      <mat-expansion-panel [expanded]="false">
+        <mat-expansion-panel-header class="disable_ripple">
+          Notification Settings
+        </mat-expansion-panel-header>
+        <div class="double-column mt-2">
+    
+
+      <div class="form-group span-6">
+        <label>Email Roles</label>
+        <br />
+        <app-custom-select
+          [parentForm]="form"
+          controlName="roleGuid"
+          [items]="data.EmailRole?.AvailableTriggerEmailRole | keyvalue"
+          [multiple]="true"
+          [submitted]="submitted"
+        ></app-custom-select>
+      </div>
+
+      <div class="form-group span-6">
+        <label>CC Email Roles</label>
+        <br>
+        <app-custom-select
+          [parentForm]="form"
+          controlName="ccMAilRoleGuids"
+          [items]="data.CcEmailRole?.AvailableCCEmailTrgrRole | keyvalue"
+          [multiple]="true"
+          [submitted]="submitted"
+        ></app-custom-select>
+      </div>
+      <div class="form-group span-12">
+        <label>Email Subject</label>
+        <br />
+        <input 
+          type="text" 
+          class="form-control" 
+          formControlName="emailSubject"
+          [ngClass]="{'is-invalid': submitted && f.emailSubject.errors || f.emailSubject.errors && !f.emailSubject.errors.required}"
+           />
+      </div>
+
+      <div class="form-group span-12">
+        <label>Notify</label>
+        <br />
+        <div class="Ql-container" >
+          <quill-editor
+          [modules]="{ toolbar: editorConfig.toolbar }"
+          class="Ql-InsideContainer"
+          formControlName="notify"
+        ></quill-editor>
+        </div> 
+      </div>
+    
+      <div class="form-group span-12">
+        <label>Files</label>
+        <br />
+        <app-file-uploader
+          [disabled]="published"
+          [uploading]="filesUploading"
+          [allowedExtensions]="allowedExtensions"
+          [multiple]="true"
+          (files)="onFilesUpload($event)"
+          (ignored)="onIgnoredFiles($event)">
+        </app-file-uploader>
+        <app-list
+          [parentForm]="form"
+          controlName="fileNames"
+          [config]="filesConfig"
+          (itemDeleted)="onFileDelete($event)"
+          (fileDownload)="onFileDownload($event)"
+        ></app-list>
+      </div>
+      </div>
+      </mat-expansion-panel>
+
+  
+    <div class="popup__actions">
+      <button class="btn btn-light btn-sm" type="button" (click)="onCancel()">Cancel</button>
+      <button class="btn btn-primary  btn-sm" type="submit" (click)="onSubmit()" *ngIf="!published">
+        <ng-container *ngIf="newElement">Create</ng-container>
+        <ng-container *ngIf="!newElement">Update</ng-container> 
+      </button>
+    </div>
+  
+  </form>
+</div>

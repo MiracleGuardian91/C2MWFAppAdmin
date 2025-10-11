@@ -1,0 +1,203 @@
+<div class="actions deleteContainer d-flex justify-content-end mt-1 mb-1">
+  <a
+    (click)="onDeleteSelected()"
+    *ngIf="config.actions?.delete && someSelected > -1"
+    href="javascript:void(0)"
+    ><i class="fas fa-trash-alt" role="img" aria-label="Delete"></i
+    ><span>&nbsp;Delete</span></a
+  >
+</div>
+<div [formGroup]="parentForm">
+  <table class="table table-bordered">
+    <thead class="thead-light">
+      <tr>
+        <td scope="col" *ngIf="config.checkbox" class="checkbox-cell">
+          <label class="wf-inline-checkbox ml-2">
+            <input type="checkbox" [formControl]="selectAll" />
+            <i class="skin"></i>
+          </label>
+        </td>
+        <td *ngIf="config.actions as actions" class="actions-cell">Actions</td>
+        <td scope="col" *ngFor="let column of config.columns">
+          {{ column.displayValue }}
+        </td>
+      </tr>
+    </thead>
+    <tbody
+      [formArrayName]="controlName"
+      cdkDropList
+      (cdkDropListDropped)="drop($event)"
+    >
+      <ng-container *ngFor="let control of list.controls; index as i">
+        <tr
+          [formGroupName]="i"
+          cdkDrag
+          (cdkDragStarted)="dragStart($event)"
+          [cdkDragDisabled]="canDrag()"
+        >
+          <td *ngIf="config.checkbox" class="checkbox-cell">
+            <label
+              class="wf-inline-checkbox ml-2"
+              *ngIf="list.controls.at(i).get('checked')"
+            >
+              <input
+                type="checkbox"
+                formControlName="checked"
+                (change)="isAllSelected(i)"
+              />
+              <i class="skin"></i>
+            </label>
+          </td>
+          <td *ngIf="config.actions as actions" class="actions-cell">
+            <div class="actions">
+              <ng-container
+                *ngIf="actions.edit || actions.delete; then defActions"
+              ></ng-container>
+              <ng-container
+                *ngIf="actions.edit && !isReadonly(i); then altActions"
+              ></ng-container>
+              <ng-template #defActions>
+                <i
+                  class="fas fa-edit"
+                  *ngIf="actions.edit && isReadonly(i)"
+                  title="Edit"
+                  (click)="onEdit(i)"
+                ></i>
+                <i
+                  class="fas fa-trash-alt"
+                  *ngIf="actions.delete && list.controls.at(i).get('deletable')"
+                  title="Delete"
+                  (click)="onDelete(i, false)"
+                ></i>
+              </ng-template>
+              <ng-template #altActions>
+                <i class="fas fa-save" (click)="onUpdate(i)" title="Update"></i>
+                <i
+                  class="fas fa-times"
+                  (click)="onCancel(i)"
+                  title="Cancel"
+                ></i>
+              </ng-template>
+            </div>
+          </td>
+          <td *ngFor="let column of config.columns">
+            <ng-container [ngSwitch]="column.type">
+              <ng-container *ngSwitchCase="'file'">
+                <input
+                  [title]="control?.value[column.key]"
+                  class="download"
+                  [formControlName]="column.key"
+                  readonly
+                  (click)="onDownload(i, column.key)"
+                />
+              </ng-container>
+
+              <ng-container *ngSwitchCase="'dropdown'">
+                <span
+                  [title]="control?.value[column.key]"
+                  *ngIf="isReadonly(i); else showDropdown"
+                >
+                  {{
+                    control?.value[column.key]?.value ||
+                      control?.value[column.key]?.key ||
+                      control?.value[column.key]
+                  }}
+                </span>
+                <ng-template #showDropdown>
+                  <app-custom-select
+                    [parentForm]="control"
+                    [controlName]="column.key"
+                    [items]="defaultValues[column.key]"
+                    [readonly]="isReadonly(i)"
+                  ></app-custom-select>
+                  <!-- </select> -->
+                </ng-template>
+              </ng-container>
+
+              <ng-container *ngSwitchDefault>
+                <input
+                  type="text"
+                  [formControlName]="column.key"
+                  *ngIf="column.asControl"
+                  class="form-control"
+                />
+
+                <input
+                  [title]="control?.value[column.key]"
+                  type="text"
+                  [formControlName]="column.key"
+                  *ngIf="!column.asControl"
+                  [readonly]="isReadonly(i)"
+                  class="form-control"
+                />
+              </ng-container>
+            </ng-container>
+          </td>
+        </tr>
+      </ng-container>
+    </tbody>
+  </table>
+</div>
+
+<form
+  class="new"
+  [formGroup]="newItem"
+  (ngSubmit)="onAdd()"
+  *ngIf="config.actions?.add"
+>
+  <table class="table" style="margin-top: 10px">
+    <thead class="thead-light" style="display: none">
+      <tr>
+        <td scope="col" *ngIf="config.checkbox" class="checkbox-cell">
+          <label class="wf-inline-checkbox ml-2">
+            <input type="checkbox" />
+            <i class="skin"></i>
+          </label>
+        </td>
+        <td *ngIf="config.actions as actions" class="actions-cell">Actions</td>
+        <td scope="col" *ngFor="let column of config.columns">
+          {{ column.displayValue }}
+        </td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="checkbox-cell" *ngIf="config.checkbox"></td>
+        <td class="actions-cell">
+          <div class="actions">
+            <i class="fas fa-plus ml-2" title="Add" (click)="onAdd()"></i>
+          </div>
+        </td>
+
+        <td *ngFor="let column of config.columns" style="padding: 0">
+          <ng-container [ngSwitch]="column.type">
+            <ng-container *ngSwitchCase="'file'">
+              <input type="text" [formControlName]="column.key" hidden />
+              <input
+                type="file"
+                (change)="fileHandler($event.target.files, column.key)"
+              />
+            </ng-container>
+
+            <ng-container *ngSwitchCase="'dropdown'">
+              <app-custom-select
+                [parentForm]="newItem"
+                [controlName]="column.key"
+                [items]="defaultValues[column.key]"
+              ></app-custom-select>
+            </ng-container>
+            <ng-container *ngSwitchDefault>
+              <input
+                [title]="newItem?.value[column.key]"
+                type="text"
+                class="form-control"
+                [formControlName]="column.key"
+                [placeholder]="column.placeholder || ''"
+              />
+            </ng-container>
+          </ng-container>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</form>

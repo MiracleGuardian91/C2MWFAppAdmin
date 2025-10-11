@@ -1,0 +1,58 @@
+<div [formGroup]="parentForm" *ngIf="parentForm && parentForm.controls as f">
+  <ng-select
+    [title]="selected?.value || control?.value?.value || ''"
+    [multiple]="multiple"
+    [virtualScroll]="true"
+    [groupBy]="groupBy"
+    [selectableGroup]="!!groupBy"
+    [selectableGroupAsModel]="false"
+    [readonly]="readonly"
+    [searchable]="true"
+    [items]="items"
+    bindLabel="value"
+    [compareWith]="compareWith"
+    [closeOnSelect]="!multiple"
+    placeholder="Select..."
+    [formControlName]="formControlName"
+    [ngClass]="{
+      'is-invalid': submitted && control.errors || control.errors && !control.errors.required, 
+      'height-fixed': fixedHeight
+    }"
+  >
+
+      <!-- SINGLE SELECT OPTION -->
+    <ng-template ng-option-tmp let-item="item">
+      <span (click)="onClick(item)" [title]="item.value" class="dlloption">{{item.value}}</span>
+    </ng-template>
+
+    <!-- SINGLE SELECT LABEL -->
+    <ng-template ng-label-tmp let-item="item" let-clear="clear"  let-label="label">
+      <span class="ng-value-icon left" (click)="clear(item);" aria-hidden="true">×</span>
+      <span class="ng-value-label">{{label?.value || label}}</span>
+    </ng-template>
+    
+
+    <!-- MULTISELECT LABEL -->
+    <ng-template ng-multi-label-tmp let-items="items" let-clear="clear">
+      <div class="ng-value" *ngFor="let item of items | slice: 0:4">
+        <span [title]="item.value" style="font-size: 12px; padding: 0.4em;">{{ item.value }}</span>
+        <span
+          class="ng-value-icon right"
+          (click)="clear(item)"
+          aria-hidden="true"
+          >×</span
+        >
+      </div>
+      <div class="ng-value" *ngIf="items.length > 4">
+        <span class="ng-value-label">{{ items.length - 4 }} more...</span>
+      </div>
+    </ng-template>
+
+  
+  </ng-select>
+
+  <ng-container *ngIf="!items">
+    <!-- <mat-progress-bar mode="buffer"></mat-progress-bar> -->
+  </ng-container>
+  
+</div>

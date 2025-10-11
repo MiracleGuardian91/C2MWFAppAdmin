@@ -1,0 +1,290 @@
+<section class="configurePop">
+  <div class="pop_box largePop">
+    <section class="modal-header">
+      <h3 class="FR22 padding-0">{{ PopupTitle }}</h3>
+
+      <div class="corner-button">
+        <button
+          type="button"
+          class="close"
+          aria-label="Close"
+          (click)="activeModal.close(false)"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    </section>
+
+    <section
+      *ngIf="!isNextClicked"
+      aria-label="Modal heading text content"
+      class="modal-body"
+      role="document"
+    >
+      <!---------------------Customize Grid columns Section--------------------->
+      <div class="fWrap sections">
+        <div
+          class="heading FR22"
+          [ngClass]="getToggle('SectionGridColumn') ? 'Hide' : ''"
+        >
+          Select Template
+          <a
+            href="JavaScript:void(0);"
+            (click)="clickEvent('SectionGridColumn')"
+            title="Show Hide"
+          >
+            <i aria-label="close/open" class="fa fa-chevron-up" role="img"></i>
+          </a>
+        </div>
+        <div class="showHide">
+          <div class="custom_wrap">
+            <div class="drag_grid trans-border">
+              <div class="row trans-border d-flex">
+                <div
+                  class="col-md-6 pad-10"
+                  *ngFor="let item of data"
+                  (click)="cardWallSelected(item)"
+                >
+                  <!-- <div 
+                      [innerHTML]="bindHtml(item)" 
+                       
+                      [ngClass]="selectedCard == item.Id ? 'selected' : '' "
+                     
+                      >
+              
+                    </div> -->
+
+                  <div class="cstm-card-container cstm-width-400">
+                    <div class="cstm-list-item">
+                      <div class="cstm-title cstm-title-mt">
+                        <div class="cstm-title-sub">
+                          <strong
+                            class="box-title Placeholder"
+                            id="Placeholder1"
+                            >XXXXXXX</strong
+                          >
+                          <span
+                            class="box-sub-title Placeholder"
+                            id="Placeholder2"
+                            >(XXXXXX)</span
+                          >
+                        </div>
+                        <div class="cstm-title-checkbox cstm-title-checkbox-radio">
+                          <input type="radio" class="cstm-title-checkbox-radio-input" />
+                        </div>
+                      </div>
+                      <div class="cstm-title cstm-title-mt">
+                        <div class="card-text-cont">
+                          <div class="msg-heading">
+                            <strong class="Placeholder" id="Placeholder3"
+                              >XXXXXX</strong
+                            >
+                          </div>
+                          <div
+                            class="msg-sub-heading Placeholder"
+                            id="Placeholder4"
+                          >
+                            XXXXXXXXXX
+                          </div>
+                        </div>
+                        <div class="cstm-title-checkbox">
+                          <img alt="" />
+                        </div>
+                      </div>
+                      <div class="cstm-title cstm-title-mt">
+                        <div class="pic-cont">
+                          <img
+                            src="/assets/admin-assets/images/circle-user-icon.png"
+                          />
+                        </div>
+                        <div class="flex-grow-1 card-text-cont">
+                          <div class="msg-heading">
+                            <strong
+                              class="user-info-heading Placeholder"
+                              id="Placeholder5"
+                              >XXXXX XXXX</strong
+                            ><span class="user-info-sub-heading">(
+                              <span class="Placeholder" id="Placeholder6">
+                                XXXXXX
+                              </span>
+                             
+                              )</span>
+                          </div>
+                          <div class="date-info-box">TTTTTTTTTTTTTTTTT</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+
+                  
+                </div>
+                <div class="col-md-6 pad-10">
+                  <div class="cstm-card-container cstm-width-400">
+                    <div class="cstm-list-item list-item-with-image">
+                      <div class="placeholder-image">
+                        <img src="/assets/admin-assets/images/placeholer-image.png" />
+                      </div>
+                      <div class="flex-direction-col width-100">
+                        <div class="box-sub-title align-gap">
+                          <div class="d-flex-justify">
+                            <div>
+                              <span>22222</span>
+                            </div>
+                            <div class="cstm-title-checkbox cstm-title-checkbox-radio">
+                              <input type="radio"  class="cstm-title-checkbox-radio-input"/>
+                            </div>
+                          </div>
+                         
+                        </div>
+                        <div class="box-title align-gap">
+                          <strong>XXXXXXX</strong>
+                          <span class="box-sub-title aling-gap-5">XXXXXX</span>
+                        </div>
+                        <div class="box-sub-title align-gap">
+                          <span>YYYYYYYYYYYYYY</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="main-divide">
+                      <div class="divider"></div>
+
+                    </div>
+                    <div class="display-jusstify">
+                      <div class="box-title">BBBBBBB</div>
+                      <div class="box-sub-title">CCCCC</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6 pad-10">
+                  <div class="cstm-card-container cstm-card3-width-400">
+                    <div class="cstm-card-header-continer">
+                      <div class="cstm-card-header">
+                        <img src="/assets/admin-assets/images/placeholer-image-2.png" />
+                      </div>
+                      <div class="cstm-card-header-checkbox">
+                        <div class="cstm-title-checkbox cstm-title-checkbox-radio">
+                          <input type="radio"  class="cstm-title-checkbox-radio-input"/>
+                        </div>
+                      </div>
+                    </div>
+
+
+                    <div class="cstm-list-item-card3-upper list-item-with-image">
+                      <div class="placeholder-image-card3">
+                        <img src="/assets/admin-assets/images/Vector.png" />
+                      </div>
+                      <div class="flex-direction-col width-100">
+                       
+                        <div class="box-title align-gap">
+                          <strong>XXXXXXX</strong>
+                          <span class="box-sub-title aling-gap-5">(
+                            XXXXXX)</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="cstm-list-item-card3-lower list-item-with-image">
+                      
+                      <div class="flex-direction-col width-100">
+                        <div class="align-gap">
+                          <div class="d-flex-justify">
+                            <div class="box-title"> 
+                              <strong>ZZZZZ</strong>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="box-sub-title align-gap">
+                          <span>YYYYYYYYYYYYYY</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-buttom-m-5">
+                      <div class="box-title align-gap">
+                        <strong>BBBBBBB</strong>
+                        <span class="box-sub-title aling-gap-5">(
+                          CCCCC)</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6 pad-10">
+                  <div class="cstm-card-container cstm-card4-width-400">
+                    <div class="cstm-card-header-continer">
+                      <div class="cstm-card-header">
+                        <img src="/assets/admin-assets/images/placeholer-image-3.png" />
+                      </div>
+                      <div class="cstm-card-header-checkbox">
+                        <div class="cstm-title-checkbox cstm-title-checkbox-radio">
+                          <input type="radio"  class="cstm-title-checkbox-radio-input"/>
+                        </div>
+                      </div>
+                    </div>
+
+
+                    <div class="cstm-list-item-card4-upper list-item-with-image">
+                      <div class="flex-direction-col width-100">
+                       
+                        <div class="box-title">
+                          <strong>XXXXXXX</strong>
+                          <span class="box-sub-title aling-gap-5">(
+                            XXXXXX)</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="display-jusstify">
+                      <div class="box-title">ZZZZZ</div>
+                      <div class="box-sub-title">BBBB</div>
+                    </div>
+                    <div class="cstm-list-item-card4-lower list-item-with-image">
+                      
+                      <div class="flex-direction-col width-100">
+                      
+                        <div class="box-sub-title q">
+                          <span>YYYYYYYYYYYYYY</span>
+                        </div>
+                      </div>
+                    </div>
+                   
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cta-button-group">
+        <button
+          class="btn btn-warning btn-sm text-white"
+          data-dismiss="modal"
+          type="button"
+          (click)="nevigateToCardWall()"
+        >
+          Next
+        </button>
+        <!-- <button class="btn btn-clear btn-small" (click)="ResetConfig()" data-dismiss="modal" type="button">Reset Grid</button> -->
+        <button
+          class="btn btn-clear btn-small btn-cancel"
+          (click)="activeModal.close(false)"
+          data-dismiss="modal"
+          type="button"
+        >
+          Cancel
+        </button>
+      </div>
+    </section>
+
+    <div [ngStyle]="EnableSelect()">
+      <section
+        aria-label="Modal heading text content"
+        class="modal-body modal-body-cardwall"
+        role="document"
+      >
+        <app-card-wall-view-configuration></app-card-wall-view-configuration>
+      </section>
+    </div>
+  </div>
+</section>

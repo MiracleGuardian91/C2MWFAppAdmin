@@ -1,0 +1,185 @@
+<!-- <div class="card">
+  <div class="top-tabs">
+    <button *ngFor="let t of topTabs" (click)="setTopTab(t)" [class.active]="activeTopTab===t">{{t}}</button>
+  </div>
+
+  <div class="panel">
+    <div class="form-row">
+      <label>Method</label>
+      <select formControlName="method">
+        <option *ngFor="let m of methods" [value]="m">{{m}}</option>
+      </select>
+
+      <label style="margin-left:16px">URL</label>
+      <input type="text" formControlName="url" placeholder="http://webhook.c2m.net/..." />
+    </div>
+
+    <div class="sub-tabs">
+      <button *ngFor="let s of subTabs" (click)="setSubTab(s)" [class.active]="activeSubTab===s">{{s}}</button>
+    </div>
+
+    <div class="sub-panel" *ngIf="activeSubTab==='Params'">
+      <div class="kv-table">
+        <div class="kv-row header">
+          <div>Key</div>
+          <div>Value</div>
+          <div></div>
+        </div>
+
+        <div class="kv-row" *ngFor="let p of params.controls; let i = index" [formGroup]="p">
+          <input formControlName="key" placeholder="processName" />
+          <input formControlName="value" placeholder="value" />
+          <button type="button" class="btn-remove" (click)="removeParam(i)">✕</button>
+        </div>
+
+        <div class="kv-add">
+          <button type="button" (click)="addParam()">+ Add</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sub-panel" *ngIf="activeSubTab==='Headers'">
+      <div class="kv-table">
+        <div class="kv-row header">
+          <div>Key</div>
+          <div>Value</div>
+          <div></div>
+        </div>
+
+        <div class="kv-row" *ngFor="let h of headers.controls; let i = index" [formGroup]="h">
+          <input formControlName="key" placeholder="accessToken" />
+          <input formControlName="value" placeholder="value" />
+          <button type="button" class="btn-remove" (click)="removeHeader(i)">✕</button>
+        </div>
+
+        <div class="kv-add">
+          <button type="button" (click)="addHeader()">+ Add</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sub-panel" *ngIf="activeSubTab==='Body'">
+      <div class="body-controls">
+        <label>Content</label>
+        <button type="button" (click)="toggleBodyMode()">{{bodyContentMode==='JSON_SCHEMA'? 'JSON_SCHEMA' : 'TEXT'}}</button>
+      </div>
+
+      <div *ngIf="bodyContentMode==='JSON_SCHEMA'">
+        <textarea formControlName="bodyJsonSchema" class="big-editor" rows="12"></textarea>
+      </div>
+
+      <div *ngIf="bodyContentMode==='TEXT'">
+        <textarea formControlName="bodyText" class="big-editor" rows="12"></textarea>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button (click)="submit()">Save / Send</button>
+    </div>
+  </div>
+</div> -->
+
+<form [formGroup]="form" class="p-4">
+    <div>
+        <div class="modal-header" style="justify-content: space-between;">
+            <h4 class="modal-title">Webhook Details</h4>
+            <button type="button" aria-label="Close" class="close-button" (click)="activeModal.close(false)">
+                <span aria-hidden="true" class="fas fa-times-circle fa-fw"></span>
+            </button>
+        </div>
+
+        <!-- Top Tabs -->
+        <div class="top-tabs mt-3" style="border-bottom: 1px solid #f2f2f2">
+            <button *ngFor="let t of topTabs" (click)="setTopTab(t)" [class.active]="activeTopTab===t">{{t}}</button>
+        </div>
+
+        <div *ngIf="activeTopTab==='Webhook'">
+            <div class="form-row mt-3" style="justify-content: space-between;">
+                <div>
+                    <label class="input-label">Method<span class="text-danger">*</span></label>
+                    <select formControlName="method" style="font-size: 12px;height: 28px;margin-left: 5px;">
+                        <option *ngFor="let m of methods" [value]="m">{{m}}</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="input-label">URL<span class="text-danger">*</span></label>
+                    <input type="text" formControlName="url" style="margin-left: 5px; width: 500px;" class="input-24"   [ngClass]="{'is-invalid': form.get('url')?.invalid && form.get('url')?.touched}"/>
+                </div>
+            </div>
+
+            <!-- Sub Tabs -->
+            <div class="sub-tabs mt-2" style="border-bottom: 1px solid #f2f2f2">
+                <button *ngFor="let s of subTabs" (click)="setSubTab(s)"
+                    [class.active]="activeSubTab===s">{{s}}</button>
+            </div>
+
+            <!-- Params Panel -->
+            <div class="sub-panel" *ngIf="activeSubTab==='Params'">
+                <div class="kv-table">
+                    <div class="kv-row header">
+                        <div class="input-label">Key</div>
+                        <div class="input-label">Value</div>
+                        <div></div>
+                    </div>
+
+                    <div class="kv-row" *ngFor="let p of params.controls; let i = index" [formGroup]="p">
+                        <input formControlName="key" placeholder="key" class="input-24" />
+                        <input formControlName="value" placeholder="value" class="input-24" />
+                        <button type="button" class="btn-remove" (click)="removeParam(i)">✕</button>
+                    </div>
+
+                    <div class="kv-add d-flex justify-content-end">
+                        <button type="button" class="btn-primary" (click)="addParam()">+ Add</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Headers Panel -->
+            <div class="sub-panel" *ngIf="activeSubTab==='Headers'">
+                <div class="kv-table">
+                    <div class="kv-row header">
+                        <div class="input-label">Key</div>
+                        <div class="input-label">Value</div>
+                        <div></div>
+                    </div>
+
+                    <div class="kv-row" *ngFor="let h of headers.controls; let i = index" [formGroup]="h">
+                        <input formControlName="key" placeholder="key" class="input-24" />
+                        <input formControlName="value" placeholder="value" class="input-24" />
+                        <button type="button" class="btn-remove" (click)="removeHeader(i)">✕</button>
+                    </div>
+
+                    <div class="kv-add d-flex justify-content-end">
+                        <button type="button" class="btn-primary" (click)="addHeader()">+ Add</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Body Panel -->
+            <div class="sub-panel" *ngIf="activeSubTab==='Body'">
+                <div class="body-controls mb-2">
+                  <label for="bodyMode" class="input-label">Content</label>
+                  <select formControlName="bodyContentMode" style="font-size: 12px; height: 28px; margin-left: 5px;">
+                    <option value="JSON_SCHEMA">JSON_SCHEMA</option>
+                    <option value="TEXT">TEXT</option>
+                  </select>
+                </div>
+
+                <div *ngIf="form.get('bodyContentMode')?.value === 'JSON_SCHEMA'">
+                    <textarea formControlName="bodyJsonSchema" class="big-editor" rows="12"></textarea>
+                </div>
+
+                <div *ngIf="form.get('bodyContentMode')?.value === 'TEXT'">
+                    <textarea formControlName="bodyText" class="big-editor" rows="12"></textarea>
+                </div>
+            </div>
+
+
+            <!-- Form Actions -->
+            <div class="form-actions d-flex justify-content-end">
+                <button (click)="submit()" class="btn-primary">Save / Send</button>
+            </div>
+        </div>
+    </div>
+</form>

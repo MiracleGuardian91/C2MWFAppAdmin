@@ -1,0 +1,108 @@
+::ng-deep .ng-select.ng-select-single .ng-select-container {
+    height: 24px !important;
+}
+td {
+  vertical-align: middle;
+  padding: 0 0.75rem;
+}
+
+input:read-only {
+  background-color: transparent;
+  border-color: transparent;
+  outline-color: transparent;
+}
+
+select {
+  width: 100%;
+}
+
+.form-control {
+  height: 28px;
+  border-radius: 3px;
+  font-size: 12px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  * {
+    cursor: pointer;
+  }
+}
+
+.tr {
+  display: table-row;
+}
+
+.td {
+  display: table-cell;
+}
+
+.table {
+  table-layout: fixed;
+  margin-bottom: 0;
+   th{
+    font-size: 12px;
+    font-weight: bold;
+    color: #4D4D51;
+    padding: 0.75rem;
+    text-align: left;
+    vertical-align: middle;
+  }
+  a{color : #4D4D51}
+}
+table td{
+  height:30px;
+  font-size: 10px;
+  font-weight: bold;
+color:#4D4D51;
+  border-bottom-width: 0px;
+}
+.new .table {
+  & td,
+  & th {
+    border-top: none;
+  }
+}
+
+.checkbox-cell {
+  width: 50px;
+}
+
+.actions-cell {
+  width: 70px;
+}
+
+.download {
+  cursor: pointer;
+  &:hover {
+    color: #226398;
+  }
+}
+.action{
+  width:8%;
+}
+.deleteContainer{
+  height: 20px;
+  a {
+    color: #4d4d51;
+    text-decoration: none;
+    span{
+      font-size: 12px;
+    }
+  }
+}
+
+table tbody tr:last-child td {
+   padding: 5px; 
+   border: none !important;
+}
+table tbody tr:last-child {
+    margin-top: 5px;
+  border-bottom: none !important;
+}
+
+table thead td label{
+    margin-top: auto;
+}

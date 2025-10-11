@@ -1,0 +1,115 @@
+<ng-container *ngIf="bm">
+  <div class="breadcrumbs p-1 mb-1" style="background-color: #fff;">
+    <a (click)="routeBack()">
+      <img [src]="backsImageUrl" style="filter: var(--plx-app-list-icon-filter);" width="20px">
+      <span>Back</span>
+    </a> 
+  </div>
+  <app-dm-header></app-dm-header>
+  <app-dm-menu 
+    [mode]="bm.Mode"
+    (modeChange)="changeMode($event)"
+    (newVersion)="onNewVersion()"
+    (generateXml)="onGenerateXML()">
+  </app-dm-menu>
+  <app-dm-breadcrumbs [bm]="bm" (select)="openObjectDetails($event)"></app-dm-breadcrumbs>
+  
+  <section >
+    <div class="col-sm-12">
+      <app-tabs 
+        (tabSelected)="onTabSelect($event)" 
+        (tabClicked)="onTabClick($event)"  
+        (tabEdit)="onTabEdit($event)"
+        (tabRemove)="onTabRemove($event)"
+        [actions]="tabActions">
+        <ng-container *ngFor="let bmogId of bm?.Children">
+          <app-tab
+            *ngIf="bm.childrenMap[bmogId] as bmog"
+            [title]="bmog.Name"
+            [data]="bmog"
+            [active]="bmog.id === bm.selectedBMOG?.id"
+            [shared]="bmog.shared"
+          ></app-tab>
+        </ng-container>
+        <app-tab title="Add BMOG" [disabled]="true" [data]="bm" *ngIf="!bm.published"></app-tab>
+      </app-tabs>
+  
+      <app-tabs 
+        (tabSelected)="onTabSelect($event)" 
+        (tabClicked)="onTabClick($event)"  
+        (tabEdit)="onTabEdit($event)"
+        (tabRemove)="onTabRemove($event)"
+        (dropped)="dropped($event, bm?.selectedBMOG)"
+        [actions]="tabActions">
+        <ng-container *ngFor="let bmoId of bm?.selectedBMOG?.Children">
+          <app-tab
+            *ngIf="bm.selectedBMOG.childrenMap[bmoId] as bmo"
+            [title]="bmo.DisplayName"
+            [data]="bmo"
+            [active]="bmo.id === bm.selectedBMO?.id"
+            [shared]="bmo.shared"
+          ></app-tab>
+        </ng-container>
+        <app-tab *ngIf="bm?.Children.length > 0 && !bm.published" [disabled]="true" [data]="bm.selectedBMOG" title="Add BMO"></app-tab>
+      </app-tabs>
+  
+      <app-tabs 
+        (tabSelected)="onTabSelect($event)" 
+        (tabClicked)="onTabClick($event)"  
+        (tabEdit)="onTabEdit($event)"
+        (tabRemove)="onTabRemove($event)"
+        (dropped)="dropped($event, bm?.selectedBMO)"
+        [actions]="tabActions">
+        <ng-container *ngFor="let dmogId of bm?.selectedBMO?.Children">
+          <app-tab
+            *ngIf="bm.selectedBMO.childrenMap[dmogId] as dmog"
+            [title]="dmog.DisplayName"
+            [data]="dmog"
+            [active]="dmog.id === bm.selectedDMOG?.id"
+            [shared]="bm.selectedBMO.shared || dmog.shared"
+          ></app-tab>
+        </ng-container>
+        <app-tab *ngIf="allowNewDMOG" [disabled]="true" [data]="bm.selectedBMO" title="Add DMOG"></app-tab>
+      </app-tabs>
+    </div>
+  </section>
+  <section aria-label="Modal heading text content" class="modal-body" role="document" [ngSwitch]="bm.selectedBMO?.BmoType">
+    <app-dmog-form-view
+      *ngSwitchCase="'Forms'"
+      [dmog]="bm.selectedDMOG"
+      [readonly]="bm.published || bm.selectedDMOG?.shared || bm.selectedBMO?.shared"   
+    ></app-dmog-form-view>
+    <img 
+      *ngSwitchCase="'Contacts'"
+      width="100%"
+      [src]="contactsImageUrl" 
+      alt="Contacts">
+    <img 
+      *ngSwitchCase="'Attachments'"
+      width="100%"
+      [src]="attachmentsImageUrl" 
+      alt="Contacts">
+    <img 
+      *ngSwitchCase="'Documents'"
+      width="100%"
+      [src]="documentsImageUrl" 
+      alt="Contacts">
+    <img 
+      *ngSwitchCase="'Subprocess'"
+      width="100%"
+      [src]="subprocessImageUrl" 
+      alt="Contacts">
+    <img 
+      *ngSwitchCase="'ChildProcess'"
+      width="100%"
+      [src]="childprocessImageUrl" 
+      alt="Contacts">
+    <img 
+      *ngSwitchCase="'SharedChildProcess'"
+      width="100%"
+      [src]="sharedChildProcessImageUrl" 
+      alt="Contacts">
+
+  </section>
+
+</ng-container>

@@ -1,0 +1,58 @@
+<div class="popup">
+  <div class="popup__header">
+    <h2 *ngIf="!data">New Condition</h2>
+    <h2 *ngIf="data">Condition Details</h2>
+    <span class="popup__close"><i class="fas fa-times-circle fa-fw" (click)="ref.close()"></i></span>
+  </div>
+    
+  <form [formGroup]="form" *ngIf="form">
+    <div class="double-column mt-3">
+      <ng-container *ngFor="let control of controls | slice: 0 : 7">
+        <app-object-control [parentForm]="form" [submitted]="formSubmitted" [config]="control" *ngIf="control.show | async"></app-object-control>
+      </ng-container>
+  
+      <ng-container *ngIf="levelAssociations$ | async as associations">
+        <app-association
+          class="span-12"
+          [checkBy]="checkByKey"
+          [uniqueWith]="uniqueWithGUID"
+          [displayWith]="displayLevelWith"
+          [items]="associations[0]"
+          [associatedItems]="associations[1]"
+          (select)="onSelectedLevelGuids($event)">
+        </app-association>
+      </ng-container>
+      
+      <ng-container *ngFor="let control of controls | slice: 7 : 9">
+        <app-object-control [parentForm]="form" [submitted]="formSubmitted" [config]="control" *ngIf="control.show | async"></app-object-control>
+      </ng-container>
+  
+      <ng-container *ngIf="areaAssociations$ | async as associations">
+        <app-association
+          class="span-12"
+          [checkBy]="checkByKey"
+          [uniqueWith]="uniqueWithGUID"
+          [displayWith]="displayAreaWith"
+          [items]="associations[0]"
+          [associatedItems]="associations[1]"
+          (select)="onSelectedAreaGuids($event)">
+        </app-association>
+      </ng-container>
+  
+      <ng-container *ngFor="let control of controls | slice: 9 : controls.length">
+        <app-object-control [parentForm]="form" [submitted]="formSubmitted" [config]="control" *ngIf="control.show | async"></app-object-control>
+      </ng-container>
+      
+    </div>
+    
+    
+    <div class="popup__actions">
+      <button class="btn btn-light btn-sm" type="button" (click)="ref.close()">Cancel</button>
+      <button class="btn btn-primary btn-sm" type="submit" (click)="onSubmit()">
+        <ng-container *ngIf="!data">Create</ng-container>
+        <ng-container *ngIf="data">Update</ng-container>
+      </button>
+    </div>
+  </form>
+  
+</div>

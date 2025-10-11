@@ -1,0 +1,22 @@
+<header>
+	<div id="cms-header" class="cms-header-fixed">
+    	<div class="logoWrap" [routerLink]="['/admin', 'wf-app-list']">
+            <a title="C2M" aria-label="C2M"><img class="C2M-White-Logo" [src]="logoWhiteUrl" alt="C2M Logo"></a>
+        </div>
+        <div class="headRightBar" [hidden]="!isUserLoggedIn">          
+
+            <div>
+                <a class="widgetsBarLogin"  href="javascript:void(0)" title="{{userFullName}}">
+                    <span class="d-none d-sm-inline-block">{{userFullName}}</span><i class="fas fa-user-circle"></i>
+                </a>
+            </div>
+
+            <div class="logout">
+                <a (click)="logout()" title="Logout">
+                    LOGOUT
+                </a>
+            </div>
+
+        </div>
+    </div>
+</header>

@@ -1,0 +1,47 @@
+.dropzone {
+  --stroke-color: #ccc;
+  --white-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column; 
+  font-weight: 200;
+  height: 90px;
+  border: 2px dashed var(--stroke-color);
+  border-radius: 5px;
+  background: var(--white-color);
+  margin-bottom: 10px;
+
+  &.hovering {
+    --stroke-color: #3cf1244a;
+    border: 2px solid var(--stroke-color);
+    color: #dadada !important;
+    &.allowed {
+      background: repeating-radial-gradient(
+        circle,
+        var(--white-color),
+        var(--stroke-color),
+        var(--white-color) 2px, 
+        var(--white-color) 10px
+      );
+    }
+    &.not-allowed {
+      --stroke-color: #e710104a;
+      background: repeating-radial-gradient(
+        circle,
+        var(--white-color),
+        var(--stroke-color),
+        var(--white-color) 2px, 
+        var(--white-color) 10px
+      );
+    }
+  }
+
+  .file-label {
+      font-size: 1.2em;
+  }
+}
+
+progress::-webkit-progress-value {
+  transition: width 0.1s ease;
+}

@@ -1,0 +1,16 @@
+<div class="header-row col-sm-12 pt-2 pb-2">
+	<button class="btn btn-outline-white btn-sm" (click)="newVersion.emit()"><i class="fas fa-code-branch" ></i> New Version</button>
+	<button class="btn btn-outline-white btn-sm" (click)="generateXml.emit()"><i class="fas fa-code"></i> Generate JSON</button>
+	<div class="mode" ngbDropdown>
+	<button class="btn btn-sm" [class]="mode === 'Edit' ? 'btn-outline-white' : 'btn-primary'" ngbDropdownToggle>
+		<i class="fas fa-edit" *ngIf="mode === 'Edit'"></i>
+		<i class="fas fa-lock" *ngIf="mode === 'Published'"></i>
+		{{mode}}
+	</button>
+	<ul ngbDropdownMenu>
+		<li ngbDropdownItem *ngFor="let mode of ['Edit', 'Published']" (click)="modeChange.emit(mode)">
+		{{mode}}
+		</li>
+	</ul>
+	</div>
+</div>
