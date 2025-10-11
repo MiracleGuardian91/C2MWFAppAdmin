@@ -1,4 +1,7 @@
 import {
+  index_esm_default
+} from "./chunk-K5QNCREJ.js";
+import {
   all,
   assign as assign2,
   attr,
@@ -13,45 +16,11 @@ import {
   remove
 } from "./chunk-W6KNEPAJ.js";
 import {
-  getOriginal,
-  hasPrimaryModifier,
-  hasSecondaryModifier,
-  isAuxiliaryButton,
-  isMac,
-  isPrimaryButton,
-  stopPropagation,
-  toPoint
-} from "./chunk-O2RUVXQP.js";
-import {
-  rotate,
-  transform as transform2,
-  translate
-} from "./chunk-CE5VFLYH.js";
-import {
-  index_esm_default
-} from "./chunk-K5QNCREJ.js";
-import {
-  BaseRenderer
-} from "./chunk-P2P5AXCL.js";
-import {
   AutoResize
-} from "./chunk-NSOGAJ2U.js";
-import {
-  eachElement,
-  getBBox,
-  getClosure,
-  getEnclosedElements,
-  getParents,
-  getType,
-  isFrameElement,
-  selfAndAllChildren
-} from "./chunk-A3Q7264O.js";
+} from "./chunk-PDHFGGQH.js";
 import {
   RuleProvider
 } from "./chunk-4X2IYSHR.js";
-import {
-  CommandInterceptor
-} from "./chunk-JI54U5I4.js";
 import {
   asBounds,
   asTRBL,
@@ -68,6 +37,37 @@ import {
   roundBounds,
   roundPoint
 } from "./chunk-4OHDVAG5.js";
+import {
+  eachElement,
+  getBBox,
+  getClosure,
+  getEnclosedElements,
+  getParents,
+  getType,
+  isFrameElement,
+  selfAndAllChildren
+} from "./chunk-A3Q7264O.js";
+import {
+  getOriginal,
+  hasPrimaryModifier,
+  hasSecondaryModifier,
+  isAuxiliaryButton,
+  isMac,
+  isPrimaryButton,
+  stopPropagation,
+  toPoint
+} from "./chunk-O2RUVXQP.js";
+import {
+  rotate,
+  transform as transform2,
+  translate
+} from "./chunk-CE5VFLYH.js";
+import {
+  CommandInterceptor
+} from "./chunk-JI54U5I4.js";
+import {
+  BaseRenderer
+} from "./chunk-P2P5AXCL.js";
 import {
   black,
   getBounds,
@@ -101,18 +101,6 @@ import {
   remove as remove2,
   transform
 } from "./chunk-VKE2OUF7.js";
-import {
-  createCategory,
-  createCategoryValue,
-  linkCategoryValue,
-  unlinkCategory,
-  unlinkCategoryValue
-} from "./chunk-QBESYOBR.js";
-import {
-  add,
-  indexOf,
-  remove as remove3
-} from "./chunk-UPPIJ347.js";
 import {
   ElementFactory,
   ElementFactory2,
@@ -189,6 +177,18 @@ import {
   values,
   without
 } from "./chunk-26FIRWZU.js";
+import {
+  createCategory,
+  createCategoryValue,
+  linkCategoryValue,
+  unlinkCategory,
+  unlinkCategoryValue
+} from "./chunk-QBESYOBR.js";
+import {
+  add,
+  indexOf,
+  remove as remove3
+} from "./chunk-UPPIJ347.js";
 import {
   __async,
   __objRest,

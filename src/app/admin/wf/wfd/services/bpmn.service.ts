@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { MessageService } from '@app/core';
-import BpmnJS from 'bpmn-js/lib/Modeler';
 import { getMid } from 'diagram-js/lib/layout/LayoutUtil';
 import { from, Observable } from 'rxjs';
 import { delay, finalize } from 'rxjs/operators';
