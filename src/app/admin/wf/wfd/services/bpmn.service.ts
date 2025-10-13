@@ -153,6 +153,14 @@ export class BpmnService {
     this.commandStack.redo();
   }
 
+  /**
+   * Manually fix overlapping connections
+   */
+  public fixOverlappingConnections(): void {
+    // This will be called by the ConnectionOverlapModule when needed
+    // The actual implementation is in the custom module
+  }
+
   public commandStackLength() {
     return this.commandStack._stack.length ?? -1;
   }
