@@ -46,8 +46,8 @@ export class BpmnService {
   private canvas: Canvas;
   private factory: ElementFactory;
   private registry: ElementRegistry;
-  private eventBus: EventBus;
-  private commandStack: any;
+  public eventBus: EventBus;
+  public commandStack: any;
   private palette: any;
   private readonly labelEditing: any;
   constructor(private msg: MessageService) {

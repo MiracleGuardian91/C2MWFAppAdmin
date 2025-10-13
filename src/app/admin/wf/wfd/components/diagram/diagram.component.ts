@@ -9,9 +9,14 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import { ICompanyAssociatedBMObject, ICompanyAssociatedWFObject, MessageService, WFAssociatedCompaniesPayload } from '@app/core';
+import {
+  ICompanyAssociatedBMObject,
+  ICompanyAssociatedWFObject,
+  MessageService,
+  WFAssociatedCompaniesPayload,
+} from '@app/core';
 import { FormViewApiService } from '@app/core/services/form-view-api.service';
-import {  switchMap, takeUntil } from 'rxjs/operators';
+import { switchMap, takeUntil } from 'rxjs/operators';
 import { WFTriggerConditionDetail } from '../../models';
 import {
   ConnectionReconnectContext,
@@ -36,6 +41,7 @@ import {
   Workflow,
 } from '../../models/wf.model';
 import { DiagramService } from '../../services/diagram.service';
+import { DiagramStorageService } from '../../services/diagram-storage.service';
 import {
   WFSaveResponse,
   WorkflowApiService,
@@ -50,7 +56,7 @@ import { TriggerConditionDetailComponent } from '../trigger-condition-detail/tri
 import { TriggerDetailComponent } from '../trigger-detail/trigger-detail.component';
 import { WorkflowDetailComponent } from '../workflow-detail/workflow-detail.component';
 import { environment } from '@env/environment';
-import { firstValueFrom, Observable,  Subject } from 'rxjs';
+import { firstValueFrom, Observable, Subject } from 'rxjs';
 import { BpmnService } from '../../services/bpmn.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { WfdComponent } from '../../wfd.component';
@@ -61,7 +67,12 @@ import { Guid } from 'guid-typescript';
 import { CompanyAssociationComponent } from '@app/admin/Shared/company-association/company-association.component';
 
 import { ToastrService } from 'ngx-toastr';
-import { NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, NgbDropdownItem } from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbDropdown,
+  NgbDropdownToggle,
+  NgbDropdownMenu,
+  NgbDropdownItem,
+} from '@ng-bootstrap/ng-bootstrap';
 import { NgIf, NgFor } from '@angular/common';
 
 const t = ElementType;
@@ -71,18 +82,18 @@ interface WfosIdToWfoIdMap {
 }
 
 @Component({
-    selector: 'app-diagram',
-    templateUrl: './diagram.component.html',
-    styleUrls: ['./diagram.component.scss'],
-    standalone: true,
-    imports: [
-        NgbDropdown,
-        NgbDropdownToggle,
-        NgIf,
-        NgbDropdownMenu,
-        NgFor,
-        NgbDropdownItem,
-    ],
+  selector: 'app-diagram',
+  templateUrl: './diagram.component.html',
+  styleUrls: ['./diagram.component.scss'],
+  standalone: true,
+  imports: [
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgIf,
+    NgbDropdownMenu,
+    NgFor,
+    NgbDropdownItem,
+  ],
 })
 export class DiagramComponent implements AfterContentInit, OnDestroy {
   @ViewChild('ref', { static: true }) private el: ElementRef;
@@ -92,25 +103,33 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
   public actionsVisible = true;
   public actionsDisabled = false;
   showWfdOnly = false; // Default state
-   metadata$: Observable<MetaData>;
-   private destroy$ = new Subject<void>();
-   previousLength: number = 0;
-   coordinatesChangePoints: Coordinates; // Store the points where the length changes
-   previousCords: Coordinates;
+  metadata$: Observable<MetaData>;
+  private destroy$ = new Subject<void>();
+  previousLength: number = 0;
+  coordinatesChangePoints: Coordinates; // Store the points where the length changes
+  previousCords: Coordinates;
   processName: any;
   IsRedoAllowed: boolean;
   IsUndoAllowed: boolean;
-  reloadData: boolean = false; 
+  reloadData: boolean = false;
 
-  EntityId: string ='' ;
-  EntityType: string='' ;
-  ActionName: string ='';
-  ActionGroupId: string ='';
-  ActionDetails: string ='';
-  clearDetail:boolean=false;
+  EntityId: string = '';
+  EntityType: string = '';
+  ActionName: string = '';
+  ActionGroupId: string = '';
+  ActionDetails: string = '';
+  clearDetail: boolean = false;
   totalComponentLenth: number;
   keyColorArrayPrevious: [string, string | undefined][] = [];
   alertMsgTxt: string[] = [];
+
+  // Manual save properties
+  public hasUnsavedChanges = false;
+  public isSaving = false;
+
+  // Local undo/redo properties
+  public canUndo = false;
+  public canRedo = false;
   trgConditionDetail: boolean = false;
   undoredoactive = false;
   constructor(
@@ -119,15 +138,14 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     public wfapi: WorkflowApiService,
     private formViewApi: FormViewApiService,
     private msg: MessageService,
-    private cdr:ChangeDetectorRef,
+    private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
     private bpmnService: BpmnService,
-    readonly toastr: ToastrService,
-  ) {  
-
+    private storageService: DiagramStorageService,
+    readonly toastr: ToastrService
+  ) {
     this.registerEventHandlers();
   }
-
 
   private registerEventHandlers(): void {
     this.service.onUpdateElement
@@ -141,114 +159,111 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     this.service.onDeleteElement
       .pipe(takeUntil(this.destroy$))
       .subscribe((res) => this.onDeleteElement(res));
-  
 
     this.service.onDiagramChange
       .pipe(takeUntil(this.destroy$))
       .subscribe((coords) => {
-        if(this.ActionName==='Delete' ||!this.ActionName.trim()){
-          this.EntityId=' ';
-          this.EntityType=' ';
-          this.ActionName=' ';
-          this.ActionGroupId=' ';
+        if (this.ActionName === 'Delete' || !this.ActionName.trim()) {
+          this.EntityId = ' ';
+          this.EntityType = ' ';
+          this.ActionName = ' ';
+          this.ActionGroupId = ' ';
         }
-         
-        const currentCordsdetail=Object.keys(coords);
-        const previousCordsdetail = this.coordinatesChangePoints 
-        ? Object.keys(this.coordinatesChangePoints) 
-        : [];
-        const storedEvent = this.getStoredEvent();
-        let isUndoRedo=false;
 
-        if (storedEvent !=="ElementMoved" && this.totalComponentLenth > currentCordsdetail.length || this.undoredoactive) {
-          if(this.undoredoactive){
-            isUndoRedo =true;  
+        const currentCordsdetail = Object.keys(coords);
+        const previousCordsdetail = this.coordinatesChangePoints
+          ? Object.keys(this.coordinatesChangePoints)
+          : [];
+        const storedEvent = this.getStoredEvent();
+        let isUndoRedo = false;
+
+        if (
+          (storedEvent !== 'ElementMoved' &&
+            this.totalComponentLenth > currentCordsdetail.length) ||
+          this.undoredoactive
+        ) {
+          if (this.undoredoactive) {
+            isUndoRedo = true;
           }
-          if(this.ActionName !=="Edit"){
+          if (this.ActionName !== 'Edit') {
             this.ActionName = '';
-           this.undoredoactive = false;
-          }  
-          
-    
-        } else if (!this.ActionName.trim()|| this.ActionName ==="FilledColor") {
+            this.undoredoactive = false;
+          }
+        } else if (
+          !this.ActionName.trim() ||
+          this.ActionName === 'FilledColor'
+        ) {
           this.ActionName = 'ElementMoved';
         }
-           
-        const newKeyColorArray: [string, string | undefined][] = Object.entries(coords)
-        .map(([key, value]) => [key, (value as any).color])
-        .filter((entry): entry is [string, string] =>
-          !!entry[1] && entry[1] !== 'none' && entry[1] !== ''
-        );
-      
-        const hasColorChanged =
-        this.keyColorArrayPrevious.length !== newKeyColorArray.length ||
-        newKeyColorArray.some(([key, color]) => {
-          const match = this.keyColorArrayPrevious.find(([prevKey]) => prevKey === key);
-          return !match || match[1] !== color;
-        });
-      
-      if (hasColorChanged) {
-        this.keyColorArrayPrevious = newKeyColorArray;
-        this.ActionName = "FilledColor";
-      }
 
-      if(isUndoRedo)
-      {
-         this.ActionName =''; 
-      }
+        const newKeyColorArray: [string, string | undefined][] = Object.entries(
+          coords
+        )
+          .map(([key, value]) => [key, (value as any).color])
+          .filter(
+            (entry): entry is [string, string] =>
+              !!entry[1] && entry[1] !== 'none' && entry[1] !== ''
+          );
+
+        const hasColorChanged =
+          this.keyColorArrayPrevious.length !== newKeyColorArray.length ||
+          newKeyColorArray.some(([key, color]) => {
+            const match = this.keyColorArrayPrevious.find(
+              ([prevKey]) => prevKey === key
+            );
+            return !match || match[1] !== color;
+          });
+
+        if (hasColorChanged) {
+          this.keyColorArrayPrevious = newKeyColorArray;
+          this.ActionName = 'FilledColor';
+        }
+
+        if (isUndoRedo) {
+          this.ActionName = '';
+        }
         this.totalComponentLenth = currentCordsdetail.length;
         const removedGateway = previousCordsdetail.some(
-          item => item.includes("bpmn:ExclusiveGateway") && !currentCordsdetail.includes(item)
+          (item) =>
+            item.includes('bpmn:ExclusiveGateway') &&
+            !currentCordsdetail.includes(item)
         );
-        
+
         const removedCondition = previousCordsdetail.some(
-          item => item.includes("Cond_") && !currentCordsdetail.includes(item)
+          (item) => item.includes('Cond_') && !currentCordsdetail.includes(item)
         );
-        
+
         if (removedGateway && removedCondition) {
           this.EntityType = 'diamond';
-          this.ActionGroupId=Guid.raw() 
+          this.ActionGroupId = Guid.raw();
         } else if (removedGateway) {
           this.EntityType = 'diamond';
-          this.ActionGroupId=Guid.raw() 
+          this.ActionGroupId = Guid.raw();
         } else if (removedCondition) {
           this.EntityType = 'TriggerCondition';
-          this.ActionGroupId=Guid.raw() 
+          this.ActionGroupId = Guid.raw();
         }
         const currentLength = Object.keys(coords).length;
         // Check if the length has changed
-        this.coordinatesChangePoints=coords;
+        this.coordinatesChangePoints = coords;
 
         // if (this.previousLength > currentLength) {
-         
-        // }     
-        this.previousLength = currentLength;  
-        
-        this.persistWorkflowDataArray();
-        this.wfapi.saveDiagramCoordinates(this.metadata.Workflow.WFID, coords, { 
-          EntityId: this.EntityId, 
-          EntityType: this.EntityType, 
-          ActionName: this.ActionName, 
-          ActionGroupId: this.ActionGroupId, 
-          ActionDetails: this.ActionDetails,
-          SequenceNumber:this.getWorkflowValue(this.metadata.Workflow.WFID).toString()
-        }).subscribe({
-          next: (response: any) => { 
-           this.IsRedoAllowed = !!response?.Redo && response.Redo > 0;
-          this.IsUndoAllowed = !!response?.Undo && response.Undo > 0;
-          },
-          error: (error) => {
-            console.error("Error saving diagram coordinates:", error);
-          }
-        });
 
-        if(this.clearDetail){
-          this.EntityId=' ';
-          this.EntityType=' ';
-          this.ActionName=' ';
-          this.ActionGroupId=' ';
-          this.ActionDetails=' ';
-          this.clearDetail=false;
+        // }
+        this.previousLength = currentLength;
+
+        this.persistWorkflowDataArray();
+
+        // Store changes locally instead of auto-saving to cloud
+        this.storeChangesLocally(coords);
+
+        if (this.clearDetail) {
+          this.EntityId = ' ';
+          this.EntityType = ' ';
+          this.ActionName = ' ';
+          this.ActionGroupId = ' ';
+          this.ActionDetails = ' ';
+          this.clearDetail = false;
         }
         this.clearStoredEvent();
       });
@@ -260,85 +275,88 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     this.service.onRestoreElement
       .pipe(takeUntil(this.destroy$))
       .subscribe((element) => {
-        this.wfapi.restoreElement(this.metadata.Workflow.WFID, element).subscribe();
+        this.wfapi
+          .restoreElement(this.metadata.Workflow.WFID, element)
+          .subscribe();
       });
   }
 
   changeUndoRedo(id: string, type: string, Action: string) {
-
-    type = type.replace('bpmn:', ''); 
+    type = type.replace('bpmn:', '');
     this.EntityId = id;
     this.ActionName = Action;
-    this.ActionGroupId=Guid.raw();
+    this.ActionGroupId = Guid.raw();
 
     switch (type) {
       case 'Task':
-        this.EntityType ='State';  
+        this.EntityType = 'State';
         break;
       case 'Participant':
-        this.EntityType ='Pool'; 
-        break; 
+        this.EntityType = 'Pool';
+        break;
       case 'Lane':
-        this.EntityType ='Stage';
-        break;  
+        this.EntityType = 'Stage';
+        break;
       case 'StartEvent':
-        this.EntityType ='StartState';
-        break;  
+        this.EntityType = 'StartState';
+        break;
       case 'EndEvent':
-        this.EntityType ='EndState'; 
-        break; 
+        this.EntityType = 'EndState';
+        break;
       case 'ExclusiveGateway':
-        this.EntityType ='Gateway';
-        this.clearDetail=true;
-        break; 
+        this.EntityType = 'Gateway';
+        this.clearDetail = true;
+        break;
       case 'SequenceFlow':
-        this.EntityType ='Trigger';
-        break;  
+        this.EntityType = 'Trigger';
+        break;
       case 'IntermediateCatchEvent':
-        this.EntityType ='TriggerExtension';
-        this.clearDetail=true;
-        break; 
-      case 'TimerEventDefinition' :
-         this.EntityType ='Timer';
-         this.clearDetail=true;
-        break; 
+        this.EntityType = 'TriggerExtension';
+        this.clearDetail = true;
+        break;
+      case 'TimerEventDefinition':
+        this.EntityType = 'Timer';
+        this.clearDetail = true;
+        break;
       case 'Association':
-        this.EntityType ='Association'; 
+        this.EntityType = 'Association';
         break;
       case 'TextAnnotation':
-        this.EntityType ='Annotation'; 
-        this.clearDetail=true;
-        break; 
+        this.EntityType = 'Annotation';
+        this.clearDetail = true;
+        break;
       case 'SubProcess':
-        this.EntityType ='SubProcess';
-        break; 
-      case 'label' :  
-        this.EntityType ='Label';
-        break; 
+        this.EntityType = 'SubProcess';
+        break;
+      case 'label':
+        this.EntityType = 'Label';
+        break;
       default:
-        this.EntityType = ''; 
-        break; 
+        this.EntityType = '';
+        break;
     }
   }
 
   deleteWfCall(ids: ElementsIds) {
-
     const deletedIds = {
       workflowIds: ids.workflowIds,
       stageIds: ids.stageIds,
       stateIds: ids.stateIds,
       triggerIds: ids.triggerIds,
       conditionIds: ids.conditionIds,
-      PrevStageIds:[],
+      PrevStageIds: [],
     };
-  
+
     const deletedIdsString = JSON.stringify(deletedIds); // Convert object to string
     this.ActionName = 'Delete';
-    this.ActionGroupId = (this.EntityType !== 'diamond' && this.EntityType !== 'TriggerCondition') ? Guid.raw() : this.ActionGroupId;
-    
+    this.ActionGroupId =
+      this.EntityType !== 'diamond' && this.EntityType !== 'TriggerCondition'
+        ? Guid.raw()
+        : this.ActionGroupId;
+
     // Determine EntityType
     this.EntityType =
-      this.EntityType === 'diamond' ||  this.EntityType ==='TriggerCondition'
+      this.EntityType === 'diamond' || this.EntityType === 'TriggerCondition'
         ? this.EntityType
         : ids.stageIds?.[0]
         ? 'Stage'
@@ -347,22 +365,33 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
         : ids.triggerIds?.[0]
         ? 'Trigger'
         : '';
-        this.persistWorkflowDataArray();
-  
+    this.persistWorkflowDataArray();
+
     this.wfapi
-      .saveDiagramCoordinates(this.metadata.Workflow.WFID, this.coordinatesChangePoints, {
-        EntityId: ids.stageIds[0] ?? ids.stateIds[0] ?? ids.triggerIds[0] ?? ids.conditionIds[0] ?? '',
-        EntityType: this.EntityType,
-        ActionName: this.ActionName,
-        ActionGroupId: this.ActionGroupId,
-        ActionDetails: deletedIdsString,
-        SequenceNumber:this.getWorkflowValue(this.metadata.Workflow.WFID).toString()
-      })
+      .saveDiagramCoordinates(
+        this.metadata.Workflow.WFID,
+        this.coordinatesChangePoints,
+        {
+          EntityId:
+            ids.stageIds[0] ??
+            ids.stateIds[0] ??
+            ids.triggerIds[0] ??
+            ids.conditionIds[0] ??
+            '',
+          EntityType: this.EntityType,
+          ActionName: this.ActionName,
+          ActionGroupId: this.ActionGroupId,
+          ActionDetails: deletedIdsString,
+          SequenceNumber: this.getWorkflowValue(
+            this.metadata.Workflow.WFID
+          ).toString(),
+        }
+      )
       .subscribe({
         next: (response: any) => {
           this.IsRedoAllowed = !!response?.Redo && response.Redo > 0;
           this.IsUndoAllowed = !!response?.Undo && response.Undo > 0;
-          
+
           // Reset values **after** successful API call
           this.resetValues();
         },
@@ -372,7 +401,7 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
         },
       });
   }
-  
+
   // Helper method to reset values after API call
   private resetValues(): void {
     this.EntityId = '';
@@ -382,11 +411,9 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     this.ActionDetails = '';
     this.clearDetail = false;
   }
-  
-  
 
   private async onCreateElement(el: DiagramEl) {
-    this.changeUndoRedo('',el.type,'Insert');
+    this.changeUndoRedo('', el.type, 'Insert');
     try {
       const details = await this.getDetails(el, true);
       if (details) {
@@ -397,53 +424,62 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
         });
 
         if (ref) {
-        const props = ref?.payload || ref;
+          const props = ref?.payload || ref;
           try {
-            const res = await firstValueFrom(this.saveDetails(el, props));      
+            const res = await firstValueFrom(this.saveDetails(el, props));
             if (res.statuscode === 200) {
-       
-              this.clearDetail=true;   
-              this.EntityId = res.result.ConditionId ?? res.result.TriggerId ?? res.result.WfoId ?? res.result.WfosId; 
-            //  this.ActionDetails = res.result.TriggerId ? JSON.stringify(Object.keys(res.result.TrgConditions)) : '';
+              this.clearDetail = true;
+              this.EntityId =
+                res.result.ConditionId ??
+                res.result.TriggerId ??
+                res.result.WfoId ??
+                res.result.WfosId;
+              //  this.ActionDetails = res.result.TriggerId ? JSON.stringify(Object.keys(res.result.TrgConditions)) : '';
               this.ActionDetails = res.result.TriggerId
-               ? JSON.stringify({
-                 workflowIds: [],
-                stageIds: [],
-                stateIds: [],
-                PrevStageIds:[],
-                triggerIds: [res.result.TriggerId], 
-                conditionIds: Object.keys(res.result.TrgConditions ?? []).filter(key => key)
-                })
-               : '';
-              if(ref.legalDocsPayload && ref.legalDocsPayload != '-1'){
-                  const Workflow =  this.metadata.Workflow;
-                  const triggerId =  res.result?.TriggerId; 
-                  await firstValueFrom(this.wfapi.insertlegaldmotrgmapping(ref.legalDocsPayload,Workflow.TypeID,triggerId));
+                ? JSON.stringify({
+                    workflowIds: [],
+                    stageIds: [],
+                    stateIds: [],
+                    PrevStageIds: [],
+                    triggerIds: [res.result.TriggerId],
+                    conditionIds: Object.keys(
+                      res.result.TrgConditions ?? []
+                    ).filter((key) => key),
+                  })
+                : '';
+              if (ref.legalDocsPayload && ref.legalDocsPayload != '-1') {
+                const Workflow = this.metadata.Workflow;
+                const triggerId = res.result?.TriggerId;
+                await firstValueFrom(
+                  this.wfapi.insertlegaldmotrgmapping(
+                    ref.legalDocsPayload,
+                    Workflow.TypeID,
+                    triggerId
+                  )
+                );
               }
 
               // trg_cond
               this.handleSaveResponse(el, res, props);
             } else {
- 
-              if(this.reloadData){
-                this.reloadData=false;
+              if (this.reloadData) {
+                this.reloadData = false;
               }
-              this.clearDetail=true;
+              this.clearDetail = true;
               this.service.deleteElement(el);
             }
           } catch (_) {
-            this.clearDetail=true;
+            this.clearDetail = true;
             this.service.deleteElement(el);
           }
-          this.clearDetail=true;
+          this.clearDetail = true;
         } else {
-          if(this.reloadData){
-            this.reloadData=false;
+          if (this.reloadData) {
+            this.reloadData = false;
           }
           this.service.undo();
-          this.clearDetail=true;
+          this.clearDetail = true;
         }
-     
       }
     } catch (error) {
       console.log(error);
@@ -452,37 +488,37 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
   }
 
   public async UndoRedo(functionality: string) {
-      try {
-          this.undoredoactive = true;
-          if (functionality === 'Undo') {
-              if (this.metadata.Workflow) {
-                  this.wfapi.UndoWfdWorkflow(this.metadata.Workflow.WFID).pipe(
-                      switchMap(() => this.loadWfData())
-                  ).subscribe(metadata => {
-                      this.mappingData(metadata);
-                      this.refreshXML();
-                  });
-              }
-
-          } else if (functionality === 'Redo') {
-              this.wfapi.RedoWfdWorkflow(this.metadata.Workflow.WFID).pipe(
-                  switchMap(() => this.loadWfData())
-              ).subscribe(metadata => {
-                  this.mappingData(metadata);
-                  this.refreshXML();
-              });
-          }
-
-      } catch (error) {
-          console.error(`Error during ${functionality} operation:`, error);
+    try {
+      this.undoredoactive = true;
+      if (functionality === 'Undo') {
+        if (this.metadata.Workflow) {
+          this.wfapi
+            .UndoWfdWorkflow(this.metadata.Workflow.WFID)
+            .pipe(switchMap(() => this.loadWfData()))
+            .subscribe((metadata) => {
+              this.mappingData(metadata);
+              this.refreshXML();
+            });
+        }
+      } else if (functionality === 'Redo') {
+        this.wfapi
+          .RedoWfdWorkflow(this.metadata.Workflow.WFID)
+          .pipe(switchMap(() => this.loadWfData()))
+          .subscribe((metadata) => {
+            this.mappingData(metadata);
+            this.refreshXML();
+          });
       }
+    } catch (error) {
+      console.error(`Error during ${functionality} operation:`, error);
+    }
   }
 
   private loadWfData() {
     var processName: string;
     var verNo: string;
-    this.route.queryParams.subscribe(params => {
-     processName = params['processName'];
+    this.route.queryParams.subscribe((params) => {
+      processName = params['processName'];
       verNo = params['VerNo'];
     });
     this.metadata$ = this.wfapi.getWorkflowDiagram(processName, verNo);
@@ -490,135 +526,143 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
   }
 
   private mappingData(metadata) {
-      this.metadata = metadata;
-      
-      this.IsRedoAllowed = !!this.metadata.Workflow.IsRedoAllowed;
-      this.IsUndoAllowed = !!this.metadata.Workflow.IsUndoAllowed;
+    this.metadata = metadata;
 
-  }
-  
-
-
-private async onUpdateElement(el: DiagramEl) {
-
-  let isExclusiveGateway;
-   if( el.type === "bpmn:SequenceFlow"){
-    isExclusiveGateway = el.source.type === "bpmn:ExclusiveGateway";
-   }else{
-    isExclusiveGateway=false
-   }
-
-  this.trgConditionDetail = isExclusiveGateway;
-  let friendlyName = isExclusiveGateway
-  ? el?.props?.Description ?? ''
-  : el.type === 'bpmn:SequenceFlow'
-    ? el.friendlyName ?? ''
-    : el?.props?.FriendlyName ?? '';
-  if (el.type === 'bpmn:IntermediateCatchEvent') {
-    friendlyName = '';
+    this.IsRedoAllowed = !!this.metadata.Workflow.IsRedoAllowed;
+    this.IsUndoAllowed = !!this.metadata.Workflow.IsUndoAllowed;
   }
 
-
-  const newElement = !el.props && el.type !== t.TriggerExtension;
-  const details = await this.getDetails(el, newElement);
-  if (!details) return;
-
-  const ref = await this.openDialog({ element: el, newElement, ...details });
-  if (!ref) return this.trgConditionDetail = false;
-
-  if(ref.legalDocsPayload && ref.legalDocsPayload != '-1'){
-    const Workflow =  this.metadata.Workflow;
-    const triggerId = ref.payload?.triggerId;
-    await firstValueFrom(this.wfapi.insertlegaldmotrgmapping(ref.legalDocsPayload,Workflow.TypeID,triggerId));
-  }
-
-  const props = ref?.payload || ref;
-  this.updateElementProperties(el, props, friendlyName);
-  await this.saveAndUpdateElement(el, props, newElement);
-}
-
-private updateElementProperties(el: DiagramEl, props: any, prev: any): void {
-  const stateTypes = ["bpmn:Task", "bpmn:StartEvent", "bpmn:EndEvent", "bpmn:SubProcess"];
-  if (stateTypes.includes(el.type)) {
-    this.changeUndoRedo(el.props.WfosId, el.type, 'Edit');
-  } else if (el.type === "bpmn:Lane") {
-    this.changeUndoRedo(el.props.WfoId, el.type, 'Edit');
-  } else if (el.type === "bpmn:SequenceFlow") {
-    if (this.trgConditionDetail) {
-      this.EntityId = props.conditionId;
-      this.ActionName = 'Edit';
-      this.ActionGroupId = Guid.raw();
-      this.EntityType='TriggerCondition'
+  private async onUpdateElement(el: DiagramEl) {
+    let isExclusiveGateway;
+    if (el.type === 'bpmn:SequenceFlow') {
+      isExclusiveGateway = el.source.type === 'bpmn:ExclusiveGateway';
     } else {
-      this.changeUndoRedo(el.props.TriggerId, el.type, 'Edit');
+      isExclusiveGateway = false;
     }
-  }else if(el.def==="bpmn:TimerEventDefinition"){
-    this.changeUndoRedo('', el.def, 'Edit');
-  }
-  else if(el.type==="bpmn:Participant"){
-    this.changeUndoRedo(props.wfId, el.type, 'Edit');
-  }
-   else {
-    this.changeUndoRedo(el.id, el.type, 'Edit');
+
+    this.trgConditionDetail = isExclusiveGateway;
+    let friendlyName = isExclusiveGateway
+      ? el?.props?.Description ?? ''
+      : el.type === 'bpmn:SequenceFlow'
+      ? el.friendlyName ?? ''
+      : el?.props?.FriendlyName ?? '';
+    if (el.type === 'bpmn:IntermediateCatchEvent') {
+      friendlyName = '';
+    }
+
+    const newElement = !el.props && el.type !== t.TriggerExtension;
+    const details = await this.getDetails(el, newElement);
+    if (!details) return;
+
+    const ref = await this.openDialog({ element: el, newElement, ...details });
+    if (!ref) return (this.trgConditionDetail = false);
+
+    if (ref.legalDocsPayload && ref.legalDocsPayload != '-1') {
+      const Workflow = this.metadata.Workflow;
+      const triggerId = ref.payload?.triggerId;
+      await firstValueFrom(
+        this.wfapi.insertlegaldmotrgmapping(
+          ref.legalDocsPayload,
+          Workflow.TypeID,
+          triggerId
+        )
+      );
+    }
+
+    const props = ref?.payload || ref;
+    this.updateElementProperties(el, props, friendlyName);
+    await this.saveAndUpdateElement(el, props, newElement);
   }
 
-  const UpdatedData = {
-    workflowIds: [],
-    stageIds: [],
-    stateIds: [],
-    PrevStageIds: [],
-    triggerIds: [],
-    conditionIds: [],
-    PrevDispName: prev,
-    CurrentDispName: this.trgConditionDetail ? props.conditionDescription : props.friendlyName,
-  };
- 
+  private updateElementProperties(el: DiagramEl, props: any, prev: any): void {
+    const stateTypes = [
+      'bpmn:Task',
+      'bpmn:StartEvent',
+      'bpmn:EndEvent',
+      'bpmn:SubProcess',
+    ];
+    if (stateTypes.includes(el.type)) {
+      this.changeUndoRedo(el.props.WfosId, el.type, 'Edit');
+    } else if (el.type === 'bpmn:Lane') {
+      this.changeUndoRedo(el.props.WfoId, el.type, 'Edit');
+    } else if (el.type === 'bpmn:SequenceFlow') {
+      if (this.trgConditionDetail) {
+        this.EntityId = props.conditionId;
+        this.ActionName = 'Edit';
+        this.ActionGroupId = Guid.raw();
+        this.EntityType = 'TriggerCondition';
+      } else {
+        this.changeUndoRedo(el.props.TriggerId, el.type, 'Edit');
+      }
+    } else if (el.def === 'bpmn:TimerEventDefinition') {
+      this.changeUndoRedo('', el.def, 'Edit');
+    } else if (el.type === 'bpmn:Participant') {
+      this.changeUndoRedo(props.wfId, el.type, 'Edit');
+    } else {
+      this.changeUndoRedo(el.id, el.type, 'Edit');
+    }
 
-  this.ActionDetails = JSON.stringify(UpdatedData);
-  this.clearDetail = true;
+    const UpdatedData = {
+      workflowIds: [],
+      stageIds: [],
+      stateIds: [],
+      PrevStageIds: [],
+      triggerIds: [],
+      conditionIds: [],
+      PrevDispName: prev,
+      CurrentDispName: this.trgConditionDetail
+        ? props.conditionDescription
+        : props.friendlyName,
+    };
 
-  el.props = el.props || {};
-  el.props.FriendlyName = props.friendlyName;
+    this.ActionDetails = JSON.stringify(UpdatedData);
+    this.clearDetail = true;
 
-  if (el.type === "bpmn:SequenceFlow") {
-    el.friendlyName = this.trgConditionDetail ? props.conditionDescription : props.friendlyName;
-    this.trgConditionDetail = false;
+    el.props = el.props || {};
+    el.props.FriendlyName = props.friendlyName;
+
+    if (el.type === 'bpmn:SequenceFlow') {
+      el.friendlyName = this.trgConditionDetail
+        ? props.conditionDescription
+        : props.friendlyName;
+      this.trgConditionDetail = false;
+    }
   }
-}
-  
-  private async saveAndUpdateElement(el: DiagramEl, props: any, newElement: boolean): Promise<void> {
+
+  private async saveAndUpdateElement(
+    el: DiagramEl,
+    props: any,
+    newElement: boolean
+  ): Promise<void> {
     const saveResponse = await this.saveDetails(el, props).toPromise();
-  
-    if (el.type === "bpmn:SubProcess") {
+
+    if (el.type === 'bpmn:SubProcess') {
       el.props.SubProcessName = saveResponse.result.SubProcessName;
-      el.props.SubProcessWFVersionNo = saveResponse.result.SubProcessWFVersionNo;
+      el.props.SubProcessWFVersionNo =
+        saveResponse.result.SubProcessWFVersionNo;
     }
-  
+
     if (!newElement) return;
-  
+
     if (saveResponse.statuscode === 200) {
       this.handleSaveResponse(el, saveResponse, props);
     } else {
       this.service.deleteElement(el);
     }
   }
-  
 
   private async onDeleteElement(ids: ElementsIds) {
     const workflowId = this.metadata.Workflow.WFID;
     this.deleteWfCall(ids);
     try {
-
       await this.wfapi.deleteElements(ids, workflowId).toPromise();
-    
-      if (ids.workflowIds.length > 0) {   
+
+      if (ids.workflowIds.length > 0) {
         this.workflowDeleted.emit(true);
       }
-
     } catch (_) {
-      this.service.undo(); 
+      this.service.undo();
     }
- 
   }
 
   private async onConnectionReconnect(ctx: ConnectionReconnectContext) {
@@ -767,13 +811,16 @@ private updateElementProperties(el: DiagramEl, props: any, prev: any): void {
         if (
           flow.source.type === t.Gateway ||
           (flow.source.type === t.TriggerExtension &&
-            (getEventDef(flow.source) === EventDef.System || getEventDef(flow.source) === EventDef.Timer))
+            (getEventDef(flow.source) === EventDef.System ||
+              getEventDef(flow.source) === EventDef.Timer))
         ) {
-          
           return this._getTriggerConditionDetails(flow, newElement);
         } else {
-
-          if (flow.target && (flow.target.type === 'bpmn:IntermediateCatchEvent'||flow.target.type ==='bpmn:ExclusiveGateway') ) {
+          if (
+            flow.target &&
+            (flow.target.type === 'bpmn:IntermediateCatchEvent' ||
+              flow.target.type === 'bpmn:ExclusiveGateway')
+          ) {
             this.reloadData = true;
           }
           return this._getTriggerDetails(flow);
@@ -845,7 +892,7 @@ private updateElementProperties(el: DiagramEl, props: any, prev: any): void {
     flow: ConnectionShape,
     newElement?: boolean
   ) {
-    this.EntityType='TriggerCondition';
+    this.EntityType = 'TriggerCondition';
     const workflowId = this.metadata?.Workflow?.WFID;
     let data: Partial<WFTriggerConditionDetail> = {};
     const component = TriggerConditionDetailComponent;
@@ -902,65 +949,64 @@ private updateElementProperties(el: DiagramEl, props: any, prev: any): void {
       });
   }
 
-  public refreshXML(){
-        this.service.toDiagram(this.metadata, this.el.nativeElement).subscribe();
+  public refreshXML() {
+    this.service.toDiagram(this.metadata, this.el.nativeElement).subscribe();
   }
 
   public generateXML() {
     this.formViewApi
-  .generateBMWFXMLGateway('wf', this.metadata.Workflow.ProcessName, this.metadata.Workflow.Ver)
-  .subscribe({
-    next: (success) => {
-      this.alertMsgTxt = [];
+      .generateBMWFXMLGateway(
+        'wf',
+        this.metadata.Workflow.ProcessName,
+        this.metadata.Workflow.Ver
+      )
+      .subscribe({
+        next: (success) => {
+          this.alertMsgTxt = [];
 
-      if (success.IsBMWFLinked === 0)
-        this.alertMsgTxt.push("BM-WF is not linked.");
+          if (success.IsBMWFLinked === 0)
+            this.alertMsgTxt.push('BM-WF is not linked.');
 
-      if (success.IsLive === 0)
-        this.alertMsgTxt.push("BM-WF is not live.");
+          if (success.IsLive === 0) this.alertMsgTxt.push('BM-WF is not live.');
 
-      if (success.IsCmpnyGrpExists === 0)
-        this.alertMsgTxt.push("Company Group is not exists.");
+          if (success.IsCmpnyGrpExists === 0)
+            this.alertMsgTxt.push('Company Group is not exists.');
 
-      if (success.IsCmpnyWFObjectLinked === 0)
-        this.alertMsgTxt.push("Company-WF Objects are not linked.");
+          if (success.IsCmpnyWFObjectLinked === 0)
+            this.alertMsgTxt.push('Company-WF Objects are not linked.');
 
-      if (this.alertMsgTxt.length > 0) {
-        this.showErrorModal();
-      } else {
-        this.toastr.success('JSON generated successfully');
-      }
-    },
-    error: () => {
-      this.showErrorModal();
-    }
-  });
+          if (this.alertMsgTxt.length > 0) {
+            this.showErrorModal();
+          } else {
+            this.toastr.success('JSON generated successfully');
+          }
+        },
+        error: () => {
+          this.showErrorModal();
+        },
+      });
+  }
 
-}
+  private showErrorModal(): void {
+    const dialogRef = this.dialog.open(GenerateXmlComponent, {
+      width: '656px',
+      disableClose: true,
+      panelClass: 'custom-dialog-container',
+      data: {
+        type: 'wf',
+        processName: this.metadata.Workflow.ProcessName,
+        verNo: this.metadata.Workflow.Ver,
+        alertMsgTxt: this.alertMsgTxt,
+      },
+    });
 
+    dialogRef.componentInstance.closeModal.subscribe(() => {
+      dialogRef.close(); // Close the modal when any action is triggered
+    });
+  }
+  wfosIdToWfoIdMap: WfosIdToWfoIdMap = {};
 
-private showErrorModal(): void {
-  const dialogRef = this.dialog.open(GenerateXmlComponent, {
-    width: '656px',
-    disableClose: true,
-    panelClass: 'custom-dialog-container',
-    data: {
-      type: 'wf',
-      processName: this.metadata.Workflow.ProcessName,
-      verNo: this.metadata.Workflow.Ver,
-      alertMsgTxt: this.alertMsgTxt
-    }
-  });
-
-  dialogRef.componentInstance.closeModal.subscribe(() => {
-    dialogRef.close(); // Close the modal when any action is triggered
-  });
-}
-wfosIdToWfoIdMap: WfosIdToWfoIdMap = {};
-
-
-createWfosIdToWfoIdMap(data: MetaData): WfosIdToWfoIdMap {
-
+  createWfosIdToWfoIdMap(data: MetaData): WfosIdToWfoIdMap {
     const stages = data.Workflow.Stages;
 
     for (const stageKey in stages) {
@@ -972,46 +1018,65 @@ createWfosIdToWfoIdMap(data: MetaData): WfosIdToWfoIdMap {
     }
     sessionStorage.setItem('StateJson', JSON.stringify(this.wfosIdToWfoIdMap));
 
-
     return this.wfosIdToWfoIdMap; // Return the mapping
   }
 
-
   ngAfterContentInit(): void {
     if (this.metadata.Workflow) {
-      this.previousLength=this.metadata.Coordinates?Object.keys(this.metadata.Coordinates).length:0;    
-      this.coordinatesChangePoints=this.metadata.Coordinates;
-      this.totalComponentLenth=Object.keys(this.metadata.Coordinates).length;
+      this.previousLength = this.metadata.Coordinates
+        ? Object.keys(this.metadata.Coordinates).length
+        : 0;
+      this.coordinatesChangePoints = this.metadata.Coordinates;
+      this.totalComponentLenth = Object.keys(this.metadata.Coordinates).length;
       this.keyColorArrayPrevious = Object.entries(this.metadata.Coordinates)
-  .map(([key, value]) => {
-    const color = 'color' in value ? value.color : undefined;
-    return [key, color];
-  })
-  .filter((entry): entry is [string, string] =>
-    !!entry[1] && entry[1] !== 'none' && entry[1] !== ''
-  );
+        .map(([key, value]) => {
+          const color = 'color' in value ? value.color : undefined;
+          return [key, color];
+        })
+        .filter(
+          (entry): entry is [string, string] =>
+            !!entry[1] && entry[1] !== 'none' && entry[1] !== ''
+        );
       this.IsRedoAllowed = !!this.metadata.Workflow.IsRedoAllowed;
       this.IsUndoAllowed = !!this.metadata.Workflow.IsUndoAllowed;
       this.actionsVisible = this.metadata.Workflow.WorkflowMode !== 'Published';
       this.actionsDisabled = !this.actionsVisible;
+
+      // Initialize unsaved changes state
+      this.hasUnsavedChanges = this.storageService.hasUnsavedChanges(
+        this.metadata.Workflow.WFID
+      );
+
+      // Initialize undo/redo state
+      this.updateUndoRedoState();
+
+      // Add command stack event listeners for undo/redo state updates
+      this.addCommandStackListeners();
+
+      // Add keyboard shortcuts for undo/redo
+      this.addKeyboardShortcuts();
+
+      // Add beforeunload event listener to warn about unsaved changes
+      this.addBeforeUnloadListener();
+
       this.createWfosIdToWfoIdMap(this.metadata);
       this.service.toDiagram(this.metadata, this.el.nativeElement).subscribe();
     } else {
       this.workflowDeleted.emit(true);
     }
   }
-  workflowDataArray:any;
+  workflowDataArray: any;
 
   persistWorkflowDataArray(): void {
     const storageKey = 'workflowDataArray';
     const stored = sessionStorage.getItem(storageKey);
-  
+
     // Load existing data or initialize empty array
     this.workflowDataArray = stored ? JSON.parse(stored) : [];
-  
+
     const wfid = this.metadata?.Workflow?.WFID;
     if (!wfid) return;
-  
+
     const index = this.workflowDataArray.findIndex(([key]) => key === wfid);
     if (index !== -1) {
       // Update existing
@@ -1020,70 +1085,82 @@ createWfosIdToWfoIdMap(data: MetaData): WfosIdToWfoIdMap {
       // Add new
       this.workflowDataArray.push([wfid, 1]);
     }
-  
+
     // Save back to sessionStorage
     sessionStorage.setItem(storageKey, JSON.stringify(this.workflowDataArray));
   }
-
 
   getWorkflowValue(wfid: string): number {
     // Load from sessionStorage
     const stored = sessionStorage.getItem('workflowDataArray');
     const array: [string, number][] = stored ? JSON.parse(stored) : [];
-  
+
     // Find entry
     const found = array.find(([key]) => key === wfid);
     return found ? found[1] : 0; // return 0 if not found
   }
-  
 
   async onCompanyAssociation() {
-
     const obj = this.metadata.Workflow;
-      const modal = this.msg.showComponent(CompanyAssociationComponent, {
-        displayWith: (item: ICompanyAssociatedWFObject) => `${item.WFDISPNAME} > ${item.WFODISPNAME} > ${item.WFOSDISPNAME} > ${item.TRGDISPNAME}`,
-        uniqueWith: (item: ICompanyAssociatedWFObject) => `${item.WFNAM}${item.WFOGUID}${item.WFOSGUID}${item.TRGGUID}`,
-        getAssociationsWith: (groupId: string) => this.formViewApi.getWFObjectsForCompanyAssociation(groupId, obj.TypeID, obj.WFID), 
+    const modal = this.msg.showComponent(
+      CompanyAssociationComponent,
+      {
+        displayWith: (item: ICompanyAssociatedWFObject) =>
+          `${item.WFDISPNAME} > ${item.WFODISPNAME} > ${item.WFOSDISPNAME} > ${item.TRGDISPNAME}`,
+        uniqueWith: (item: ICompanyAssociatedWFObject) =>
+          `${item.WFNAM}${item.WFOGUID}${item.WFOSGUID}${item.TRGGUID}`,
+        getAssociationsWith: (groupId: string) =>
+          this.formViewApi.getWFObjectsForCompanyAssociation(
+            groupId,
+            obj.TypeID,
+            obj.WFID
+          ),
         checkBy: 'isAlreadySelected',
-      },{ size: 'lg', centered: true });
-      const res = await modal.result;
-      if (res) {
-        const success = await this.updateCompanyAssociatedRecords(obj, res) === 1;
-        if (success) {
-         this.toastr.success('Success');
-        }
+      },
+      { size: 'lg', centered: true }
+    );
+    const res = await modal.result;
+    if (res) {
+      const success =
+        (await this.updateCompanyAssociatedRecords(obj, res)) === 1;
+      if (success) {
+        this.toastr.success('Success');
       }
-    
+    }
   }
 
   private updateCompanyAssociatedRecords(wf: any, res: any) {
-  const stageGuids = new Set(), stateGuids = new Set(), triggerGuids = new Set();
+    const stageGuids = new Set(),
+      stateGuids = new Set(),
+      triggerGuids = new Set();
 
-  const selectedItems = Array.isArray(res?.selectedItems)
-    ? res.selectedItems
-    : res?.selectedItems
+    const selectedItems = Array.isArray(res?.selectedItems)
+      ? res.selectedItems
+      : res?.selectedItems
       ? [res.selectedItems] // convert single item to array
       : [];
 
-  (selectedItems as ICompanyAssociatedWFObject[]).forEach(item => {
-    stageGuids.add(item.WFOGUID);
-    stateGuids.add(item.WFOSGUID);
-    triggerGuids.add(item.TRGGUID);
-  });
+    (selectedItems as ICompanyAssociatedWFObject[]).forEach((item) => {
+      stageGuids.add(item.WFOGUID);
+      stateGuids.add(item.WFOSGUID);
+      triggerGuids.add(item.TRGGUID);
+    });
 
-  const payload: WFAssociatedCompaniesPayload = {
-    WFId: wf?.WFID ?? null,
-    ProcessId: wf?.TypeID ?? null,
-    CompanyId: res?.companyId ?? null,
-    groupName: res?.groupName ?? '',
-    WFOGUIDS: [...stageGuids].toString(),
-    WFOSGUIDS: [...stateGuids].toString(),
-    TrigGUIDS: [...triggerGuids].toString(),
-    IsAllComp: res?.IsAllComp ?? false
-  };
+    const payload: WFAssociatedCompaniesPayload = {
+      WFId: wf?.WFID ?? null,
+      ProcessId: wf?.TypeID ?? null,
+      CompanyId: res?.companyId ?? null,
+      groupName: res?.groupName ?? '',
+      WFOGUIDS: [...stageGuids].toString(),
+      WFOSGUIDS: [...stateGuids].toString(),
+      TrigGUIDS: [...triggerGuids].toString(),
+      IsAllComp: res?.IsAllComp ?? false,
+    };
 
-  return firstValueFrom(this.formViewApi.updateWFObjectsForCompanyAssociation(payload));
-}
+    return firstValueFrom(
+      this.formViewApi.updateWFObjectsForCompanyAssociation(payload)
+    );
+  }
 
   private clearStoredEvent(): void {
     const key = 'event';
@@ -1095,12 +1172,240 @@ createWfosIdToWfoIdMap(data: MetaData): WfosIdToWfoIdMap {
     const storedValue = sessionStorage.getItem(key);
     return storedValue ? JSON.parse(storedValue) : null;
   }
- 
 
   ngOnDestroy(): void {
     this.service.destroy();
-    
+    this.removeBeforeUnloadListener();
+    this.removeKeyboardShortcuts();
   }
+
+  /**
+   * Store diagram changes locally instead of auto-saving to cloud
+   */
+  private storeChangesLocally(coords: Coordinates): void {
+    const change = {
+      coordinates: coords,
+      entityId: this.EntityId,
+      entityType: this.EntityType,
+      actionName: this.ActionName,
+      actionGroupId: this.ActionGroupId,
+      actionDetails: this.ActionDetails,
+      sequenceNumber: this.getWorkflowValue(
+        this.metadata.Workflow.WFID
+      ).toString(),
+      timestamp: Date.now(),
+    };
+
+    this.storageService.storeChanges(this.metadata.Workflow.WFID, change);
+    this.hasUnsavedChanges = true;
+    // Update undo/redo state after a short delay to ensure command stack is updated
+    setTimeout(() => this.updateUndoRedoState(), 100);
+  }
+
+  /**
+   * Manually save diagram changes to cloud
+   */
+  public saveDiagram(): void {
+    if (this.isSaving) {
+      return; // Prevent multiple simultaneous saves
+    }
+
+    const latestChange = this.storageService.getLatestChange(
+      this.metadata.Workflow.WFID
+    );
+    if (!latestChange) {
+      this.toastr.info('No changes to save');
+      return;
+    }
+
+    this.isSaving = true;
+
+    this.wfapi
+      .saveDiagramCoordinates(
+        this.metadata.Workflow.WFID,
+        latestChange.coordinates,
+        {
+          EntityId: latestChange.entityId,
+          EntityType: latestChange.entityType,
+          ActionName: latestChange.actionName,
+          ActionGroupId: latestChange.actionGroupId,
+          ActionDetails: latestChange.actionDetails,
+          SequenceNumber: latestChange.sequenceNumber,
+        }
+      )
+      .subscribe({
+        next: (response: any) => {
+          this.IsRedoAllowed = !!response?.Redo && response.Redo > 0;
+          this.IsUndoAllowed = !!response?.Undo && response.Undo > 0;
+
+          // Clear local storage after successful save
+          this.storageService.clearChanges(this.metadata.Workflow.WFID);
+          this.hasUnsavedChanges = false;
+          this.isSaving = false;
+          // Clear command stack after successful save
+          if (this.bpmnService && this.bpmnService.commandStack) {
+            this.bpmnService.commandStack.clear();
+          }
+          this.updateUndoRedoState();
+
+          this.toastr.success('Diagram saved successfully');
+
+          // Update the coordinates change points to reflect the saved state
+          this.coordinatesChangePoints = latestChange.coordinates;
+        },
+        error: (error) => {
+          console.error('Error saving diagram coordinates:', error);
+          this.isSaving = false;
+          this.toastr.error('Failed to save diagram. Please try again.');
+        },
+      });
+  }
+
+  /**
+   * Check if there are unsaved changes
+   */
+  public checkUnsavedChanges(): boolean {
+    return this.storageService.hasUnsavedChanges(this.metadata.Workflow.WFID);
+  }
+
+  /**
+   * Clear unsaved changes (discard changes)
+   */
+  public discardChanges(): void {
+    this.storageService.clearChanges(this.metadata.Workflow.WFID);
+    this.hasUnsavedChanges = false;
+    // Clear command stack when discarding changes
+    if (this.bpmnService && this.bpmnService.commandStack) {
+      this.bpmnService.commandStack.clear();
+    }
+    this.updateUndoRedoState();
+    this.toastr.info('Changes discarded');
+  }
+
+  /**
+   * Get storage statistics for debugging
+   */
+  public getStorageStats(): void {
+    const size = this.storageService.getStorageSize(
+      this.metadata.Workflow.WFID
+    );
+    const changes = this.storageService.getStoredChanges(
+      this.metadata.Workflow.WFID
+    );
+    console.log(
+      `Storage size: ${size} bytes, Changes count: ${changes.length}`
+    );
+  }
+
+  /**
+   * Update undo/redo button states based on BPMN command stack
+   */
+  private updateUndoRedoState(): void {
+    if (this.bpmnService && this.bpmnService.commandStack) {
+      this.canUndo = this.bpmnService.commandStack.canUndo();
+      this.canRedo = this.bpmnService.commandStack.canRedo();
+    } else {
+      this.canUndo = false;
+      this.canRedo = false;
+    }
+  }
+
+  /**
+   * Local undo functionality using BPMN command stack
+   */
+  public localUndo(): void {
+    if (this.canUndo && this.bpmnService) {
+      this.bpmnService.undo();
+      this.updateUndoRedoState();
+      this.toastr.info('Undo applied');
+    }
+  }
+
+  /**
+   * Local redo functionality using BPMN command stack
+   */
+  public localRedo(): void {
+    if (this.canRedo && this.bpmnService) {
+      this.bpmnService.redo();
+      this.updateUndoRedoState();
+      this.toastr.info('Redo applied');
+    }
+  }
+
+  /**
+   * Add command stack event listeners for undo/redo state updates
+   */
+  private addCommandStackListeners(): void {
+    if (this.bpmnService && this.bpmnService.eventBus) {
+      // Listen for command stack changes
+      this.bpmnService.eventBus.on('commandStack.changed', () => {
+        this.updateUndoRedoState();
+      });
+
+      // Listen for command execution
+      this.bpmnService.eventBus.on('commandStack.executed', () => {
+        this.updateUndoRedoState();
+      });
+
+      // Listen for command reverted
+      this.bpmnService.eventBus.on('commandStack.reverted', () => {
+        this.updateUndoRedoState();
+      });
+    }
+  }
+
+  /**
+   * Add keyboard shortcuts for undo/redo
+   */
+  private addKeyboardShortcuts(): void {
+    document.addEventListener('keydown', (event) => {
+      // Check if Ctrl+Z (undo) is pressed
+      if (event.ctrlKey && event.key === 'z' && !event.shiftKey) {
+        event.preventDefault();
+        this.localUndo();
+      }
+      // Check if Ctrl+Y or Ctrl+Shift+Z (redo) is pressed
+      else if (
+        (event.ctrlKey && event.key === 'y') ||
+        (event.ctrlKey && event.shiftKey && event.key === 'z')
+      ) {
+        event.preventDefault();
+        this.localRedo();
+      }
+    });
+  }
+
+  /**
+   * Add beforeunload event listener to warn about unsaved changes
+   */
+  private addBeforeUnloadListener(): void {
+    window.addEventListener('beforeunload', this.beforeUnloadHandler);
+  }
+
+  /**
+   * Remove beforeunload event listener
+   */
+  private removeBeforeUnloadListener(): void {
+    window.removeEventListener('beforeunload', this.beforeUnloadHandler);
+  }
+
+  /**
+   * Remove keyboard shortcuts
+   */
+  private removeKeyboardShortcuts(): void {
+    // Note: We can't easily remove specific event listeners, but this is called on destroy
+    // so the component will be cleaned up anyway
+  }
+
+  /**
+   * Handle beforeunload event
+   */
+  private beforeUnloadHandler = (event: BeforeUnloadEvent): string | void => {
+    if (this.hasUnsavedChanges) {
+      event.preventDefault();
+      event.returnValue =
+        'You have unsaved changes. Are you sure you want to leave?';
+      return 'You have unsaved changes. Are you sure you want to leave?';
+    }
+  };
 }
-
-
