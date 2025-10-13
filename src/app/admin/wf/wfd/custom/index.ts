@@ -5,6 +5,7 @@ import { CustomRules } from './custom-rules';
 import { CustomResize } from './custom-resize';
 import { ForceLaneSpace } from './custom-force-lane';
 import { ShiftConnectionsByWaypoints } from './shift-connections-by-waypoints';
+import { ConnectionOverlapModule } from './connection-overlap-module';
 // import { FixConnectionsOnLaneResize } from './fix-connections-after-lane-resize';
 import { ReadOnly } from './custom-readonly';
 import CustomLabelEditingProvider from './custom-label-editing';
@@ -37,6 +38,7 @@ export const customModules = {
     'customResize',
     'forceLaneSpace',
     'shiftConnectionsByWaypoints',
+    'connectionOverlapModule',
     // 'fixConnectionsOnLaneResize',
   ],
   paletteProvider: ['type', CustomPalette],
@@ -61,6 +63,7 @@ export const customModules = {
   customResize: ['type', CustomResize],
   forceLaneSpace: ['type', ForceLaneSpace],
   shiftConnectionsByWaypoints: ['type', ShiftConnectionsByWaypoints],
+  connectionOverlapModule: ['type', ConnectionOverlapModule],
   // fixConnectionsOnLaneResize: ['type', FixConnectionsOnLaneResize],
   // autoPlace: ["value", null],
   // bpmnAutoPlace: ["value", null],

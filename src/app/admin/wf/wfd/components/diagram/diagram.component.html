@@ -246,6 +246,18 @@
               <i class="fa fa-times"></i>
               Discard
             </button>
+
+            <!-- Fix Overlaps Button -->
+            <button
+              class="btn btn-outline-info btn-small ml-1"
+              type="button"
+              (click)="fixOverlappingConnections()"
+              title="Fix overlapping connection lines"
+              style="display: flex; align-items: center; gap: 5px"
+            >
+              <i class="fa fa-arrows-alt"></i>
+              Fix Overlaps
+            </button>
             <div class="mode" ngbDropdown class="d-none">
               <button class="btn btn-light textStyle" ngbDropdownToggle>
                 <i *ngIf="!actionsDisabled">
