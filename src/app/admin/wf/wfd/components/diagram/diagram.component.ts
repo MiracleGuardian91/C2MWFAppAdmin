@@ -1298,16 +1298,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
   }
 
   /**
-   * Manually fix overlapping connections (for testing/debugging)
-   */
-  public fixOverlappingConnections(): void {
-    if (this.bpmnService) {
-      this.bpmnService.fixOverlappingConnections();
-      this.toastr.info('Connection overlaps fixed');
-    }
-  }
-
-  /**
    * Update undo/redo button states based on BPMN command stack
    */
   private updateUndoRedoState(): void {
