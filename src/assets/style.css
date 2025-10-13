@@ -26417,11 +26417,12 @@ input {
   }
 
   .btn {
-      margin-right: 0;
-      /* min-width: 120px; */
-      background-color: #4C9E00;
-      padding: 7px 26px;
-      border: none;
+    display: flex;
+    align-items: center;
+    margin-right: 0;
+    background-color: #4C9E00;
+    padding: 7px 26px;
+    border: none;
   }
 
   .btn+.btn {

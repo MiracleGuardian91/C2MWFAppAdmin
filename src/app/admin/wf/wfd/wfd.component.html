@@ -1,9 +1,22 @@
-<div class="breadcrumbs p-1 mb-1" style="background-color: #fff;">
-    <a (click)="routeBack()">
-      <img [src]="backsImageUrl" style="filter: var(--plx-app-list-icon-filter);" width="20px">
-      <span>Back</span>
-    </a> 
-  </div>
+<div
+  class="breadcrumbs p-1 mb-1"
+  style="
+    background-color: #fff;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    margin-top: 0px;
+  "
+>
+  <a (click)="routeBack()">
+    <img
+      [src]="backsImageUrl"
+      style="filter: var(--plx-app-list-icon-filter)"
+      width="20px"
+    />
+    <span>Back</span>
+  </a>
+</div>
 <div class="diagram-parent">
   <!-- <div class="enableDisable" [ngStyle]="{ 'background-color': serviceBpmn.paletteIsOpen ? '#005996' : '#F2F2F2' }">
     <div style=" padding: 8px 7px;" (click)="serviceBpmn.togglePalette()">
@@ -22,8 +35,8 @@
     </div>
   
   </div> -->
-  
-  <app-diagram 
+
+  <app-diagram
     *ngIf="metadata$ | async as metadata"
     [metadata]="metadata"
     (workflowDeleted)="handleDelete()"
