@@ -16,18 +16,15 @@ interface ConnectionSegment {
 interface OverlapGroup {
   segments: ConnectionSegment[];
   direction: 'horizontal' | 'vertical';
-  position: number; // x for vertical, y for horizontal
+  position: number;
 }
 
 export class ConnectionOverlapFixer {
-  private readonly OVERLAP_THRESHOLD = 5; // pixels
-  private readonly OFFSET_STEP = 15; // pixels between parallel connections
+  private readonly OVERLAP_THRESHOLD = 5;
+  private readonly OFFSET_STEP = 15;
 
   constructor() {}
 
-  /**
-   * Fix overlapping connections by adjusting their waypoints
-   */
   fixOverlappingConnections(
     eventBus: EventBus,
     elementRegistry: ElementRegistry,
@@ -50,9 +47,6 @@ export class ConnectionOverlapFixer {
     });
   }
 
-  /**
-   * Find segments that overlap with each other
-   */
   private findOverlappingSegments(
     connections: ConnectionShape[]
   ): OverlapGroup[] {
@@ -112,9 +106,6 @@ export class ConnectionOverlapFixer {
     return overlapGroups;
   }
 
-  /**
-   * Check if two segments overlap
-   */
   private segmentsOverlap(
     segment1: ConnectionSegment,
     segment2: ConnectionSegment
@@ -154,9 +145,6 @@ export class ConnectionOverlapFixer {
     }
   }
 
-  /**
-   * Get the direction of a segment
-   */
   private getSegmentDirection(
     segment: ConnectionSegment
   ): 'horizontal' | 'vertical' {
@@ -165,9 +153,6 @@ export class ConnectionOverlapFixer {
     return dx > dy ? 'horizontal' : 'vertical';
   }
 
-  /**
-   * Fix overlapping segments in a group by offsetting them
-   */
   private fixOverlapGroup(
     group: OverlapGroup,
     modeling: Modeling<any, any, any, any, any>
@@ -198,9 +183,6 @@ export class ConnectionOverlapFixer {
     });
   }
 
-  /**
-   * Calculate offsets for parallel segments
-   */
   private calculateOffsets(
     count: number,
     direction: 'horizontal' | 'vertical'
@@ -216,9 +198,6 @@ export class ConnectionOverlapFixer {
     return offsets;
   }
 
-  /**
-   * Apply offset to a connection segment
-   */
   private applyOffsetToSegment(
     segment: ConnectionSegment,
     offset: number,

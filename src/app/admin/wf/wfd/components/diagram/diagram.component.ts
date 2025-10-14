@@ -1220,50 +1220,116 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
 
     this.isSaving = true;
 
-    this.wfapi
-      .saveDiagramCoordinates(
-        this.metadata.Workflow.WFID,
-        latestChange.coordinates,
-        {
-          EntityId: latestChange.entityId,
-          EntityType: latestChange.entityType,
-          ActionName: latestChange.actionName,
-          ActionGroupId: latestChange.actionGroupId,
-          ActionDetails: latestChange.actionDetails,
-          SequenceNumber: latestChange.sequenceNumber,
-        }
-      )
-      .subscribe({
-        next: (response: any) => {
-          this.IsRedoAllowed = !!response?.Redo && response.Redo > 0;
-          this.IsUndoAllowed = !!response?.Undo && response.Undo > 0;
+    // Process any pending stage changes first
+    this.processPendingStageChanges()
+      .then(() => {
+        // Then save the diagram coordinates
+        this.wfapi
+          .saveDiagramCoordinates(
+            this.metadata.Workflow.WFID,
+            latestChange.coordinates,
+            {
+              EntityId: latestChange.entityId,
+              EntityType: latestChange.entityType,
+              ActionName: latestChange.actionName,
+              ActionGroupId: latestChange.actionGroupId,
+              ActionDetails: latestChange.actionDetails,
+              SequenceNumber: latestChange.sequenceNumber,
+            }
+          )
+          .subscribe({
+            next: (response: any) => {
+              this.IsRedoAllowed = !!response?.Redo && response.Redo > 0;
+              this.IsUndoAllowed = !!response?.Undo && response.Undo > 0;
 
-          // Clear local storage after successful save
-          this.storageService.clearChanges(this.metadata.Workflow.WFID);
-          this.hasUnsavedChanges = false;
-          this.isSaving = false;
-          // Clear command stack after successful save
-          if (this.bpmnService && this.bpmnService.commandStack) {
-            this.bpmnService.commandStack.clear();
-          }
-          this.updateUndoRedoState();
+              // Clear local storage after successful save
+              this.storageService.clearChanges(this.metadata.Workflow.WFID);
+              this.hasUnsavedChanges = false;
+              this.isSaving = false;
+              // Clear command stack after successful save
+              if (this.bpmnService && this.bpmnService.commandStack) {
+                this.bpmnService.commandStack.clear();
+              }
+              this.updateUndoRedoState();
 
-          this.toastr.success('Diagram saved successfully');
+              this.toastr.success('Diagram saved successfully');
 
-          // Update the coordinates change points to reflect the saved state
-          this.coordinatesChangePoints = latestChange.coordinates;
-        },
-        error: (error) => {
-          console.error('Error saving diagram coordinates:', error);
-          this.isSaving = false;
-          this.toastr.error('Failed to save diagram. Please try again.');
-        },
+              // Update the coordinates change points to reflect the saved state
+              this.coordinatesChangePoints = latestChange.coordinates;
+            },
+            error: (error) => {
+              console.error('Error saving diagram coordinates:', error);
+              this.isSaving = false;
+              this.toastr.error('Failed to save diagram. Please try again.');
+            },
+          });
+      })
+      .catch((error) => {
+        console.error('Error processing stage changes:', error);
+        this.toastr.error('Failed to process stage changes');
+        this.isSaving = false;
       });
   }
 
   /**
-   * Check if there are unsaved changes
+   * Process pending stage changes stored locally
    */
+  private async processPendingStageChanges(): Promise<void> {
+    const storedChanges = this.getStoredStageChanges();
+
+    if (storedChanges.length === 0) {
+      return Promise.resolve();
+    }
+
+    // Process each stage change
+    const promises = storedChanges.map((change) => {
+      return new Promise<void>((resolve, reject) => {
+        this.wfapi
+          .callApiOnMoveLane(
+            change.stateID,
+            change.stageID,
+            change.ActionGroupId,
+            change.PreviousStage
+          )
+          .subscribe({
+            next: (response) => {
+              console.log('Stage change API call successful:', response);
+              resolve();
+            },
+            error: (error) => {
+              console.error('Stage change API call error:', error);
+              reject(error);
+            },
+          });
+      });
+    });
+
+    try {
+      await Promise.all(promises);
+      // Clear the stored changes after successful processing
+      this.clearStoredStageChanges();
+      console.log('All stage changes processed successfully');
+    } catch (error) {
+      console.error('Error processing stage changes:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get stored stage changes from session storage
+   */
+  private getStoredStageChanges(): any[] {
+    const stored = sessionStorage.getItem('pendingStageChanges');
+    return stored ? JSON.parse(stored) : [];
+  }
+
+  /**
+   * Clear stored stage changes
+   */
+  private clearStoredStageChanges() {
+    sessionStorage.removeItem('pendingStageChanges');
+  }
+
   public checkUnsavedChanges(): boolean {
     return this.storageService.hasUnsavedChanges(this.metadata.Workflow.WFID);
   }
@@ -1278,6 +1344,8 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     if (this.bpmnService && this.bpmnService.commandStack) {
       this.bpmnService.commandStack.clear();
     }
+    // Clear stored stage changes when discarding
+    this.clearStoredStageChanges();
     this.updateUndoRedoState();
     this.toastr.info('Changes discarded');
   }

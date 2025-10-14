@@ -112,7 +112,12 @@ export class CustomRules extends RuleProvider {
           const currenParentId = shape.parent?.id;
 
           if (previousStageId !== currenParentId) {
-            this.callApiOnMoveLane(this.stateID, this.stageID, PreviousStage);
+            // Store stage change locally instead of making immediate API call
+            this.storeStageChangeLocally(
+              this.stateID,
+              this.stageID,
+              PreviousStage
+            );
             this.updateWfoIdInSession(this.stateID, this.stageID);
           }
         }
@@ -278,6 +283,51 @@ export class CustomRules extends RuleProvider {
           console.error('API call error:', error);
         },
       });
+  }
+
+  /**
+   * Store stage change locally instead of making immediate API call
+   */
+  storeStageChangeLocally(
+    stateID: string,
+    stageID: string,
+    PreviousStage: string
+  ) {
+    const ActionGroupId = Guid.raw();
+
+    // Store the stage change data for later processing
+    const stageChangeData = {
+      stateID,
+      stageID,
+      PreviousStage,
+      ActionGroupId,
+      timestamp: Date.now(),
+    };
+
+    // Store in session storage for now (could be moved to a service)
+    const existingChanges = this.getStoredStageChanges();
+    existingChanges.push(stageChangeData);
+    sessionStorage.setItem(
+      'pendingStageChanges',
+      JSON.stringify(existingChanges)
+    );
+
+    console.log('Stage change stored locally:', stageChangeData);
+  }
+
+  /**
+   * Get stored stage changes from session storage
+   */
+  getStoredStageChanges(): any[] {
+    const stored = sessionStorage.getItem('pendingStageChanges');
+    return stored ? JSON.parse(stored) : [];
+  }
+
+  /**
+   * Clear stored stage changes
+   */
+  clearStoredStageChanges() {
+    sessionStorage.removeItem('pendingStageChanges');
   }
 
   init() {
