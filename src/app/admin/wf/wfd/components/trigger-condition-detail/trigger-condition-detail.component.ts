@@ -1,48 +1,72 @@
 import { Component } from '@angular/core';
-import { UntypedFormArray, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import {
+  UntypedFormArray,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  Validators,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { Status } from '@app/admin/data-modeler/models';
-import { ListColumnType, ListConfig } from '@app/admin/lib/list/list-config.model';
+import {
+  ListColumnType,
+  ListConfig,
+} from '@app/admin/lib/list/list-config.model';
 import { MessageService } from '@app/core';
 import { NAME_VALIDATORS } from '@lib/common/const';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { SaveTriggerConditionPayload, TriggerConditionFilter, WFTriggerConditionDetail, WorkflowFile } from '../../models';
+import {
+  SaveTriggerConditionPayload,
+  TriggerConditionFilter,
+  WFTriggerConditionDetail,
+  WorkflowFile,
+} from '../../models';
 import { ElementType, TriggerConditionConnection } from '../../models/bpmn';
 import { ElementDetail } from '../../models/element-detail.class';
 import { TriggerCondition } from '../../models/wf.model';
 import { FileSizePipe } from '../../pipes/filesize.pipe';
 import { DetailService } from '../../services/detail.service';
 import { isStateType } from '../../util/bpmn';
-import { KeyValueList, keyValueListToKeyList, objToList, primitiveArrayToList, toFormArray, toFormGroup } from '../../util/helpers';
+import {
+  KeyValueList,
+  keyValueListToKeyList,
+  objToList,
+  primitiveArrayToList,
+  toFormArray,
+  toFormGroup,
+} from '../../util/helpers';
 import { WorkflowApiService } from '../../services/workflow-api.service';
 import { EditorConfigService } from '@app/admin/CommonService/editor-config.service';
 import { ActivatedRoute } from '@angular/router';
 import { NgIf, NgClass, KeyValuePipe } from '@angular/common';
 import { CustomSelectComponent } from '../../../../lib/custom-select/custom-select.component';
 import { ListComponent } from '../../../../lib/list/list.component';
-import { MatExpansionPanel, MatExpansionPanelHeader } from '@angular/material/expansion';
+import {
+  MatExpansionPanel,
+  MatExpansionPanelHeader,
+} from '@angular/material/expansion';
 import { EditorComponent } from '../../../../Shared/editor/editor.component';
 import { FileUploaderComponent } from '../file-uploader/file-uploader.component';
 import { QuillModule } from 'ngx-quill';
 
-
 @Component({
-    selector: 'app-trigger-condition-detail',
-    templateUrl: './trigger-condition-detail.component.html',
-    styleUrls: ['./trigger-condition-detail.component.scss'],
-    standalone: true,
-    imports: [
-        NgIf,
-        ReactiveFormsModule,
-        NgClass,
-        CustomSelectComponent,
-        ListComponent,
-        MatExpansionPanel,
-        MatExpansionPanelHeader,
-        EditorComponent,
-        FileUploaderComponent,
-        KeyValuePipe,
-        QuillModule
-    ],
+  selector: 'app-trigger-condition-detail',
+  templateUrl: './trigger-condition-detail.component.html',
+  styleUrls: ['./trigger-condition-detail.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    ReactiveFormsModule,
+    NgClass,
+    CustomSelectComponent,
+    ListComponent,
+    MatExpansionPanel,
+    MatExpansionPanelHeader,
+    EditorComponent,
+    FileUploaderComponent,
+    KeyValuePipe,
+    QuillModule,
+  ],
 })
 export class TriggerConditionDetailComponent extends ElementDetail<
   TriggerCondition,
@@ -83,11 +107,15 @@ export class TriggerConditionDetailComponent extends ElementDetail<
   verNo: any;
   id: any;
   editorConfig: any;
-  constructor(fb: UntypedFormBuilder, ref: NgbActiveModal, msg: MessageService, 
+  constructor(
+    fb: UntypedFormBuilder,
+    ref: NgbActiveModal,
+    msg: MessageService,
     private readonly detail: DetailService,
     public wfapi: WorkflowApiService,
     readonly editorConfigService: EditorConfigService,
-    private readonly route: ActivatedRoute) {
+    private readonly route: ActivatedRoute
+  ) {
     super(fb, ref, msg);
     this.formActions = [
       {
@@ -98,15 +126,19 @@ export class TriggerConditionDetailComponent extends ElementDetail<
   }
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
-      this.processName = params['processName']; 
-      this.verNo = params['VerNo']; 
-      this.id=params['id'];
-   });
-   
+    this.route.queryParams.subscribe((params) => {
+      this.processName = params['processName'];
+      this.verNo = params['VerNo'];
+      this.id = params['id'];
+    });
+
     this.filesConfig = {
       columns: [
-        { key: 'FileName', displayValue: 'File Name', type: ListColumnType.File },
+        {
+          key: 'FileName',
+          displayValue: 'File Name',
+          type: ListColumnType.File,
+        },
         { key: 'FileSize', displayValue: 'Size', type: ListColumnType.File },
       ],
       actions: { delete: true, download: true },
@@ -115,24 +147,40 @@ export class TriggerConditionDetailComponent extends ElementDetail<
     this.configureFilters();
     const stageState = this.getStateStageInformation();
     this.form = this.fb.group({
-      conditionName: [this.newElement ? '' : this.data.ConditionName, NAME_VALIDATORS],
-      conditionDescription: [
-        this.newElement ? '' : this.data.ConditionDescription, 
-        [Validators.required, Validators.maxLength(100)]
+      conditionName: [
+        this.newElement ? '' : this.data.ConditionName,
+        NAME_VALIDATORS,
       ],
-      status: [this.newElement ? Status.Active : this.data.Status, [Validators.required]],
+      conditionDescription: [
+        this.newElement ? '' : this.data.ConditionDescription,
+        [Validators.required, Validators.maxLength(100)],
+      ],
+      status: [
+        this.newElement ? Status.Active : this.data.Status,
+        [Validators.required],
+      ],
       endWfoId: [stageState.endStage, [Validators.required]],
       endWfosId: [stageState.endState, [Validators.required]],
       notify: [this.data.Notify],
-      roleGuid: [this.newElement ? [] : objToList(this.data.EmailRole.SelectedTriggerEmailRole)],
-      filter: toFormArray(this.data.Filter, { addCheckbox: this.filters.checkbox }),
+      roleGuid: [
+        this.newElement
+          ? []
+          : objToList(this.data.EmailRole.SelectedTriggerEmailRole),
+      ],
+      filter: toFormArray(this.data.Filter, {
+        addCheckbox: this.filters.checkbox,
+      }),
       fileNames: toFormArray(this.data.Files, {
         addCheckbox: this.filesConfig.checkbox,
       }),
       deletedUploadedFiles: [[]],
       files: [[]],
       emailSubject: [this.newElement ? '' : this.data.EmailSubject],
-      ccMAilRoleGuids: [this.newElement ? [] : objToList(this.data.CcEmailRole.SelectedCCEmailTrgrRole)],
+      ccMAilRoleGuids: [
+        this.newElement
+          ? []
+          : objToList(this.data.CcEmailRole.SelectedCCEmailTrgrRole),
+      ],
     });
     if (this.newElement) {
       this.addTriggerControl();
@@ -141,23 +189,31 @@ export class TriggerConditionDetailComponent extends ElementDetail<
   }
 
   public CheckValidationWF() {
-    if(this.newElement===false || !this.form.controls['conditionName'].value){
+    if (
+      this.newElement === false ||
+      !this.form.controls['conditionName'].value
+    ) {
       return;
     }
     const processName = this.processName;
     const type = 'trgcond';
-    const wfId = this.id; 
+    const wfId = this.id;
     const name = this.form.controls['conditionName'].value;
-    const version = this.verNo; 
-  
-    this.wfapi.CheckValidationWF(processName, type, wfId, name, version).subscribe({
-      next: (isDuplicate: boolean) => {
-        this.detail.handleValidationResult(isDuplicate, this.form.controls['conditionName']);
-      },
-      error: (error) => {
-        this.detail.handleValidationError(error);
-      }
-    });
+    const version = this.verNo;
+
+    this.wfapi
+      .CheckValidationWF(processName, type, wfId, name, version)
+      .subscribe({
+        next: (isDuplicate: boolean) => {
+          this.detail.handleValidationResult(
+            isDuplicate,
+            this.form.controls['conditionName']
+          );
+        },
+        error: (error) => {
+          this.detail.handleValidationError(error);
+        },
+      });
   }
 
   public onFilesUpload(files: File[]) {
@@ -168,22 +224,30 @@ export class TriggerConditionDetailComponent extends ElementDetail<
     const fileList = this.form.get('fileNames') as UntypedFormArray;
     const unique = [];
     files.forEach((file) => {
-      if (!fileList.controls.some((group: UntypedFormGroup) => group.get('FileName').value === file.name)) {
+      if (
+        !fileList.controls.some(
+          (group: UntypedFormGroup) => group.get('FileName').value === file.name
+        )
+      ) {
         unique.push(file);
       }
     });
     this.filesUploading = true;
-    this.detail.uploadFiles(unique, this.workflow.WFID, this.element.id).subscribe(
-      (file) => {
-        const wfFile: WorkflowFile = {
-          FileName: file.name,
-          FileSize: this.fileSizePipe.transform(file.size.toString()),
-        };
-        fileList.push(toFormGroup(wfFile, { addCheckbox: this.filesConfig.checkbox }));
-      },
-      () => null,
-      () => (this.filesUploading = false)
-    );
+    this.detail
+      .uploadFiles(unique, this.workflow.WFID, this.element.id)
+      .subscribe(
+        (file) => {
+          const wfFile: WorkflowFile = {
+            FileName: file.name,
+            FileSize: this.fileSizePipe.transform(file.size.toString()),
+          };
+          fileList.push(
+            toFormGroup(wfFile, { addCheckbox: this.filesConfig.checkbox })
+          );
+        },
+        () => null,
+        () => (this.filesUploading = false)
+      );
   }
 
   onIgnoredFiles(files: File[]) {
@@ -201,7 +265,9 @@ export class TriggerConditionDetailComponent extends ElementDetail<
   }
 
   public onFileDownload(filename: string) {
-    const uploadedAndSaved = (this.data.Files || []).some((f) => f.FileName === filename);
+    const uploadedAndSaved = (this.data.Files || []).some(
+      (f) => f.FileName === filename
+    );
     this.detail
       .downloadFile(
         this.workflow.ProcessName,
@@ -216,36 +282,120 @@ export class TriggerConditionDetailComponent extends ElementDetail<
 
   private configureFilters() {
     const bools = ['AND', 'OR'];
-    const operators = ['LT', 'LE', 'GT', 'GE', 'EQ', 'NOT EQ', 'LIKE', 'NOT IN', 'IN'];
-    const trigger = this.element.source.incoming[0];
+    const operators = [
+      'LT',
+      'LE',
+      'GT',
+      'GE',
+      'EQ',
+      'NOT EQ',
+      'LIKE',
+      'NOT IN',
+      'IN',
+    ];
+
+    // Add null checks to prevent crashes when element is not properly initialized
+    const trigger = this.element?.source?.incoming?.[0];
+    if (!trigger) {
+      // Initialize with empty filters if trigger is not available
+      this.filters = {
+        columns: [
+          {
+            key: 'DmoName',
+            displayValue: 'Dmo Name',
+            type: ListColumnType.Dropdown,
+            validators: [Validators.required],
+          },
+          {
+            key: 'Operator',
+            displayValue: 'Operator',
+            type: ListColumnType.Dropdown,
+            validators: [Validators.required],
+          },
+          {
+            key: 'Value',
+            displayValue: 'Value',
+            validators: [Validators.required],
+          },
+          {
+            key: 'BooleanExpression',
+            displayValue: 'Boolean Expression',
+            type: ListColumnType.Dropdown,
+            validators: [Validators.required],
+          },
+        ],
+        defaultValues: {
+          BooleanExpression: primitiveArrayToList(bools),
+          Operator: primitiveArrayToList(operators),
+          DmoName: [],
+        },
+        actions: { add: true, delete: true, edit: true },
+        checkbox: true,
+      };
+      return;
+    }
+
     this.filters = {
       columns: [
-        { key: 'DmoName', displayValue: 'Dmo Name', type: ListColumnType.Dropdown, validators: [Validators.required] },
-        { key: 'Operator', displayValue: 'Operator', type: ListColumnType.Dropdown, validators: [Validators.required] },
-        { key: 'Value', displayValue: 'Value', validators: [Validators.required] },
-        { key: 'BooleanExpression', displayValue: 'Boolean Expression', type: ListColumnType.Dropdown, validators: [Validators.required] },
+        {
+          key: 'DmoName',
+          displayValue: 'Dmo Name',
+          type: ListColumnType.Dropdown,
+          validators: [Validators.required],
+        },
+        {
+          key: 'Operator',
+          displayValue: 'Operator',
+          type: ListColumnType.Dropdown,
+          validators: [Validators.required],
+        },
+        {
+          key: 'Value',
+          displayValue: 'Value',
+          validators: [Validators.required],
+        },
+        {
+          key: 'BooleanExpression',
+          displayValue: 'Boolean Expression',
+          type: ListColumnType.Dropdown,
+          validators: [Validators.required],
+        },
       ],
       defaultValues: {
         BooleanExpression: primitiveArrayToList(bools),
         Operator: primitiveArrayToList(operators),
-        DmoName: this.detail.getDmos(trigger.props.TriggerId, this.newElement ? '' : this.element.props.ConditionId),
+        DmoName: this.detail.getDmos(
+          trigger.props.TriggerId,
+          this.newElement ? '' : this.element.props.ConditionId
+        ),
       },
       actions: { add: true, delete: true, edit: true },
       checkbox: true,
     };
-    // const trigger = this.element.source.incoming[0];
   }
 
   private getStateStageInformation() {
+    // Add null check to prevent crashes when element is not properly initialized
+    if (!this.element?.target) {
+      return { endState: null, endStage: null };
+    }
+
     const { target } = this.element;
     if (isStateType(target)) {
-      const endState = { key: target.props.WfosId, value: target.businessObject.name };
+      const endState = {
+        key: target.props.WfosId,
+        value: target.businessObject.name,
+      };
       const parent = target.parent;
       if (parent.type === ElementType.Stage) {
-        const endStage = { key: parent.props.WfoId, value: parent.businessObject.name };
+        const endStage = {
+          key: parent.props.WfoId,
+          value: parent.businessObject.name,
+        };
         return { endState, endStage };
       }
     }
+    return { endState: null, endStage: null };
   }
 
   private addTriggerControl() {
@@ -255,8 +405,12 @@ export class TriggerConditionDetailComponent extends ElementDetail<
         value: flow.businessObject.name,
       };
     });
-    const value = this.parentTriggers.length === 1 ? this.parentTriggers[0] : [];
-    this.form.addControl('triggerId', new UntypedFormControl(value, [Validators.required]));
+    const value =
+      this.parentTriggers.length === 1 ? this.parentTriggers[0] : [];
+    this.form.addControl(
+      'triggerId',
+      new UntypedFormControl(value, [Validators.required])
+    );
     this.form.updateValueAndValidity();
   }
 
@@ -271,13 +425,17 @@ export class TriggerConditionDetailComponent extends ElementDetail<
       const payload: SaveTriggerConditionPayload = {
         ...this.form.value,
         conditionId: this.newElement ? '' : props.ConditionId,
-        triggerId: this.newElement ? this.form.value.triggerId.key : props.TriggerId,
+        triggerId: this.newElement
+          ? this.form.value.triggerId.key
+          : props.TriggerId,
         roleGuid: keyValueListToKeyList(this.form.value.roleGuid),
         ccMAilRoleGuids: keyValueListToKeyList(this.form.value.ccMAilRoleGuids),
         endWfoId: this.form.value.endWfoId.key,
         endWfosId: this.form.value.endWfosId.key,
         wfId: this.workflow.WFID,
-        fileNames: this.form.value.fileNames.map(({ FileName }) => FileName).toString(), // ????
+        fileNames: this.form.value.fileNames
+          .map(({ FileName }) => FileName)
+          .toString(), // ????
         deletedUploadedFiles: this.form.value.deletedUploadedFiles.toString(),
         fileUploadLoc: this.element.id,
         status: this.form.value.status?.toString(),

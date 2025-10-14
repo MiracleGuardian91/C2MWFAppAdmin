@@ -2,55 +2,68 @@
   <div class="popup__header">
     <h2 *ngIf="newElement">New Trigger</h2>
     <h2 *ngIf="!newElement">Trigger Details</h2>
-    <span class="popup__close"><i class="fas fa-times-circle fa-fw" (click)="ref.close()"></i></span>
+    <span class="popup__close"
+      ><i class="fas fa-times-circle fa-fw" (click)="ref.close()"></i
+    ></span>
   </div>
-  <hr>
-  
-  
-  <form [formGroup]="form">
-  
+  <hr />
+
+  <form [formGroup]="form" *ngIf="form">
     <div class="double-column">
       <div class="form-group span-6">
         <label>Trigger Name <span style="color: red">*</span></label>
         <br />
-        <input 
-          type="text" 
-          class="form-control" 
-          formControlName="name" 
+        <input
+          type="text"
+          class="form-control"
+          formControlName="name"
           [readonly]="!newElement"
-          [style.background-color]="!newElement ? '#e9ecef' : 'white'" 
+          [style.background-color]="!newElement ? '#e9ecef' : 'white'"
           (blur)="CheckValidationWF()"
-          [ngClass]="{'is-invalid': submitted && f.name.errors || f.name.errors && !f.name.errors.required|| f.name.errors?.duplicate}"
+          [ngClass]="{
+            'is-invalid':
+              (submitted && f.name.errors) ||
+              (f.name.errors && !f.name.errors.required) ||
+              f.name.errors?.duplicate
+          }"
         />
         <div *ngIf="f.name?.errors?.duplicate" class="invalid-feedback">
           Duplicate name
         </div>
       </div>
-    
+
       <div class="form-group span-6">
         <label>Friendly Name <span style="color: red">*</span></label>
         <br />
-        <input 
-          type="text" 
-          class="form-control" 
+        <input
+          type="text"
+          class="form-control"
           formControlName="friendlyName"
-          [ngClass]="{'is-invalid': submitted && f.friendlyName.errors || f.friendlyName.errors && !f.friendlyName.errors.required}"
-           />
+          [ngClass]="{
+            'is-invalid':
+              (submitted && f.friendlyName.errors) ||
+              (f.friendlyName.errors && !f.friendlyName.errors.required)
+          }"
+        />
       </div>
-    
+
       <div class="form-group span-6">
         <label>Status <span style="color: red">*</span></label>
         <br />
-        <select 
-          class="form-control" 
+        <select
+          class="form-control"
           formControlName="status"
-          [ngClass]="{'is-invalid': submitted && f.status.errors || f.status.errors && !f.status.errors.required}"
+          [ngClass]="{
+            'is-invalid':
+              (submitted && f.status.errors) ||
+              (f.status.errors && !f.status.errors.required)
+          }"
         >
           <option value="1">Active</option>
           <option value="0">Inactive</option>
         </select>
       </div>
-    
+
       <div class="form-group span-6">
         <label>Type <span style="color: red">*</span></label>
         <br />
@@ -59,10 +72,9 @@
           controlName="triggerType"
           [items]="data.TriggerType?.AvailableTriggerType | keyvalue"
           [submitted]="submitted"
-          
         ></app-custom-select>
       </div>
-    
+
       <div class="form-group span-6">
         <label>Action <span style="color: red">*</span></label>
         <br />
@@ -73,16 +85,21 @@
           [submitted]="submitted"
         ></app-custom-select>
       </div>
-    
+
       <div class="form-group span-6">
         <label>Confirmation Message</label>
         <br />
-        <input 
-          type="text" 
-          class="form-control" 
+        <input
+          type="text"
+          class="form-control"
           formControlName="triggerConfirmMsg"
-          [ngClass]="{'is-invalid': submitted && f.triggerConfirmMsg.errors || f.triggerConfirmMsg.errors && !f.triggerConfirmMsg.errors.required}"
-           />
+          [ngClass]="{
+            'is-invalid':
+              (submitted && f.triggerConfirmMsg.errors) ||
+              (f.triggerConfirmMsg.errors &&
+                !f.triggerConfirmMsg.errors.required)
+          }"
+        />
       </div>
 
       <div class="form-group span-6">
@@ -97,11 +114,21 @@
         ></app-custom-select>
       </div>
 
-     <div class="form-group span-6">
-        <label for="notificationOption">Notification Option <span style="color: red">*</span></label>
-        <app-custom-select id="notificationOption" controlName="NotificationOption" [parentForm]="form"
-          [items]="notificationOptions" [submitted]="submitted"></app-custom-select>
-        <div *ngIf="submitted && f.NotificationOption.errors" class="invalid-feedback d-block">
+      <div class="form-group span-6">
+        <label for="notificationOption"
+          >Notification Option <span style="color: red">*</span></label
+        >
+        <app-custom-select
+          id="notificationOption"
+          controlName="NotificationOption"
+          [parentForm]="form"
+          [items]="notificationOptions"
+          [submitted]="submitted"
+        ></app-custom-select>
+        <div
+          *ngIf="submitted && f.NotificationOption.errors"
+          class="invalid-feedback d-block"
+        >
           Notification option is required.
         </div>
       </div>
@@ -116,207 +143,263 @@
           [submitted]="submitted"
           [multiple]="true"
         ></app-custom-select>
-      </div> 
-      <div class="form-group span-6" *ngIf="['LegalOnline','LegalOffline'].includes(form.get('triggerType')?.value?.value)">
-        <label for="legalProcess">Legal Process <span style="color: red">*</span></label>
-        <app-custom-select id="legalProcess" controlName="LegalProcess" [parentForm]="form" [items]="itemProcess$ | async">
+      </div>
+      <div
+        class="form-group span-6"
+        *ngIf="
+          ['LegalOnline', 'LegalOffline'].includes(
+            form.get('triggerType')?.value?.value
+          )
+        "
+      >
+        <label for="legalProcess"
+          >Legal Process <span style="color: red">*</span></label
+        >
+        <app-custom-select
+          id="legalProcess"
+          controlName="LegalProcess"
+          [parentForm]="form"
+          [items]="itemProcess$ | async"
+        >
           [submitted]="submitted">
         </app-custom-select>
-        <div *ngIf="submitted && f.LegalProcess.errors" class="invalid-feedback d-block">
+        <div
+          *ngIf="submitted && f.LegalProcess.errors"
+          class="invalid-feedback d-block"
+        >
           Legal Process is required.
         </div>
       </div>
-
-
     </div>
-    
- <mat-expansion-panel [expanded]="false">
+
+    <mat-expansion-panel [expanded]="false">
       <mat-expansion-panel-header class="disable_ripple">
         Notification Settings
       </mat-expansion-panel-header>
-    
+
       <div class="double-column mt-2">
+        <div class="form-group span-6">
+          <label>Trigger Email Role</label>
+          <br />
+          <app-custom-select
+            [parentForm]="form"
+            controlName="triggerEmailRoleGuid"
+            [items]="
+              data.TriggerEmailRole?.AvailableTriggerEmailRole | keyvalue
+            "
+            [submitted]="submitted"
+            [multiple]="true"
+          ></app-custom-select>
+        </div>
 
-          <div class="form-group span-6">
-            <label>Trigger Email Role</label>
-            <br />
-            <app-custom-select
-              [parentForm]="form"
-              controlName="triggerEmailRoleGuid"
-              [items]="data.TriggerEmailRole?.AvailableTriggerEmailRole | keyvalue"
-              [submitted]="submitted"
-              [multiple]="true"
-            ></app-custom-select>
-          </div>
-      
-          <div class="form-group span-6">
-            <label>Trigger CC Email Role</label>
-            <br />
-            <app-custom-select
-              [parentForm]="form"
-              controlName="ccEmailTrgrRolelist"
-              [items]="data.CCTriggerEmailRole?.AvailableCCEmailTrgrRole | keyvalue"
-              [submitted]="submitted"
-              [multiple]="true"
-            ></app-custom-select>
-          </div>
+        <div class="form-group span-6">
+          <label>Trigger CC Email Role</label>
+          <br />
+          <app-custom-select
+            [parentForm]="form"
+            controlName="ccEmailTrgrRolelist"
+            [items]="
+              data.CCTriggerEmailRole?.AvailableCCEmailTrgrRole | keyvalue
+            "
+            [submitted]="submitted"
+            [multiple]="true"
+          ></app-custom-select>
+        </div>
 
-           <div class="form-group span-6">
-            <label>Additional To List</label>
-            <br />
-            <app-custom-select
-              [parentForm]="form"
-              controlName="toAdditionalList"
-              [items]="data.AdditionalToList?.AvailableAdditionalToRole | keyvalue"
-              [submitted]="submitted"
-              [multiple]="true"
-            ></app-custom-select>
-          </div>
-      
-          <div class="form-group span-6">
-            <label>Additional CC List</label>
-            <br />
-            <app-custom-select
-              [parentForm]="form"
-              controlName="ccAdditionalList"
-              [items]="data?.AdditionalCcList?.AvailableAdditionalCcRole ? (data.AdditionalCcList.AvailableAdditionalCcRole | keyvalue) : []"
-              [submitted]="submitted"
-              [multiple]="true"
-            ></app-custom-select>
-          </div>
-    
-          <div class="form-group span-6">
-            <label>Email Subject</label>
-            <br />
-            <input 
-              type="text" 
-              class="form-control" 
-              formControlName="emailSubject"
-              [ngClass]="{'is-invalid': submitted && f.emailSubject.errors || f.emailSubject.errors && !f.emailSubject.errors.required}"
-              />
-          </div>
-     
-          <div class="form-group span-12">
-            <label>Notify</label>
-            <br />
-            <div class="Ql-container" >
-              <quill-editor
+        <div class="form-group span-6">
+          <label>Additional To List</label>
+          <br />
+          <app-custom-select
+            [parentForm]="form"
+            controlName="toAdditionalList"
+            [items]="
+              data.AdditionalToList?.AvailableAdditionalToRole | keyvalue
+            "
+            [submitted]="submitted"
+            [multiple]="true"
+          ></app-custom-select>
+        </div>
+
+        <div class="form-group span-6">
+          <label>Additional CC List</label>
+          <br />
+          <app-custom-select
+            [parentForm]="form"
+            controlName="ccAdditionalList"
+            [items]="
+              data?.AdditionalCcList?.AvailableAdditionalCcRole
+                ? (data.AdditionalCcList.AvailableAdditionalCcRole | keyvalue)
+                : []
+            "
+            [submitted]="submitted"
+            [multiple]="true"
+          ></app-custom-select>
+        </div>
+
+        <div class="form-group span-6">
+          <label>Email Subject</label>
+          <br />
+          <input
+            type="text"
+            class="form-control"
+            formControlName="emailSubject"
+            [ngClass]="{
+              'is-invalid':
+                (submitted && f.emailSubject.errors) ||
+                (f.emailSubject.errors && !f.emailSubject.errors.required)
+            }"
+          />
+        </div>
+
+        <div class="form-group span-12">
+          <label>Notify</label>
+          <br />
+          <div class="Ql-container">
+            <quill-editor
               [modules]="{ toolbar: editorConfig.toolbar }"
               class="Ql-InsideContainer"
-             formControlName="notify"
+              formControlName="notify"
             ></quill-editor>
-            </div> 
           </div>
+        </div>
 
-          <div class="form-group span-12">
-            <label>Files</label>
-            <br />
-            <app-file-uploader
-              [disabled]="published"
-              [uploading]="filesUploading"
-              [allowedExtensions]="allowedExtensions"
-              [multiple]="true"
-              (files)="onFilesUpload($event)"
-              (ignored)="onIgnoredFiles($event)">
-            </app-file-uploader>
-            <app-list
-              [parentForm]="form"
-              controlName="fileNames"
-              [config]="filesConfig"
-              [withPrompt]="true"
-              (beforeDelete)="beforeItemDelete($event)"
-              (itemDeleted)="onFileDelete($event)"
-              (fileDownload)="onFileDownload($event)"
-            ></app-list>
-          </div>
-
-
+        <div class="form-group span-12">
+          <label>Files</label>
+          <br />
+          <app-file-uploader
+            [disabled]="published"
+            [uploading]="filesUploading"
+            [allowedExtensions]="allowedExtensions"
+            [multiple]="true"
+            (files)="onFilesUpload($event)"
+            (ignored)="onIgnoredFiles($event)"
+          >
+          </app-file-uploader>
+          <app-list
+            [parentForm]="form"
+            controlName="fileNames"
+            [config]="filesConfig"
+            [withPrompt]="true"
+            (beforeDelete)="beforeItemDelete($event)"
+            (itemDeleted)="onFileDelete($event)"
+            (fileDownload)="onFileDownload($event)"
+          ></app-list>
+        </div>
       </div>
     </mat-expansion-panel>
 
-    <mat-expansion-panel [expanded]="false"  *ngIf="['LegalOnline','LegalOffline'].includes(form.get('triggerType')?.value?.value)">
+    <mat-expansion-panel
+      [expanded]="false"
+      *ngIf="
+        ['LegalOnline', 'LegalOffline'].includes(
+          form.get('triggerType')?.value?.value
+        )
+      "
+    >
       <mat-expansion-panel-header class="disable_ripple">
         Legal Trigger Settings
       </mat-expansion-panel-header>
 
-    <div class="form-group span-12">
-    
-      <!-- Tab Headers -->
-      <div class="tab-buttons">
-        <button type="button" [class.active]="activeTab === 'dmo'" (click)="setTab('dmo')">DMO Mapping</button>
-        <button type="button" [class.active]="activeTab === 'trigger'" (click)="setTab('trigger')">Trigger Mapping</button>
-        <!-- <button type="button" [class.active]="activeTab === 'template'" (click)="setTab('template')">Define Template</button>
+      <div class="form-group span-12">
+        <!-- Tab Headers -->
+        <div class="tab-buttons">
+          <button
+            type="button"
+            [class.active]="activeTab === 'dmo'"
+            (click)="setTab('dmo')"
+          >
+            DMO Mapping
+          </button>
+          <button
+            type="button"
+            [class.active]="activeTab === 'trigger'"
+            (click)="setTab('trigger')"
+          >
+            Trigger Mapping
+          </button>
+          <!-- <button type="button" [class.active]="activeTab === 'template'" (click)="setTab('template')">Define Template</button>
         <button type="button" [class.active]="activeTab === 'preview'" (click)="setTab('preview')">Template preview</button> -->
-      </div>
-    
-      <!-- Tab Panel: DMO Mapping -->
-      <div *ngIf="activeTab === 'dmo'">
-        <div class="col-lg-12">
-      
-          <table class="table table-bordered">
-            <thead class="thead-light">
-              <tr>
-                <th>{{LegalProcessName | uppercase }}</th>
-                <th>{{ParentProcessName | uppercase}}</th>
-              </tr>
-            </thead>
-      
-            <tbody>
-              <tr *ngFor="let item of legalProcessDmos; let i = index">
-      
-                <td>
-                  <span>{{ item.DISPNAME }}</span>
-                </td>
-                <td>
-                  <ng-select [searchable]="true" [bindLabel]="'DISPNAME'" [bindValue]="'GUID'" placeholder="Select..."
-                    [(ngModel)]="item.selectedParent" [ngModelOptions]="{standalone: true}">
-                    <ng-option *ngFor="let item of parentProcessDmos" [value]="item.GUID"
-                      [disabled]="shouldOptionBeDisabled(item.GUID)">
-                      {{ item.DISPNAME }}
-                    </ng-option>
-                  </ng-select>
-      
-                </td>
-      
-              </tr>
-      
-            </tbody>
-          </table>
-      
         </div>
-      </div>
-      
-      <!-- Tab Panel: Trigger Mapping -->
-      <div *ngIf="activeTab === 'trigger'">
-        <div class="col-lg-12">
-      
-          <table class="table table-bordered">
-            <thead class="thead-light">
-              <tr>
-                <th>{{LegalProcessName | uppercase }}</th>
-                <th>{{ParentProcessName | uppercase}}</th>
-              </tr>
-            </thead>
-      
-            <tbody>
-              <tr *ngFor="let item of legalProcessTrgrs; let i = index">
-                <td>
-                  <span>{{ item.DISPNAME }}</span>
-                </td>
-                <td>
-                  <ng-select [items]="parentProcessTrgrs" [searchable]="true" placeholder="Select..." [bindLabel]="'DISPNAME'"
-                    [bindValue]="'GUID'" [(ngModel)]="item.selectedParent" [ngModelOptions]="{standalone: true}">
-                    <ng-option *ngFor="let opt of parentProcessTrgrs" [value]="opt.GUID">
-                      {{ opt.DISPNAME }}
-                    </ng-option>
-                  </ng-select>
-      
-                </td>
-              </tr>
-            </tbody>
-          </table>
+
+        <!-- Tab Panel: DMO Mapping -->
+        <div *ngIf="activeTab === 'dmo'">
+          <div class="col-lg-12">
+            <table class="table table-bordered">
+              <thead class="thead-light">
+                <tr>
+                  <th>{{ LegalProcessName | uppercase }}</th>
+                  <th>{{ ParentProcessName | uppercase }}</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr *ngFor="let item of legalProcessDmos; let i = index">
+                  <td>
+                    <span>{{ item.DISPNAME }}</span>
+                  </td>
+                  <td>
+                    <ng-select
+                      [searchable]="true"
+                      [bindLabel]="'DISPNAME'"
+                      [bindValue]="'GUID'"
+                      placeholder="Select..."
+                      [(ngModel)]="item.selectedParent"
+                      [ngModelOptions]="{ standalone: true }"
+                    >
+                      <ng-option
+                        *ngFor="let item of parentProcessDmos"
+                        [value]="item.GUID"
+                        [disabled]="shouldOptionBeDisabled(item.GUID)"
+                      >
+                        {{ item.DISPNAME }}
+                      </ng-option>
+                    </ng-select>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+
+        <!-- Tab Panel: Trigger Mapping -->
+        <div *ngIf="activeTab === 'trigger'">
+          <div class="col-lg-12">
+            <table class="table table-bordered">
+              <thead class="thead-light">
+                <tr>
+                  <th>{{ LegalProcessName | uppercase }}</th>
+                  <th>{{ ParentProcessName | uppercase }}</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr *ngFor="let item of legalProcessTrgrs; let i = index">
+                  <td>
+                    <span>{{ item.DISPNAME }}</span>
+                  </td>
+                  <td>
+                    <ng-select
+                      [items]="parentProcessTrgrs"
+                      [searchable]="true"
+                      placeholder="Select..."
+                      [bindLabel]="'DISPNAME'"
+                      [bindValue]="'GUID'"
+                      [(ngModel)]="item.selectedParent"
+                      [ngModelOptions]="{ standalone: true }"
+                    >
+                      <ng-option
+                        *ngFor="let opt of parentProcessTrgrs"
+                        [value]="opt.GUID"
+                      >
+                        {{ opt.DISPNAME }}
+                      </ng-option>
+                    </ng-select>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
         <!-- Tab Panel: Define Template -->
         <!-- <div *ngIf="activeTab === 'template'">
           <div class="d-flex flex-column gap-3 Ql-container">
@@ -341,18 +424,23 @@
             (dragover)="onDragOver($event)" #preview [innerHTML]="previewHtml | sanitizeHtml">
           </div>
         </div> -->
-
-    </div>
+      </div>
     </mat-expansion-panel>
-    <br/>
+    <br />
 
     <div class="popup__actions">
-      <button class="btn btn-light btn-sm" type="button" (click)="onCancel()">Cancel</button>
-      <button class="btn btn-primary btn-sm" type="submit" (click)="onSubmit()" *ngIf="!published">
+      <button class="btn btn-light btn-sm" type="button" (click)="onCancel()">
+        Cancel
+      </button>
+      <button
+        class="btn btn-primary btn-sm"
+        type="submit"
+        (click)="onSubmit()"
+        *ngIf="!published"
+      >
         <ng-container *ngIf="newElement">Create</ng-container>
-        <ng-container *ngIf="!newElement">Update</ng-container> 
+        <ng-container *ngIf="!newElement">Update</ng-container>
       </button>
     </div>
-  
   </form>
 </div>
