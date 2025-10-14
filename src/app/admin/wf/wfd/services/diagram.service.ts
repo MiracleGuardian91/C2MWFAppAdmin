@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { from } from 'rxjs';
 import {
   bufferTime,
@@ -62,8 +62,10 @@ const GATEWAY_H = getShapeSize(t.Gateway).width;
 const LANE_INDENTATION = 30;
 
 @Injectable({ providedIn: 'root' })
-export class DiagramService {
+export class DiagramService implements OnDestroy {
   private _metadata: MetaData;
+  private _isDragOperationInProgress = false;
+  private _dragEndTimeout: any;
   private _initComplete = false;
   private _states: State[] = [];
   private hoverOnElement$ = this.bpmn.listenTo(EventType.HoverOnElement).pipe(
@@ -74,8 +76,32 @@ export class DiagramService {
     )
   );
 
-  constructor(private bpmn: BpmnService) {}
- 
+  constructor(private bpmn: BpmnService) {
+    // Track drag operations to prevent unwanted modal popups
+    this.bpmn.listenTo(EventType.DragStart).subscribe(() => {
+      this._isDragOperationInProgress = true;
+      // Clear any existing timeout
+      if (this._dragEndTimeout) {
+        clearTimeout(this._dragEndTimeout);
+      }
+    });
+
+    this.bpmn.listenTo(EventType.DragEnd).subscribe(() => {
+      // Set a timeout to allow drag operations to fully complete
+      // before allowing modal popups again
+      this._dragEndTimeout = setTimeout(() => {
+        this._isDragOperationInProgress = false;
+      }, 100);
+    });
+  }
+
+  ngOnDestroy() {
+    // Clean up timeout when service is destroyed
+    if (this._dragEndTimeout) {
+      clearTimeout(this._dragEndTimeout);
+    }
+  }
+
   get paletteIsOpen() {
     return this.bpmn.paletteIsOpen;
   }
@@ -95,19 +121,27 @@ export class DiagramService {
     return this.bpmn.listenTo(EventType.DiagramChanged).pipe(
       debounceTime(0),
       skip(1),
-      map((_) =>{
+      map((_) => {
         return this.bpmn.allElements.reduce((acc, el) => {
           acc[el.id] = extractElementCoordinates(el);
           return acc;
-        }, {} as Coordinates)}
-      )
+        }, {} as Coordinates);
+      })
     );
   }
 
   get onUpdateElement() {
     return this.bpmn.listenTo(EventType.DoubleClick).pipe(
       map((e) => e.element as DiagramEl),
-      filter((e) => e.type !== t.Gateway)
+      filter((e) => e.type !== t.Gateway),
+      // Prevent modal from opening when element is dropped on trigger during drag operations
+      filter((e) => {
+        // If a drag operation is in progress or just completed, prevent modal for triggers
+        if (e.type === t.Trigger && this._isDragOperationInProgress) {
+          return false;
+        }
+        return true;
+      })
     );
   }
 
@@ -298,7 +332,14 @@ export class DiagramService {
     const flowType = metadata.FlowType;
     const dataToDiagram = () => this.toBPMNPool(metadata.Workflow);
     return this.bpmn
-      .importDiagram(Name, FriendlyName, attachTo, dataToDiagram, readOnly, flowType)
+      .importDiagram(
+        Name,
+        FriendlyName,
+        attachTo,
+        dataToDiagram,
+        readOnly,
+        flowType
+      )
       .pipe(
         finalize(() => {
           this._initComplete = true;
@@ -387,48 +428,53 @@ export class DiagramService {
     condition: TriggerCondition,
     trigger?: Trigger
   ) {
-
-    const connetionType = trigger?.SpecID === "1" ? "custom:DottedFlow": "bpmn:SequenceFlow";
+    const connetionType =
+      trigger?.SpecID === '1' ? 'custom:DottedFlow' : 'bpmn:SequenceFlow';
     //const endState = this._metadata.Workflow.Stages[condition.EndStageGuid]?.States[condition.EndStateGuid];
 
     const endStateGuid = condition.EndStateGuid;
 
-// search across all stages to find the state
-let endState: any = null;
+    // search across all stages to find the state
+    let endState: any = null;
 
-for (const stageKey of Object.keys(this._metadata.Workflow.Stages)) {
-  const stage = this._metadata.Workflow.Stages[stageKey];
-  if (stage.States && stage.States[endStateGuid]) {
-    endState = stage.States[endStateGuid];
-    break;
-  }
-}
+    for (const stageKey of Object.keys(this._metadata.Workflow.Stages)) {
+      const stage = this._metadata.Workflow.Stages[stageKey];
+      if (stage.States && stage.States[endStateGuid]) {
+        endState = stage.States[endStateGuid];
+        break;
+      }
+    }
 
     if (endState) {
       const toEvent = this.bpmn.getElement(endState.Guid);
-      if(toEvent.type==='bpmn:StartEvent' && fromEvent.type==='bpmn:StartEvent' )
-      {
-        return
+      if (
+        toEvent.type === 'bpmn:StartEvent' &&
+        fromEvent.type === 'bpmn:StartEvent'
+      ) {
+        return;
       }
 
-      
       const id = trigger?.Guid || constructId('Cond_', condition.Name);
       let flow = null;
-      if(!elementAdded.includes(id)){
-        flow = this.bpmn.connect(fromEvent, toEvent, connetionType as ElementType);
+      if (!elementAdded.includes(id)) {
+        flow = this.bpmn.connect(
+          fromEvent,
+          toEvent,
+          connetionType as ElementType
+        );
         const coords = (this._getElementCoordinates(id) ||
           {}) as TriggerCoordinates;
         flow.props = trigger ? { ...trigger } : { ...condition };
 
         this.updateElementProperties(flow, {
           id,
-          ...coords,  
+          ...coords,
           name: null,
         });
-        flow.friendlyName = trigger?.FriendlyName ? trigger.FriendlyName : " ";
+        flow.friendlyName = trigger?.FriendlyName ? trigger.FriendlyName : ' ';
         elementAdded.push(id);
       }
-        // Set flow.friendlyName based on trigger.FriendlyName
+      // Set flow.friendlyName based on trigger.FriendlyName
       return flow;
     }
   }
@@ -436,13 +482,12 @@ for (const stageKey of Object.keys(this._metadata.Workflow.Stages)) {
   private toBPMNFlowTrigger(
     fromEvent: StateShapeType,
     toEvent: any,
-    props: Trigger,
-   
+    props: Trigger
   ) {
-
     const flow = this.bpmn.connect(fromEvent, toEvent);
-    var coords = this._getElementCoordinates(props.Guid) || {} as TriggerCoordinates;
-  
+    var coords =
+      this._getElementCoordinates(props.Guid) || ({} as TriggerCoordinates);
+
     if ('name' in coords) {
       delete coords.name;
     }
@@ -454,7 +499,7 @@ for (const stageKey of Object.keys(this._metadata.Workflow.Stages)) {
       ...coords,
       //name: null,
     });
-    flow.friendlyName =  props.FriendlyName;
+    flow.friendlyName = props.FriendlyName;
     return flow;
   }
 
@@ -545,68 +590,66 @@ for (const stageKey of Object.keys(this._metadata.Workflow.Stages)) {
   private toBPMNFlows() {
     this._states.forEach((state) => {
       const fromEvent = this.bpmn.getElement(state.Guid) as StateShapeType;
-        Object.values(state.Triggers).forEach((trigger) => {
-          const conditions = Object.values(trigger.TrgConditions);
-          if (conditions.length === 0) {
-            const extension = this.toBPMNEventDefinition(fromEvent, trigger);
-            if (extension) {
-                this.toBPMNFlowTrigger(fromEvent, extension, trigger);
+      Object.values(state.Triggers).forEach((trigger) => {
+        const conditions = Object.values(trigger.TrgConditions);
+        if (conditions.length === 0) {
+          const extension = this.toBPMNEventDefinition(fromEvent, trigger);
+          if (extension) {
+            this.toBPMNFlowTrigger(fromEvent, extension, trigger);
+          } else {
+            const gateway = this.toBPMNGateway(fromEvent, trigger);
+            this.toBPMNFlowTrigger(fromEvent, gateway, trigger);
+          }
+        } else {
+          if (conditions.length === 1) {
+            const triggerType = +trigger.TypeID;
+            const def = getEventDefinition(triggerType);
+
+            if (def === EventDef.System || def === EventDef.Timer) {
+              const system = this.toBPMNEventDefinition(fromEvent, trigger);
+              this.toBPMNFlowTrigger(fromEvent, system, trigger);
+              this.toBPMNFlowCondition(system, conditions[0]);
+              return;
+            }
+            const gatewayId = constructId(t.Gateway, trigger.Guid);
+            let coordinates = this._getElementCoordinates(gatewayId);
+            if (coordinates) {
+              const gateway = this.toBPMNGateway(fromEvent, trigger);
+              this.toBPMNFlowTrigger(fromEvent, gateway, trigger);
+              this.toBPMNFlowCondition(gateway, conditions[0]);
             } else {
-                const gateway = this.toBPMNGateway(fromEvent, trigger);
-                this.toBPMNFlowTrigger(fromEvent, gateway, trigger);
+              // Connect two states by a trigger directly if there is only one condition
+              this.toBPMNFlowCondition(fromEvent, conditions[0], trigger);
             }
           } else {
-            if (conditions.length === 1) {
-              const triggerType = +trigger.TypeID;
-              const def = getEventDefinition(triggerType);
-              
-              if (def === EventDef.System || def === EventDef.Timer) {
-                  const system = this.toBPMNEventDefinition(fromEvent, trigger);
-                  this.toBPMNFlowTrigger(fromEvent, system, trigger);
-                  this.toBPMNFlowCondition(system, conditions[0]);
-                  return;
-              }
-              const gatewayId = constructId(t.Gateway, trigger.Guid);
-              let coordinates = this._getElementCoordinates(gatewayId);
-              if (coordinates) {
-                  const gateway = this.toBPMNGateway(fromEvent, trigger);
-                  this.toBPMNFlowTrigger(fromEvent, gateway, trigger);
-                  this.toBPMNFlowCondition(gateway, conditions[0]);
-              } else {
-                // Connect two states by a trigger directly if there is only one condition
-                  this.toBPMNFlowCondition(fromEvent, conditions[0], trigger);
-                
-              }
-            } else {
-              const triggerType = +trigger.TypeID;
-              const def = getEventDefinition(triggerType);
-              
-              if (def === EventDef.System || def === EventDef.Timer) {
-                  const system = this.toBPMNEventDefinition(fromEvent, trigger);
-                  this.toBPMNFlowTrigger(fromEvent, system, trigger);
-                  conditions.forEach((condition) =>
-                    this.toBPMNFlowCondition(system, condition)
-                  );
-                  return;
-              }
-              // Create exclusive gateway to connect the states with one another
-                const gateway = this.toBPMNGateway(
-                  fromEvent,
-                  trigger,
-                  conditions[0]
-                );
-                this.toBPMNFlowTrigger(fromEvent, gateway, trigger);
-                conditions.forEach((condition) =>
-                  this.toBPMNFlowCondition(gateway, condition)
-                );
+            const triggerType = +trigger.TypeID;
+            const def = getEventDefinition(triggerType);
+
+            if (def === EventDef.System || def === EventDef.Timer) {
+              const system = this.toBPMNEventDefinition(fromEvent, trigger);
+              this.toBPMNFlowTrigger(fromEvent, system, trigger);
+              conditions.forEach((condition) =>
+                this.toBPMNFlowCondition(system, condition)
+              );
+              return;
             }
+            // Create exclusive gateway to connect the states with one another
+            const gateway = this.toBPMNGateway(
+              fromEvent,
+              trigger,
+              conditions[0]
+            );
+            this.toBPMNFlowTrigger(fromEvent, gateway, trigger);
+            conditions.forEach((condition) =>
+              this.toBPMNFlowCondition(gateway, condition)
+            );
           }
-        });
+        }
+      });
     });
 
     elementAdded = [];
     eventAdded = [];
-
   }
 
   private stageDirection(start: string, end: string) {
@@ -632,7 +675,11 @@ for (const stageKey of Object.keys(this._metadata.Workflow.Stages)) {
         height: getShapeSize(type).height,
       };
     } else {
-      coords = { ...coords, width: getShapeSize(type).width, height: getShapeSize(type).height };
+      coords = {
+        ...coords,
+        width: getShapeSize(type).width,
+        height: getShapeSize(type).height,
+      };
     }
     // coords = (this._getElementCoordinates(state.Guid) || {
     //   x: index * 100 + STATE_H * 2 + lane.x,
@@ -649,7 +696,7 @@ for (const stageKey of Object.keys(this._metadata.Workflow.Stages)) {
       },
       lane
     ) as StateShapeType;
-   this.updateElementProperties(event, { name: state.FriendlyName });
+    this.updateElementProperties(event, { name: state.FriendlyName });
     lane.children.push(event);
     event.parent = lane;
     return event;
@@ -658,7 +705,7 @@ for (const stageKey of Object.keys(this._metadata.Workflow.Stages)) {
   private toBPMNEvents(states: State[], lane: StageShape) {
     states.forEach((state, i) => {
       this.toBPMNEvent(state, i, lane);
-      if(!this._states.some(s => s.Name === state.Name)){
+      if (!this._states.some((s) => s.Name === state.Name)) {
         this._states.push(state);
       }
     });
@@ -707,9 +754,7 @@ for (const stageKey of Object.keys(this._metadata.Workflow.Stages)) {
       }
     } else {
       this.bpmn.splitLane(pool, stages.length);
-      const lanes: any[] = pool.children.filter(
-        (child) => child.type === type
-      );
+      const lanes: any[] = pool.children.filter((child) => child.type === type);
       stages.forEach((guid, i) => {
         const stage = wf.Stages[guid];
         lanes[i].props = { ...stage };
@@ -748,11 +793,9 @@ for (const stageKey of Object.keys(this._metadata.Workflow.Stages)) {
       this.toMiscElements();
     }
   }
- name : string;
+  name: string;
   public updateElementProperties(element: any, updated: any) {
-    
-    if(updated.name)
-    {
+    if (updated.name) {
       this.name = updated.name;
     }
     if (element.props) {
@@ -765,7 +808,7 @@ for (const stageKey of Object.keys(this._metadata.Workflow.Stages)) {
     this.bpmn.destroy();
   }
 
-   public clear() {
+  public clear() {
     this.bpmn.clear();
   }
 }
