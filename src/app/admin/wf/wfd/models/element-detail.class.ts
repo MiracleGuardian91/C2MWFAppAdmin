@@ -31,7 +31,7 @@ export abstract class ElementDetail<Props, Data, Payload>
   newElement: boolean;
   data: Data;
   element: DiagramEl;
- 
+
   readonly editorConfig = {
     removePlugins: ['ImageUpload', 'EasyImage', 'MediaEmbed', 'Table'],
   };
@@ -46,7 +46,7 @@ export abstract class ElementDetail<Props, Data, Payload>
   ) {}
 
   get f() {
-    return this.form.controls;
+    return this.form?.controls;
   }
 
   get published() {

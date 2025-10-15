@@ -2,34 +2,50 @@
   <div class="popup__header">
     <h2 *ngIf="newElement">New Timer</h2>
     <h2 *ngIf="!newElement">Timer Details</h2>
-    <span class="popup__close"><i class="fas fa-times-circle fa-fw" (click)="ref.close()"></i></span>
+    <span class="popup__close"
+      ><i class="fas fa-times-circle fa-fw" (click)="ref.close()"></i
+    ></span>
   </div>
-  
-  <hr>
-  
-  <form [formGroup]="form">
 
+  <hr />
+
+  <form [formGroup]="form" *ngIf="form">
     <div class="form-group">
       <div class="form-group flex">
-            <input class="radio-container" formControlName="freq" type="radio" (change)="onRadioChange($event)" value="One Time"/>
-            <i class="skin"></i><label for="">One Time</label>
-            <input class="radio-container" formControlName="freq" type="radio" (change)="onRadioChange($event)" value="Recurring"/>
-            <i class="skin"></i><label for="">Recurring</label>
+        <input
+          class="radio-container"
+          formControlName="freq"
+          type="radio"
+          (change)="onRadioChange($event)"
+          value="One Time"
+        />
+        <i class="skin"></i><label for="">One Time</label>
+        <input
+          class="radio-container"
+          formControlName="freq"
+          type="radio"
+          (change)="onRadioChange($event)"
+          value="Recurring"
+        />
+        <i class="skin"></i><label for="">Recurring</label>
       </div>
       <br />
     </div>
-
 
     <div *ngIf="!isrec" class="form-group">
       <label for="">Delay</label>
       <br />
       <div class="form-group flex">
-        <input 
-          type="number" 
-          class="form-control" 
+        <input
+          type="number"
+          class="form-control"
           formControlName="periodFrequency"
-          [ngClass]="{'is-invalid': submitted && f.periodFrequency.errors || f.periodFrequency.errors && !f.periodFrequency.errors.required}"
-        >
+          [ngClass]="{
+            'is-invalid':
+              (submitted && f.periodFrequency.errors) ||
+              (f.periodFrequency.errors && !f.periodFrequency.errors.required)
+          }"
+        />
         <select formControlName="recurrenceFrequency" class="form-control">
           <option value="Hours">Hours</option>
           <option value="Days">Days</option>
@@ -39,17 +55,21 @@
       </div>
       <br />
     </div>
-  
+
     <div *ngIf="isrec" class="form-group">
       <label for="">Frequency</label>
       <br />
       <div class="form-group flex">
-        <input 
-          type="number" 
-          class="form-control" 
+        <input
+          type="number"
+          class="form-control"
           formControlName="periodStart"
-          [ngClass]="{'is-invalid': submitted && f.periodStart.errors || f.periodStart.errors && !f.periodStart.errors.required}"
-        >
+          [ngClass]="{
+            'is-invalid':
+              (submitted && f.periodStart.errors) ||
+              (f.periodStart.errors && !f.periodStart.errors.required)
+          }"
+        />
         <select formControlName="recurrenceStart" class="form-control">
           <option value="Hours">Hours</option>
           <option value="Days">Days</option>
@@ -58,19 +78,26 @@
         </select>
       </div>
     </div>
-  
+
     <div *ngIf="isrec" class="form-group">
       <label class="mt-3" for="">Period of inactivity (In Days)</label>
-      <i _ngcontent-ioh-c500="" 
-      class="fa fa-question-circle" title="No end date if select zero for period of inactivity"></i>
-      <br>
+      <i
+        _ngcontent-ioh-c500=""
+        class="fa fa-question-circle"
+        title="No end date if select zero for period of inactivity"
+      ></i>
+      <br />
       <div class="form-group flex">
-        <input 
-          type="number" 
-          class="form-control" 
+        <input
+          type="number"
+          class="form-control"
           formControlName="periodEnd"
-          [ngClass]="{'is-invalid': submitted && f.periodEnd.errors || f.periodEnd.errors && !f.periodEnd.errors.required}"
-        >
+          [ngClass]="{
+            'is-invalid':
+              (submitted && f.periodEnd.errors) ||
+              (f.periodEnd.errors && !f.periodEnd.errors.required)
+          }"
+        />
 
         <!--<div class="form-group flex" style="margin-bottom: 0;">
           
@@ -82,10 +109,17 @@
       </div>
     </div>
     <div class="popup__actions">
-      <button class="btn btn-light btn-sm" type="button" (click)="onCancel()">Cancel</button>
-      <button class="btn btn-primary btn-sm" type="submit" (click)="onSubmit()" *ngIf="!published">
+      <button class="btn btn-light btn-sm" type="button" (click)="onCancel()">
+        Cancel
+      </button>
+      <button
+        class="btn btn-primary btn-sm"
+        type="submit"
+        (click)="onSubmit()"
+        *ngIf="!published"
+      >
         <ng-container *ngIf="newElement">Create</ng-container>
-        <ng-container *ngIf="!newElement">Update</ng-container> 
+        <ng-container *ngIf="!newElement">Update</ng-container>
       </button>
     </div>
   </form>

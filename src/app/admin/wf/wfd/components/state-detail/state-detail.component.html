@@ -2,90 +2,109 @@
   <div class="popup__header">
     <h2 *ngIf="newElement">New State</h2>
     <h2 *ngIf="!newElement">State Details</h2>
-    <span class="popup__close"><i class="fas fa-times-circle fa-fw" (click)="ref.close()"></i></span>
+    <span class="popup__close"
+      ><i class="fas fa-times-circle fa-fw" (click)="ref.close()"></i
+    ></span>
   </div>
-  <hr>
-  
-  <form [formGroup]="form">
+  <hr />
+
+  <form [formGroup]="form" *ngIf="form">
     <div class="double-column">
       <div class="form-group span-6">
-        <label>{{name}} Name <span style="color: red">*</span></label>
+        <label>{{ name }} Name <span style="color: red">*</span></label>
         <br />
-        <input 
-          type="text" 
-          class="form-control" 
-          formControlName="name" 
+        <input
+          type="text"
+          class="form-control"
+          formControlName="name"
           [readonly]="!newElement"
-           [style.background-color]="!newElement ? '#e9ecef' : 'white'" 
+          [style.background-color]="!newElement ? '#e9ecef' : 'white'"
           (blur)="CheckValidationWF()"
-          [ngClass]="{'is-invalid': submitted && f.name.errors || f.name.errors && !f.name.errors.required|| f.name.errors?.duplicate}"
+          [ngClass]="{
+            'is-invalid':
+              (submitted && f.name.errors) ||
+              (f.name.errors && !f.name.errors.required) ||
+              f.name.errors?.duplicate
+          }"
         />
         <div *ngIf="f.name?.errors?.duplicate" class="invalid-feedback">
           Duplicate name
         </div>
       </div>
-    
+
       <div class="form-group span-6">
         <label>Friendly Name <span style="color: red">*</span></label>
         <br />
-        <input 
-          type="text" 
-          class="form-control" 
+        <input
+          type="text"
+          class="form-control"
           formControlName="friendlyName"
-          [ngClass]="{'is-invalid': submitted && f.friendlyName.errors || f.friendlyName.errors && !f.friendlyName.errors.required}"
-           />
+          [ngClass]="{
+            'is-invalid':
+              (submitted && f.friendlyName.errors) ||
+              (f.friendlyName.errors && !f.friendlyName.errors.required)
+          }"
+        />
       </div>
-    
+
       <div class="form-group span-6">
         <label>Status <span style="color: red">*</span></label>
         <br />
-        <select 
-          class="form-control" 
+        <select
+          class="form-control"
           formControlName="status"
-          [ngClass]="{'is-invalid': submitted && f.status.errors || f.status.errors && !f.status.errors.required}"
+          [ngClass]="{
+            'is-invalid':
+              (submitted && f.status.errors) ||
+              (f.status.errors && !f.status.errors.required)
+          }"
         >
           <option value="1">Active</option>
           <option value="0">Inactive</option>
         </select>
       </div>
-    
+
       <div class="form-group span-6">
         <label>Short Description <span style="color: red">*</span></label>
         <br />
-        <input 
-          type="text" 
-          class="form-control" 
-          formControlName="shortDescription" 
-          [ngClass]="{'is-invalid': submitted && f.shortDescription.errors || f.shortDescription.errors && !f.shortDescription.errors.required}"
+        <input
+          type="text"
+          class="form-control"
+          formControlName="shortDescription"
+          [ngClass]="{
+            'is-invalid':
+              (submitted && f.shortDescription.errors) ||
+              (f.shortDescription.errors && !f.shortDescription.errors.required)
+          }"
         />
       </div>
-    
+
       <div class="form-group span-6 span-12">
         <label>Long Description</label>
         <br />
-        <div class="Ql-container" >
+        <div class="Ql-container">
           <quill-editor
-          [modules]="{ toolbar: editorConfig.toolbar }"
-          class="Ql-InsideContainer"
-         formControlName="longDescription"
-        ></quill-editor>
-        </div> 
-     
+            [modules]="{ toolbar: editorConfig.toolbar }"
+            class="Ql-InsideContainer"
+            formControlName="longDescription"
+          ></quill-editor>
+        </div>
       </div>
-  
+
       <div class="form-group span-6" *ngIf="!isSubProcess">
         <label>State Specification</label>
-        <br>
+        <br />
         <app-custom-select
           [parentForm]="form"
           controlName="stateSpecification"
-          [items]="data.StateSpecification?.AvailableStateSpecification | keyvalue"
+          [items]="
+            data.StateSpecification?.AvailableStateSpecification | keyvalue
+          "
           [readonly]="true"
           [submitted]="submitted"
         ></app-custom-select>
       </div>
-  
-  
+
       <div class="form-group span-6">
         <label>Role Available <span style="color: red">*</span></label>
         <br />
@@ -97,33 +116,33 @@
           [submitted]="submitted"
         ></app-custom-select>
       </div>
-  
-     
+
       <div class="form-group span-6">
         <label>Checklist</label>
         <br />
-        <app-list 
+        <app-list
           [parentForm]="form"
           controlName="checkList"
           [config]="checkList"
         ></app-list>
       </div>
-  
+
       <div class="form-group span-6">
         <label>Trigger List</label>
-        <br>
-        <app-tree-list 
-          [items]="data.TriggerList" 
-          [displayWith]="displayTrigger" 
+        <br />
+        <app-tree-list
+          [items]="data.TriggerList"
+          [displayWith]="displayTrigger"
           [dragDrop]="true"
-          height="auto">
+          height="auto"
+        >
         </app-tree-list>
       </div>
-      
+
       <ng-container *ngIf="isSubProcess">
         <div class="form-group span-6">
           <label>Subprocess <span style="color: red">*</span></label>
-          <br>
+          <br />
           <app-custom-select
             [parentForm]="form"
             controlName="subProcessID"
@@ -131,10 +150,10 @@
             [submitted]="submitted"
           ></app-custom-select>
         </div>
-      
+
         <div class="form-group span-6">
           <label>Subprocess End State <span style="color: red">*</span></label>
-          <br>
+          <br />
           <app-custom-select
             [parentForm]="form"
             controlName="subProcessEndStateIds"
@@ -145,15 +164,20 @@
         </div>
       </ng-container>
     </div>
-  
+
     <div class="popup__actions">
-      <button class="btn btn-light btn-sm" type="button" (click)="onCancel()">Cancel</button>
-      <button class="btn btn-primary btn-sm" type="submit" (click)="onSubmit()" *ngIf="!published">
+      <button class="btn btn-light btn-sm" type="button" (click)="onCancel()">
+        Cancel
+      </button>
+      <button
+        class="btn btn-primary btn-sm"
+        type="submit"
+        (click)="onSubmit()"
+        *ngIf="!published"
+      >
         <ng-container *ngIf="newElement">Create</ng-container>
-        <ng-container *ngIf="!newElement">Update</ng-container> 
+        <ng-container *ngIf="!newElement">Update</ng-container>
       </button>
     </div>
-  
-  
   </form>
 </div>

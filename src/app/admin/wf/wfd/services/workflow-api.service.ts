@@ -42,12 +42,10 @@ export class WorkflowApiService extends BaseHttpService {
   readonly #baseurl = `${environment.Setting.GatewayAPIUrl}/wfapiwf/wf`;
   stateIds: string;
   stageIds: string;
-  ActionId:string;
-  previousId:string;
+  ActionId: string;
+  previousId: string;
   wfid: string;
   wfjson: Coordinates;
-
-
 
   getBMList(wfId: string) {
     const url = `${this.#baseurl}/getWFBM`;
@@ -61,13 +59,18 @@ export class WorkflowApiService extends BaseHttpService {
     return this.get<WF.ConditionDetail>(url, { conditionId });
   }
 
-  callApiOnMoveLane(stateID: string, stageID: string,ActionGroupId :string,PreviousStage:string) {
-    this.previousId=PreviousStage;
-    this.stateIds=stateID;
-    this.stageIds=stageID;
-    this.ActionId=ActionGroupId;
+  callApiOnMoveLane(
+    stateID: string,
+    stageID: string,
+    ActionGroupId: string,
+    PreviousStage: string
+  ) {
+    this.previousId = PreviousStage;
+    this.stateIds = stateID;
+    this.stageIds = stageID;
+    this.ActionId = ActionGroupId;
     const url = `${this.#baseurl}/stagechange`;
-    return this.post(url,{stateID,stageID,ActionGroupId});
+    return this.post(url, { stateID, stageID, ActionGroupId });
   }
 
   getBMOGsByBMId(bmId: string) {
@@ -137,14 +140,13 @@ export class WorkflowApiService extends BaseHttpService {
     version: string
   ) {
     const encodedName = btoa(name);
-    const url = `${this.#baseurl}/checkName/wf/${wfId}/${encodedName}`; 
+    const url = `${this.#baseurl}/checkName/wf/${wfId}/${encodedName}`;
     const params = {
       wfObjType: type,
     };
-  
+
     return this.get(url, params);
   }
-  
 
   changeMode(wfId: string, mode: 'Edit' | 'Published') {
     const url = `${this.#baseurl}/changewfMode`;
@@ -167,19 +169,19 @@ export class WorkflowApiService extends BaseHttpService {
     wfId: string,
     coordinates: Coordinates,
     undoRedoActionGroup: UndoRedoActionGroup | null
-  ) { 
+  ) {
     const url = `${this.#baseurl}/saveWFDCoordinate`;
 
     if (this.stateIds === undefined) {
-    this.wfid= wfId;
-    this.wfjson = coordinates;
+      this.wfid = wfId;
+      this.wfjson = coordinates;
     }
-  
+
     // If undoRedoActionGroup is null or undefined, initialize it
     if (!undoRedoActionGroup) {
       undoRedoActionGroup = new UndoRedoActionGroup();
     }
-  
+
     // Assign state-related data if stateIds is present
     if (this.stateIds !== undefined) {
       wfId = this.wfid;
@@ -189,9 +191,11 @@ export class WorkflowApiService extends BaseHttpService {
       undoRedoActionGroup.ActionName = 'StageChange';
       undoRedoActionGroup.ActionGroupId = this.ActionId ?? '';
       this.stateIds = undefined;
-     undoRedoActionGroup.SequenceNumber=this.incrementWorkflowValue(this.wfid).toString();
+      undoRedoActionGroup.SequenceNumber = this.incrementWorkflowValue(
+        this.wfid
+      ).toString();
     }
-  
+
     // Assign stage-related data and build ActionDetails
     if (this.stageIds !== undefined) {
       const deletedIds = {
@@ -200,12 +204,12 @@ export class WorkflowApiService extends BaseHttpService {
         stateIds: [undoRedoActionGroup.EntityId ?? ''],
         triggerIds: [],
         conditionIds: [],
-        prevstageIds: [this.previousId ?? '']
+        prevstageIds: [this.previousId ?? ''],
       };
       undoRedoActionGroup.ActionDetails = JSON.stringify(deletedIds);
       this.stageIds = undefined;
     }
-  
+
     // Build query parameters
     const params = new HttpParams()
       .set('wfId', wfId)
@@ -215,38 +219,35 @@ export class WorkflowApiService extends BaseHttpService {
       .set('ActionGroupId', undoRedoActionGroup.ActionGroupId ?? '')
       .set('ActionDetails', undoRedoActionGroup.ActionDetails ?? '')
       .set('SequenceNumber', undoRedoActionGroup.SequenceNumber ?? '0');
-  
+
     // Request body
     const body = { coordinates };
-  
+
     return this.postparm(url, body, params);
   }
-  
+
   incrementWorkflowValue(wfid: string): number {
     const storageKey = 'workflowDataArray';
     const stored = sessionStorage.getItem(storageKey);
     const array: [string, number][] = stored ? JSON.parse(stored) : [];
-  
+
     const index = array.findIndex(([key]) => key === wfid);
-  
+
     if (index !== -1) {
       array[index][1]++; // Increment existing
     } else {
       array.push([wfid, 1]); // Add new with count 1
     }
-  
+
     // Save updated array
     sessionStorage.setItem(storageKey, JSON.stringify(array));
-  
+
     // Optional: update class property
     //this.workflowDataArray = array;
-  
+
     // Return updated value
     return index !== -1 ? array[index][1] : 1;
   }
-  
-  
-  
 
   UndoWfdWorkflow(wfId: string) {
     // debugger
@@ -266,11 +267,13 @@ export class WorkflowApiService extends BaseHttpService {
     return this.get<WFDetail[]>(url, { wfId: workflowId });
   }
 
-  
-GetWfdDetailUsingProcessName(guid: string, displayName: string): Observable<any> {
-  const url = `${this.#baseurl}/GetWfdDetailUsingProcessName`;
-  return this.get<any>(url, { Guid: guid, DisplayName: displayName });
-}
+  GetWfdDetailUsingProcessName(
+    guid: string,
+    displayName: string
+  ): Observable<any> {
+    const url = `${this.#baseurl}/GetWfdDetailUsingProcessName`;
+    return this.get<any>(url, { Guid: guid, DisplayName: displayName });
+  }
 
   getStageDetails(stageId: string, workflowId: string) {
     const url = `${this.#baseurl}/getWFStage`;
@@ -435,9 +438,9 @@ GetWfdDetailUsingProcessName(guid: string, displayName: string): Observable<any>
       const storedDatastr = sessionStorage.getItem('StateJson');
       let storedData: Record<string, string> = {};
       storedData = JSON.parse(storedDatastr);
-      const anyMissing = ids.stateIds.some(id => !(id in storedData));
-      
-      if (anyMissing || ids.stageIds.length==0) {
+      const anyMissing = ids.stateIds.some((id) => !(id in storedData));
+
+      if (anyMissing || ids.stageIds.length == 0) {
         stateCall$ = this._deleteState(ids.stateIds, workflowId);
       }
     }
@@ -618,38 +621,41 @@ GetWfdDetailUsingProcessName(guid: string, displayName: string): Observable<any>
     );
   }
 
-
   getDmoByProcessName(procNM: string): Observable<any> {
     return this.get<any>(`${this.#baseurl}/getdmobyprocessname`, { procNM });
   }
 
   getTriggersByProcessName(procNM: string): Observable<any> {
-    return this.get<any>(`${this.#baseurl}/gettrgbyprocessname`, {procNM });
+    return this.get<any>(`${this.#baseurl}/gettrgbyprocessname`, { procNM });
   }
 
-   GetWFAppList() {
+  GetWFAppList() {
     return this.get<any>(`${this.#baseurl}/GetWFProcessList`);
   }
 
-  insertlegaldmotrgmapping(payload: any,procID : string, trgID : string) {
+  insertlegaldmotrgmapping(payload: any, procID: string, trgID: string) {
     const url = `${this.#baseurl}/insertlegaldmotrgmapping`;
-    return this.post<WFSaveResponse>(url, payload, {procID,trgID});
+    return this.post<WFSaveResponse>(url, payload, { procID, trgID });
   }
 
-  getlegalmappeddmo(typeid: any,legalprocessNM : string,trgID : string) {
+  getlegalmappeddmo(typeid: any, legalprocessNM: string, trgID: string) {
     const url = `${this.#baseurl}/getlegalmappeddmo`;
-    return this.get<any>(url, {typeid,legalprocessNM,trgID});
+    return this.get<any>(url, { typeid, legalprocessNM, trgID });
   }
 
-  getlegalmappedtrigger(typeid: any,wfID: string,legalprocessNM : string,trgID : string) {
+  getlegalmappedtrigger(
+    typeid: any,
+    wfID: string,
+    legalprocessNM: string,
+    trgID: string
+  ) {
     const url = `${this.#baseurl}/getlegalmappedtrigger`;
-    return this.get<any>(url, {typeid,wfID,legalprocessNM,trgID});
+    return this.get<any>(url, { typeid, wfID, legalprocessNM, trgID });
   }
 
   getLegalTemplate(DocumentId: string) {
-    return this.get(`${this.#baseurl}/getlegaltemplate`,{DocumentId});
+    return this.get(`${this.#baseurl}/getlegaltemplate`, { DocumentId });
   }
-
 }
 
 export interface WFSaveResponse {
@@ -660,7 +666,7 @@ export interface WFSaveResponse {
 }
 
 type ResultId = 'WfoId' | 'WfosId' | 'TriggerId' | 'ConditionId';
-type WFSaveResponseResult = { 
+type WFSaveResponseResult = {
   Guid?: string;
   SubProcessName?: string;
   SubProcessWFVersionNo?: string;
