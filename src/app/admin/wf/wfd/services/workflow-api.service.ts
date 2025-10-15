@@ -65,6 +65,19 @@ export class WorkflowApiService extends BaseHttpService {
     ActionGroupId: string,
     PreviousStage: string
   ) {
+    // Validate input parameters
+    if (!stateID || !stageID || !ActionGroupId) {
+      console.error('Invalid parameters for stage change API call:', {
+        stateID,
+        stageID,
+        ActionGroupId,
+        PreviousStage,
+      });
+      return throwError(
+        () => new Error('Invalid parameters for stage change API call')
+      );
+    }
+
     this.previousId = PreviousStage;
     this.stateIds = stateID;
     this.stageIds = stageID;
