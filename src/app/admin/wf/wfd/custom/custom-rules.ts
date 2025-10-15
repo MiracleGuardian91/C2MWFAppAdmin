@@ -238,13 +238,11 @@ export class CustomRules extends RuleProvider {
     return storedData ? JSON.parse(storedData) : {};
   }
 
-  // ✅ Get WfoId by WfosId from sessionStorage
   getWfoIdFromSession(wfosId: string): string | null {
     const storedMap = this.getStoredWfosIdToWfoIdMap();
     return storedMap[wfosId] || null;
   }
 
-  // ✅ Update WfoId for a given WfosId in sessionStorage
   updateWfoIdInSession(wfosId: string, newWfoId: string): void {
     const storedMap = this.getStoredWfosIdToWfoIdMap();
 
@@ -257,7 +255,6 @@ export class CustomRules extends RuleProvider {
     }
   }
 
-  // ✅ Check if a WfosId exists in sessionStorage
   hasWfosIdInSession(wfosId: string): boolean {
     const storedMap = this.getStoredWfosIdToWfoIdMap();
     return wfosId in storedMap;
@@ -285,14 +282,21 @@ export class CustomRules extends RuleProvider {
       });
   }
 
-  /**
-   * Store stage change locally instead of making immediate API call
-   */
   storeStageChangeLocally(
     stateID: string,
     stageID: string,
     PreviousStage: string
   ) {
+    // Validate that all required parameters are present and not null/undefined
+    if (!stateID || !stageID || !PreviousStage) {
+      console.warn('Invalid stage change data - missing required parameters:', {
+        stateID,
+        stageID,
+        PreviousStage,
+      });
+      return;
+    }
+
     const ActionGroupId = Guid.raw();
 
     // Store the stage change data for later processing
@@ -315,17 +319,18 @@ export class CustomRules extends RuleProvider {
     console.log('Stage change stored locally:', stageChangeData);
   }
 
-  /**
-   * Get stored stage changes from session storage
-   */
   getStoredStageChanges(): any[] {
-    const stored = sessionStorage.getItem('pendingStageChanges');
-    return stored ? JSON.parse(stored) : [];
+    try {
+      const stored = sessionStorage.getItem('pendingStageChanges');
+      return stored ? JSON.parse(stored) : [];
+    } catch (error) {
+      console.error('Error parsing stored stage changes:', error);
+      // Clear invalid data
+      sessionStorage.removeItem('pendingStageChanges');
+      return [];
+    }
   }
 
-  /**
-   * Clear stored stage changes
-   */
   clearStoredStageChanges() {
     sessionStorage.removeItem('pendingStageChanges');
   }
@@ -367,16 +372,6 @@ export class CustomRules extends RuleProvider {
       if (shape.type === t.Label) return false;
       if (shape.type === t.Annotation) return true;
       if (isStateType(shape)) {
-        // Moving states with triggers across stages is not allowed
-        // as it introduces a bunch of problems of updating multiple properties
-        // of triggers and conditions such as start state, end state, start stage, end stage.
-        // Without clear cut apis this is problematic and error prone.
-        // if (
-        //    this.lastHoveredLane?.id !== shape.parent.id &&
-        //   (shape.incoming.length > 0 || shape.outgoing.length > 0)
-        // ) {
-        //   return false;
-        // }
         return true;
       }
     });
@@ -406,10 +401,6 @@ export class CustomRules extends RuleProvider {
           )
             return false;
         }
-        // triggers are attached to the element
-        // if (element.outgoing.length > 0 || element.incoming.length > 0)
-        //   return false;
-        // stage has children states
         if (
           element.type === t.Stage &&
           element.children.some((el) => isStateType(el as StateShapeType))

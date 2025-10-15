@@ -717,9 +717,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     }
   }
 
-  /** THIS REQUIRES API CHANGES
-   * SAVE RESPONSE MUST CONTAIN THE OBJECT CREATED
-   */
   private handleSaveResponse(el: DiagramEl, res: WFSaveResponse, payload: any) {
     const props = { ...res.result };
     let id = props.Guid;
@@ -1179,9 +1176,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     this.removeKeyboardShortcuts();
   }
 
-  /**
-   * Store diagram changes locally instead of auto-saving to cloud
-   */
   private storeChangesLocally(coords: Coordinates): void {
     const change = {
       coordinates: coords,
@@ -1202,9 +1196,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     setTimeout(() => this.updateUndoRedoState(), 100);
   }
 
-  /**
-   * Manually save diagram changes to cloud
-   */
   public saveDiagram(): void {
     if (this.isSaving) {
       return; // Prevent multiple simultaneous saves
@@ -1271,9 +1262,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       });
   }
 
-  /**
-   * Process pending stage changes stored locally
-   */
   private async processPendingStageChanges(): Promise<void> {
     const storedChanges = this.getStoredStageChanges();
 
@@ -1281,8 +1269,27 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       return Promise.resolve();
     }
 
-    // Process each stage change
-    const promises = storedChanges.map((change) => {
+    // Filter out invalid stage changes before processing
+    const validChanges = storedChanges.filter((change) => {
+      const isValid =
+        change.stateID &&
+        change.stageID &&
+        change.ActionGroupId &&
+        change.PreviousStage;
+      if (!isValid) {
+        console.warn('Skipping invalid stage change:', change);
+      }
+      return isValid;
+    });
+
+    if (validChanges.length === 0) {
+      console.log('No valid stage changes to process');
+      this.clearStoredStageChanges();
+      return Promise.resolve();
+    }
+
+    // Process each valid stage change
+    const promises = validChanges.map((change) => {
       return new Promise<void>((resolve, reject) => {
         this.wfapi
           .callApiOnMoveLane(
@@ -1315,17 +1322,18 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     }
   }
 
-  /**
-   * Get stored stage changes from session storage
-   */
   private getStoredStageChanges(): any[] {
-    const stored = sessionStorage.getItem('pendingStageChanges');
-    return stored ? JSON.parse(stored) : [];
+    try {
+      const stored = sessionStorage.getItem('pendingStageChanges');
+      return stored ? JSON.parse(stored) : [];
+    } catch (error) {
+      console.error('Error parsing stored stage changes:', error);
+      // Clear invalid data
+      sessionStorage.removeItem('pendingStageChanges');
+      return [];
+    }
   }
 
-  /**
-   * Clear stored stage changes
-   */
   private clearStoredStageChanges() {
     sessionStorage.removeItem('pendingStageChanges');
   }
@@ -1334,9 +1342,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     return this.storageService.hasUnsavedChanges(this.metadata.Workflow.WFID);
   }
 
-  /**
-   * Clear unsaved changes (discard changes)
-   */
   public discardChanges(): void {
     this.storageService.clearChanges(this.metadata.Workflow.WFID);
     this.hasUnsavedChanges = false;
@@ -1350,9 +1355,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     this.toastr.info('Changes discarded');
   }
 
-  /**
-   * Get storage statistics for debugging
-   */
   public getStorageStats(): void {
     const size = this.storageService.getStorageSize(
       this.metadata.Workflow.WFID
@@ -1365,9 +1367,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     );
   }
 
-  /**
-   * Update undo/redo button states based on BPMN command stack
-   */
   private updateUndoRedoState(): void {
     if (this.bpmnService && this.bpmnService.commandStack) {
       this.canUndo = this.bpmnService.commandStack.canUndo();
@@ -1378,9 +1377,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     }
   }
 
-  /**
-   * Local undo functionality using BPMN command stack
-   */
   public localUndo(): void {
     if (this.canUndo && this.bpmnService) {
       this.bpmnService.undo();
@@ -1389,9 +1385,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     }
   }
 
-  /**
-   * Local redo functionality using BPMN command stack
-   */
   public localRedo(): void {
     if (this.canRedo && this.bpmnService) {
       this.bpmnService.redo();
@@ -1400,9 +1393,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     }
   }
 
-  /**
-   * Add command stack event listeners for undo/redo state updates
-   */
   private addCommandStackListeners(): void {
     if (this.bpmnService && this.bpmnService.eventBus) {
       // Listen for command stack changes
@@ -1422,9 +1412,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     }
   }
 
-  /**
-   * Add keyboard shortcuts for undo/redo
-   */
   private addKeyboardShortcuts(): void {
     document.addEventListener('keydown', (event) => {
       // Check if Ctrl+Z (undo) is pressed
@@ -1443,31 +1430,19 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     });
   }
 
-  /**
-   * Add beforeunload event listener to warn about unsaved changes
-   */
   private addBeforeUnloadListener(): void {
     window.addEventListener('beforeunload', this.beforeUnloadHandler);
   }
 
-  /**
-   * Remove beforeunload event listener
-   */
   private removeBeforeUnloadListener(): void {
     window.removeEventListener('beforeunload', this.beforeUnloadHandler);
   }
 
-  /**
-   * Remove keyboard shortcuts
-   */
   private removeKeyboardShortcuts(): void {
     // Note: We can't easily remove specific event listeners, but this is called on destroy
     // so the component will be cleaned up anyway
   }
 
-  /**
-   * Handle beforeunload event
-   */
   private beforeUnloadHandler = (event: BeforeUnloadEvent): string | void => {
     if (this.hasUnsavedChanges) {
       event.preventDefault();
