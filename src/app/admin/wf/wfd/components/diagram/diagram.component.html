@@ -96,6 +96,90 @@
               <span class="newBtnDesin">Redo</span>
             </button>
           </div>
+
+          <!-- Alignment Buttons -->
+          <div
+            *ngIf="service.paletteIsOpen && selectedSwimlane"
+            style="display: flex; align-items: center; padding-bottom: 5px"
+          >
+            <button
+              style="border-left: 1px solid #e0e0e0; cursor: pointer"
+              (click)="alignStatesInSwimlane('top')"
+              title="Align states to top"
+            >
+              <svg
+                width="20"
+                height="14"
+                viewBox="0 0 20 18"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M1 2H19M1 6H19M1 10H19M1 14H19"
+                  stroke="#555555"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                />
+                <path d="M8 2L12 2L12 6L8 6L8 2Z" fill="#555555" />
+              </svg>
+              <span class="newBtnDesin">Top</span>
+            </button>
+          </div>
+          <div
+            *ngIf="service.paletteIsOpen && selectedSwimlane"
+            style="display: flex; align-items: center; padding-bottom: 5px"
+          >
+            <button
+              style="border-left: 1px solid #e0e0e0; cursor: pointer"
+              (click)="alignStatesInSwimlane('middle')"
+              title="Align states to middle"
+            >
+              <svg
+                width="20"
+                height="14"
+                viewBox="0 0 20 18"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M1 2H19M1 6H19M1 10H19M1 14H19"
+                  stroke="#555555"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                />
+                <path d="M8 6L12 6L12 10L8 10L8 6Z" fill="#555555" />
+              </svg>
+              <span class="newBtnDesin">Middle</span>
+            </button>
+          </div>
+          <div
+            *ngIf="service.paletteIsOpen && selectedSwimlane"
+            style="display: flex; align-items: center; padding-bottom: 5px"
+          >
+            <button
+              style="border-right: 1px solid #e0e0e0; cursor: pointer"
+              (click)="alignStatesInSwimlane('bottom')"
+              title="Align states to bottom"
+            >
+              <svg
+                width="20"
+                height="14"
+                viewBox="0 0 20 18"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M1 2H19M1 6H19M1 10H19M1 14H19"
+                  stroke="#555555"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                />
+                <path d="M8 10L12 10L12 14L8 14L8 10Z" fill="#555555" />
+              </svg>
+              <span class="newBtnDesin">Bottom</span>
+            </button>
+          </div>
+
           <div class="d-none">
             <button>
               <svg

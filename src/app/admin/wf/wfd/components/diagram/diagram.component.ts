@@ -130,6 +130,9 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
   // Local undo/redo properties
   public canUndo = false;
   public canRedo = false;
+
+  // Alignment properties
+  public selectedSwimlane: any = null;
   trgConditionDetail: boolean = false;
   undoredoactive = false;
   constructor(
@@ -278,6 +281,13 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
         this.wfapi
           .restoreElement(this.metadata.Workflow.WFID, element)
           .subscribe();
+      });
+
+    // Track selection changes to detect swimlane selection
+    this.service.onSelectionChanged
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((event: any) => {
+        this.handleSelectionChange(event);
       });
   }
 
@@ -1451,4 +1461,55 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       return 'You have unsaved changes. Are you sure you want to leave?';
     }
   };
+
+  /**
+   * Handles selection changes to detect when a swimlane is selected
+   */
+  private handleSelectionChange(event: any): void {
+    const selection = event?.newSelection || [];
+
+    console.log('Selection changed:', selection);
+
+    if (selection.length === 1) {
+      const selectedElement = selection[0];
+
+      // Check if the selected element is a swimlane (Lane)
+      if (selectedElement.type === 'bpmn:Lane') {
+        this.selectedSwimlane = selectedElement;
+        console.log('Swimlane selected:', selectedElement);
+      } else {
+        this.selectedSwimlane = null;
+        console.log('Non-swimlane element selected:', selectedElement.type);
+      }
+    } else {
+      this.selectedSwimlane = null;
+      console.log('No element or multiple elements selected');
+    }
+  }
+
+  /**
+   * Aligns state boxes within the selected swimlane
+   */
+  public alignStatesInSwimlane(alignment: 'top' | 'middle' | 'bottom'): void {
+    if (!this.selectedSwimlane) {
+      console.warn('No swimlane selected');
+      this.toastr.warning('Please select a swimlane first');
+      return;
+    }
+
+    console.log(
+      'Aligning states in swimlane:',
+      this.selectedSwimlane.id,
+      'to',
+      alignment
+    );
+
+    // Call the service method to align states
+    this.service.alignStatesInSwimlane(this.selectedSwimlane, alignment);
+
+    // Show feedback to user
+    const alignmentText =
+      alignment.charAt(0).toUpperCase() + alignment.slice(1);
+    this.toastr.success(`States aligned to ${alignmentText}`);
+  }
 }
