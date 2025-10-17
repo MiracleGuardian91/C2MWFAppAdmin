@@ -255,6 +255,10 @@ export class DiagramService implements OnDestroy {
       );
   }
 
+  get onSelectionChanged() {
+    return this.bpmn.listenTo('selection.changed' as any);
+  }
+
   get onElementMove() {
     const move$ = this.bpmn
       .listenTo<{ context: ShapeMoveContext }>(EventType.MoveShape)
@@ -972,6 +976,105 @@ export class DiagramService implements OnDestroy {
         this._isRepositioningInProgress = false;
       }, 100);
     }
+  }
+
+  /**
+   * Aligns state boxes within a swimlane to the specified position
+   * @param swimlane The swimlane containing the state boxes
+   * @param alignment The alignment type: 'top', 'middle', or 'bottom'
+   */
+  alignStatesInSwimlane(swimlane: any, alignment: 'top' | 'middle' | 'bottom') {
+    if (!swimlane || !swimlane.children) {
+      return;
+    }
+
+    // Get all state boxes within the swimlane
+    const stateBoxes = swimlane.children.filter(
+      (child: any) =>
+        child.type === t.State ||
+        child.type === t.StartState ||
+        child.type === t.EndState ||
+        child.type === t.SubProcess
+    );
+
+    console.log(
+      `Found ${stateBoxes.length} state boxes in swimlane:`,
+      stateBoxes.map((s) => s.id)
+    );
+
+    if (stateBoxes.length < 2) {
+      console.log('Not enough state boxes to align');
+      return; // Need at least 2 elements to align
+    }
+
+    // Use BPMN.js command stack for proper alignment
+    this.alignElementsWithBPMN(stateBoxes, swimlane, alignment);
+  }
+
+  /**
+   * Aligns elements using BPMN.js command stack for proper integration
+   * @param elements Array of elements to align
+   * @param swimlane The parent swimlane
+   * @param alignment The alignment type
+   */
+  private alignElementsWithBPMN(
+    elements: any[],
+    swimlane: any,
+    alignment: 'top' | 'middle' | 'bottom'
+  ) {
+    if (elements.length === 0) return;
+
+    const swimlaneTop = swimlane.y;
+    const swimlaneBottom = swimlane.y + swimlane.height;
+    const swimlaneHeight = swimlane.height;
+    const swimlaneLeft = swimlane.x;
+    const swimlaneWidth = swimlane.width;
+
+    // Calculate target Y position based on alignment
+    const verticalPadding = 60; // Good spacing from boundaries
+    let targetY: number;
+
+    switch (alignment) {
+      case 'top':
+        targetY = swimlaneTop + verticalPadding;
+        break;
+      case 'middle':
+        targetY = swimlaneTop + swimlaneHeight / 2 - 30; // Center with element height consideration
+        break;
+      case 'bottom':
+        targetY = swimlaneBottom - verticalPadding - 60; // Account for element height
+        break;
+      default:
+        targetY = swimlaneTop + verticalPadding;
+    }
+
+    // Calculate horizontal distribution
+    const elementWidth = 120;
+    const spacing = 40;
+    const totalWidth =
+      elements.length * elementWidth + (elements.length - 1) * spacing;
+    const startX = swimlaneLeft + (swimlaneWidth - totalWidth) / 2;
+
+    console.log(
+      `Aligning to ${alignment}: targetY=${targetY}, startX=${startX}`
+    );
+
+    // Move each element to its new position using BPMN service
+    elements.forEach((element: any, index: number) => {
+      const newX = startX + index * (elementWidth + spacing);
+      const newY = targetY;
+
+      console.log(
+        `Moving element ${index}: ${element.id} to (${newX}, ${newY})`
+      );
+
+      // Calculate delta from current position
+      const deltaX = newX - element.x;
+      const deltaY = newY - element.y;
+
+      // Use BPMN service to move the element
+      this.bpmn.moveElements([element], { x: deltaX, y: deltaY });
+    });
   }
 
   private toBPMNEvents(states: State[], lane: StageShape) {
