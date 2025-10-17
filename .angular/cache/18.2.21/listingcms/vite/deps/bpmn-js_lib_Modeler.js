@@ -1,7 +1,4 @@
 import {
-  index_esm_default
-} from "./chunk-K5QNCREJ.js";
-import {
   all,
   assign as assign2,
   attr,
@@ -16,11 +13,32 @@ import {
   remove
 } from "./chunk-W6KNEPAJ.js";
 import {
-  AutoResize
-} from "./chunk-PDHFGGQH.js";
+  index_esm_default
+} from "./chunk-K5QNCREJ.js";
 import {
   RuleProvider
 } from "./chunk-4X2IYSHR.js";
+import {
+  getOriginal,
+  hasPrimaryModifier,
+  hasSecondaryModifier,
+  isAuxiliaryButton,
+  isMac,
+  isPrimaryButton,
+  stopPropagation,
+  toPoint
+} from "./chunk-O2RUVXQP.js";
+import {
+  rotate,
+  transform as transform2,
+  translate
+} from "./chunk-CE5VFLYH.js";
+import {
+  BaseRenderer
+} from "./chunk-P2P5AXCL.js";
+import {
+  AutoResize
+} from "./chunk-PDHFGGQH.js";
 import {
   asBounds,
   asTRBL,
@@ -47,27 +65,6 @@ import {
   isFrameElement,
   selfAndAllChildren
 } from "./chunk-A3Q7264O.js";
-import {
-  getOriginal,
-  hasPrimaryModifier,
-  hasSecondaryModifier,
-  isAuxiliaryButton,
-  isMac,
-  isPrimaryButton,
-  stopPropagation,
-  toPoint
-} from "./chunk-O2RUVXQP.js";
-import {
-  rotate,
-  transform as transform2,
-  translate
-} from "./chunk-CE5VFLYH.js";
-import {
-  CommandInterceptor
-} from "./chunk-JI54U5I4.js";
-import {
-  BaseRenderer
-} from "./chunk-P2P5AXCL.js";
 import {
   black,
   getBounds,
@@ -106,10 +103,7 @@ import {
   ElementFactory2,
   ensureCompatDiRef,
   isModelElement
-} from "./chunk-TP6EHZ73.js";
-import {
-  e
-} from "./chunk-4FMKAPTB.js";
+} from "./chunk-5Q2C7BQY.js";
 import {
   getParent,
   isDirectionHorizontal
@@ -142,6 +136,27 @@ import {
   is,
   isAny
 } from "./chunk-6CMT5M6M.js";
+import {
+  createCategory,
+  createCategoryValue,
+  linkCategoryValue,
+  unlinkCategory,
+  unlinkCategoryValue
+} from "./chunk-QBESYOBR.js";
+import {
+  add,
+  indexOf,
+  remove as remove3
+} from "./chunk-UPPIJ347.js";
+import {
+  OrderingProvider
+} from "./chunk-IJKYPOYD.js";
+import {
+  CommandInterceptor
+} from "./chunk-JI54U5I4.js";
+import {
+  e
+} from "./chunk-4FMKAPTB.js";
 import {
   assign,
   bind,
@@ -177,18 +192,6 @@ import {
   values,
   without
 } from "./chunk-26FIRWZU.js";
-import {
-  createCategory,
-  createCategoryValue,
-  linkCategoryValue,
-  unlinkCategory,
-  unlinkCategoryValue
-} from "./chunk-QBESYOBR.js";
-import {
-  add,
-  indexOf,
-  remove as remove3
-} from "./chunk-UPPIJ347.js";
 import {
   __async,
   __objRest,
@@ -20104,36 +20107,6 @@ var di_ordering_default = {
   __init__: ["bpmnDiOrdering"],
   bpmnDiOrdering: ["type", BpmnDiOrdering]
 };
-
-// node_modules/diagram-js/lib/features/ordering/OrderingProvider.js
-function OrderingProvider(eventBus) {
-  CommandInterceptor.call(this, eventBus);
-  var self2 = this;
-  this.preExecute(["shape.create", "connection.create"], function(event2) {
-    var context = event2.context, element = context.shape || context.connection, parent = context.parent;
-    var ordering = self2.getOrdering(element, parent);
-    if (ordering) {
-      if (ordering.parent !== void 0) {
-        context.parent = ordering.parent;
-      }
-      context.parentIndex = ordering.index;
-    }
-  });
-  this.preExecute(["shape.move", "connection.move"], function(event2) {
-    var context = event2.context, element = context.shape || context.connection, parent = context.newParent || element.parent;
-    var ordering = self2.getOrdering(element, parent);
-    if (ordering) {
-      if (ordering.parent !== void 0) {
-        context.newParent = ordering.parent;
-      }
-      context.newParentIndex = ordering.index;
-    }
-  });
-}
-OrderingProvider.prototype.getOrdering = function(element, newParent) {
-  return null;
-};
-e(OrderingProvider, CommandInterceptor);
 
 // node_modules/bpmn-js/lib/features/ordering/BpmnOrderingProvider.js
 function BpmnOrderingProvider(eventBus, canvas) {

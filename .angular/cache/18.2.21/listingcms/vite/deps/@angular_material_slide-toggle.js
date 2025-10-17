@@ -1,9 +1,4 @@
 import {
-  CheckboxRequiredValidator,
-  NG_VALIDATORS,
-  NG_VALUE_ACCESSOR
-} from "./chunk-MV4OK5XK.js";
-import {
   MatCommonModule,
   MatRipple,
   _MatInternalFormField
@@ -12,6 +7,11 @@ import {
   FocusMonitor
 } from "./chunk-MQPTQCIX.js";
 import "./chunk-UC23J2IQ.js";
+import {
+  CheckboxRequiredValidator,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR
+} from "./chunk-MV4OK5XK.js";
 import "./chunk-5YOS2YTK.js";
 import {
   ANIMATION_MODULE_TYPE,

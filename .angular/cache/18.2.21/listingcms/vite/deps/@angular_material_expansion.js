@@ -1,16 +1,11 @@
 import {
-  CdkAccordion,
-  CdkAccordionItem,
-  CdkAccordionModule
-} from "./chunk-3TKDPAUF.js";
-import {
   CdkPortalOutlet,
   PortalModule,
   TemplatePortal
 } from "./chunk-DJXBA42B.js";
 import {
-  UniqueSelectionDispatcher
-} from "./chunk-QHBAYEQZ.js";
+  MatCommonModule
+} from "./chunk-J46YL22A.js";
 import {
   animate,
   state,
@@ -19,8 +14,10 @@ import {
   trigger
 } from "./chunk-HQF4VCCY.js";
 import {
-  MatCommonModule
-} from "./chunk-J46YL22A.js";
+  CdkAccordion,
+  CdkAccordionItem,
+  CdkAccordionModule
+} from "./chunk-3TKDPAUF.js";
 import {
   FocusKeyManager,
   FocusMonitor
@@ -30,6 +27,9 @@ import {
   SPACE,
   hasModifierKey
 } from "./chunk-UC23J2IQ.js";
+import {
+  UniqueSelectionDispatcher
+} from "./chunk-QHBAYEQZ.js";
 import {
   DOCUMENT
 } from "./chunk-5YOS2YTK.js";
