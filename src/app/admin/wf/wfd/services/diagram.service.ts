@@ -473,6 +473,15 @@ export class DiagramService implements OnDestroy {
         });
         flow.friendlyName = trigger?.FriendlyName ? trigger.FriendlyName : ' ';
         elementAdded.push(id);
+
+        // Position the target state at the bottom of the connection
+        // This creates the effect where state boxes appear below the connecting line
+        if (toEvent && flow && flow.waypoints) {
+          this.positionStateAtBottomOfConnection(
+            toEvent as StateShapeType,
+            flow as ConnectionShape
+          );
+        }
       }
       // Set flow.friendlyName based on trigger.FriendlyName
       return flow;
@@ -500,6 +509,16 @@ export class DiagramService implements OnDestroy {
       //name: null,
     });
     flow.friendlyName = props.FriendlyName;
+
+    // Position the target state at the bottom of the connection
+    // This creates the effect where state boxes appear below the connecting line
+    if (toEvent && flow && flow.waypoints) {
+      this.positionStateAtBottomOfConnection(
+        toEvent as StateShapeType,
+        flow as ConnectionShape
+      );
+    }
+
     return flow;
   }
 
@@ -648,6 +667,9 @@ export class DiagramService implements OnDestroy {
       });
     });
 
+    // After all connections are created, reposition states at the bottom of their connections
+    this.repositionStatesAtBottomOfConnections();
+
     elementAdded = [];
     eventAdded = [];
   }
@@ -681,12 +703,7 @@ export class DiagramService implements OnDestroy {
         height: getShapeSize(type).height,
       };
     }
-    // coords = (this._getElementCoordinates(state.Guid) || {
-    //   x: index * 100 + STATE_H * 2 + lane.x,
-    //   y: lane.y + STATE_H,
-    //   width: STATE_H,
-    //   height: STATE_H,
-    // }) as ElementCoordinates;
+
     const event = this.bpmn.createShape(
       {
         id: state.Guid,
@@ -700,6 +717,108 @@ export class DiagramService implements OnDestroy {
     lane.children.push(event);
     event.parent = lane;
     return event;
+  }
+
+  /**
+   * Determines if a state should be positioned at the bottom of its connection
+   * This can be customized based on state properties or connection properties
+   */
+  private shouldPositionStateAtBottomOfConnection(
+    state: StateShapeType,
+    connection: ConnectionShape
+  ): boolean {
+    // For now, position all states at the bottom of their connections
+    // This can be made configurable based on state properties or connection properties
+    return true;
+  }
+
+  /**
+   * Positions a state box at the bottom of its incoming connection line
+   * This method calculates the position based on the connection waypoints
+   */
+  private positionStateAtBottomOfConnection(
+    state: StateShapeType,
+    connection: ConnectionShape
+  ) {
+    if (
+      !connection ||
+      !connection.waypoints ||
+      connection.waypoints.length < 2
+    ) {
+      return;
+    }
+
+    // Check if this state should be positioned at the bottom of the connection
+    if (!this.shouldPositionStateAtBottomOfConnection(state, connection)) {
+      return;
+    }
+
+    const waypoints = connection.waypoints;
+    const lastWaypoint = waypoints[waypoints.length - 1];
+    const secondLastWaypoint = waypoints[waypoints.length - 2];
+
+    // Calculate the position at the bottom of the connection
+    // The state box should be positioned below the horizontal segment of the connection
+    let newX = lastWaypoint.x;
+    let newY = lastWaypoint.y;
+
+    // If the connection has a horizontal segment before the final point,
+    // position the state box below that horizontal line
+    if (waypoints.length >= 3) {
+      const horizontalSegment = waypoints[waypoints.length - 2];
+      if (horizontalSegment && horizontalSegment.y !== lastWaypoint.y) {
+        newX = horizontalSegment.x;
+        newY = horizontalSegment.y + 20; // Position 20px below the horizontal line
+      } else {
+        newY = lastWaypoint.y + 20; // Position 20px below the connection end
+      }
+    } else {
+      newY = lastWaypoint.y + 20; // Position 20px below the connection end
+    }
+
+    // Center the state box horizontally on the connection
+    newX = newX - state.width / 2;
+
+    // Update the state position
+    this.updateElementProperties(state, {
+      x: newX,
+      y: newY,
+    });
+  }
+
+  /**
+   * Repositions all states that have incoming connections to appear at the bottom of their connections
+   * This creates the visual effect where state boxes are positioned below the connecting lines
+   */
+  private repositionStatesAtBottomOfConnections() {
+    // Get all connections in the diagram
+    const allElements = this.bpmn.allElements;
+    const connections = allElements.filter(
+      (el) => el.type === t.Trigger || el.type === t.DottedFlow
+    );
+
+    connections.forEach((connection) => {
+      if (
+        connection.target &&
+        connection.waypoints &&
+        connection.waypoints.length >= 2
+      ) {
+        const targetState = connection.target as StateShapeType;
+
+        // Only reposition if the target is a state (not a gateway or other element)
+        if (
+          targetState &&
+          (targetState.type === t.State ||
+            targetState.type === t.StartState ||
+            targetState.type === t.EndState)
+        ) {
+          this.positionStateAtBottomOfConnection(
+            targetState,
+            connection as ConnectionShape
+          );
+        }
+      }
+    });
   }
 
   private toBPMNEvents(states: State[], lane: StageShape) {
