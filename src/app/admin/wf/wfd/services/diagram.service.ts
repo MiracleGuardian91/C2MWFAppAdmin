@@ -58,7 +58,6 @@ let eventAdded = [];
 const STATE_SIZE = getShapeSize(t.StartState).width;
 const GATEWAY_H = getShapeSize(t.Gateway).width;
 
-/** Left padding applied to lanes relative to Pool */
 const LANE_INDENTATION = 30;
 
 @Injectable({ providedIn: 'root' })
@@ -68,6 +67,7 @@ export class DiagramService implements OnDestroy {
   private _dragEndTimeout: any;
   private _initComplete = false;
   private _states: State[] = [];
+  private _isRepositioningInProgress = false;
   private hoverOnElement$ = this.bpmn.listenTo(EventType.HoverOnElement).pipe(
     map(({ element }: { element: DiagramEl }) => element),
     filter(
@@ -92,6 +92,82 @@ export class DiagramService implements OnDestroy {
       this._dragEndTimeout = setTimeout(() => {
         this._isDragOperationInProgress = false;
       }, 100);
+    });
+
+    // Listen for shape move events to maintain bottom positioning
+    this.bpmn.listenTo(EventType.MoveEnd).subscribe((event: any) => {
+      const shape = event.context?.shape;
+      if (shape && this.isStateType(shape)) {
+        // Use a timeout to ensure the move is complete before repositioning
+        setTimeout(() => {
+          this.maintainBottomPositioningForState(shape);
+        }, 50);
+      }
+    });
+
+    // Listen for connection reconnect events to update state positions
+    this.bpmn
+      .listenTo(EventType.ReconnectConnection)
+      .subscribe((event: any) => {
+        const connection = event.context?.connection;
+        if (
+          connection &&
+          connection.target &&
+          this.isStateType(connection.target)
+        ) {
+          // Use a timeout to ensure the reconnect is complete before repositioning
+          setTimeout(() => {
+            this.maintainBottomPositioningForState(connection.target);
+          }, 50);
+        }
+      });
+
+    // Listen for diagram changes to update state positions when connections are modified
+    this.bpmn.listenTo(EventType.DiagramChanged).subscribe((event: any) => {
+      // Check if the change involves a connection
+      if (
+        event.element &&
+        (event.element.type === t.Trigger ||
+          event.element.type === t.DottedFlow)
+      ) {
+        const connection = event.element;
+        if (connection.target && this.isStateType(connection.target)) {
+          // Use a timeout to ensure the change is complete before repositioning
+          setTimeout(() => {
+            this.maintainBottomPositioningForState(connection.target);
+          }, 50);
+        }
+      }
+    });
+
+    // Listen for any element changes that might affect positioning
+    this.bpmn.listenTo(EventType.DiagramChanged).subscribe((event: any) => {
+      // If any element changes, check if we need to reposition states
+      setTimeout(() => {
+        this.repositionAllStatesAtBottomOfConnections();
+      }, 100);
+    });
+
+    // Listen for command stack changes to catch connection updates
+    this.bpmn.eventBus.on('commandStack.changed', () => {
+      // Check if the last command was related to connections or shapes
+      const commandStack = this.bpmn.commandStack;
+      if (
+        commandStack &&
+        commandStack._stack &&
+        commandStack._stack.length > 0
+      ) {
+        const lastCommand = commandStack._stack[commandStack._stack.length - 1];
+        if (
+          lastCommand &&
+          (lastCommand.command.includes('connection') ||
+            lastCommand.command.includes('shape.move'))
+        ) {
+          setTimeout(() => {
+            this.repositionAllStatesAtBottomOfConnections();
+          }, 150);
+        }
+      }
     });
   }
 
@@ -179,7 +255,6 @@ export class DiagramService implements OnDestroy {
       );
   }
 
-  /** Only deals with state (event) objects and ignores the rest */
   get onElementMove() {
     const move$ = this.bpmn
       .listenTo<{ context: ShapeMoveContext }>(EventType.MoveShape)
@@ -285,9 +360,6 @@ export class DiagramService implements OnDestroy {
         return true;
       }),
       map(({ element, parent }) => {
-        // Collaboration becomes the parent of pool automatically
-        // and Plasma workflow is not concerned about it
-        // so I'm leaving it as it is
         if (element.type !== t.Pool) {
           // The rest of the elements created from pallette should have Stage as their parent
           element.parent = parent;
@@ -719,23 +791,60 @@ export class DiagramService implements OnDestroy {
     return event;
   }
 
-  /**
-   * Determines if a state should be positioned at the bottom of its connection
-   * This can be customized based on state properties or connection properties
-   */
+  private isStateType(element: any): boolean {
+    return (
+      element &&
+      (element.type === t.State ||
+        element.type === t.StartState ||
+        element.type === t.EndState ||
+        element.type === t.SubProcess)
+    );
+  }
+
+  private maintainBottomPositioningForState(state: StateShapeType) {
+    if (!state || !this.isStateType(state) || this._isRepositioningInProgress) {
+      return;
+    }
+
+    // Set flag to prevent infinite loops
+    this._isRepositioningInProgress = true;
+
+    try {
+      // Find all incoming connections to this state
+      const allElements = this.bpmn.allElements;
+      const incomingConnections = allElements.filter(
+        (el) =>
+          (el.type === t.Trigger || el.type === t.DottedFlow) &&
+          el.target &&
+          el.target.id === state.id
+      );
+
+      // If there are incoming connections, position the state at the bottom of the most relevant one
+      if (incomingConnections.length > 0) {
+        const primaryConnection = incomingConnections.reduce(
+          (prev, current) => {
+            const prevWaypoints = prev.waypoints?.length || 0;
+            const currentWaypoints = current.waypoints?.length || 0;
+            return currentWaypoints > prevWaypoints ? current : prev;
+          }
+        ) as ConnectionShape;
+
+        this.positionStateAtBottomOfConnection(state, primaryConnection);
+      }
+    } finally {
+      setTimeout(() => {
+        this._isRepositioningInProgress = false;
+      }, 100);
+    }
+  }
+
   private shouldPositionStateAtBottomOfConnection(
     state: StateShapeType,
     connection: ConnectionShape
   ): boolean {
-    // For now, position all states at the bottom of their connections
-    // This can be made configurable based on state properties or connection properties
     return true;
   }
 
-  /**
-   * Positions a state box at the bottom of its incoming connection line
-   * This method calculates the position based on the connection waypoints
-   */
   private positionStateAtBottomOfConnection(
     state: StateShapeType,
     connection: ConnectionShape
@@ -748,6 +857,11 @@ export class DiagramService implements OnDestroy {
       return;
     }
 
+    // Prevent repositioning if already in progress to avoid infinite loops
+    if (this._isRepositioningInProgress) {
+      return;
+    }
+
     // Check if this state should be positioned at the bottom of the connection
     if (!this.shouldPositionStateAtBottomOfConnection(state, connection)) {
       return;
@@ -757,23 +871,19 @@ export class DiagramService implements OnDestroy {
     const lastWaypoint = waypoints[waypoints.length - 1];
     const secondLastWaypoint = waypoints[waypoints.length - 2];
 
-    // Calculate the position at the bottom of the connection
-    // The state box should be positioned below the horizontal segment of the connection
     let newX = lastWaypoint.x;
     let newY = lastWaypoint.y;
 
-    // If the connection has a horizontal segment before the final point,
-    // position the state box below that horizontal line
     if (waypoints.length >= 3) {
       const horizontalSegment = waypoints[waypoints.length - 2];
       if (horizontalSegment && horizontalSegment.y !== lastWaypoint.y) {
         newX = horizontalSegment.x;
-        newY = horizontalSegment.y + 20; // Position 20px below the horizontal line
+        newY = horizontalSegment.y + 20;
       } else {
-        newY = lastWaypoint.y + 20; // Position 20px below the connection end
+        newY = lastWaypoint.y + 20;
       }
     } else {
-      newY = lastWaypoint.y + 20; // Position 20px below the connection end
+      newY = lastWaypoint.y + 20;
     }
 
     // Center the state box horizontally on the connection
@@ -786,10 +896,6 @@ export class DiagramService implements OnDestroy {
     });
   }
 
-  /**
-   * Repositions all states that have incoming connections to appear at the bottom of their connections
-   * This creates the visual effect where state boxes are positioned below the connecting lines
-   */
   private repositionStatesAtBottomOfConnections() {
     // Get all connections in the diagram
     const allElements = this.bpmn.allElements;
@@ -819,6 +925,53 @@ export class DiagramService implements OnDestroy {
         }
       }
     });
+  }
+
+  private repositionAllStatesAtBottomOfConnections() {
+    if (this._isRepositioningInProgress) {
+      return;
+    }
+
+    this._isRepositioningInProgress = true;
+
+    try {
+      // Get all states in the diagram
+      const allElements = this.bpmn.allElements;
+      const states = allElements.filter(
+        (el) =>
+          el.type === t.State ||
+          el.type === t.StartState ||
+          el.type === t.EndState ||
+          el.type === t.SubProcess
+      );
+
+      // For each state, find its incoming connections and reposition it
+      states.forEach((state: StateShapeType) => {
+        const incomingConnections = allElements.filter(
+          (el) =>
+            (el.type === t.Trigger || el.type === t.DottedFlow) &&
+            el.target &&
+            el.target.id === state.id
+        );
+
+        if (incomingConnections.length > 0) {
+          // Choose the connection with the most waypoints (most complex routing)
+          const primaryConnection = incomingConnections.reduce(
+            (prev, current) => {
+              const prevWaypoints = prev.waypoints?.length || 0;
+              const currentWaypoints = current.waypoints?.length || 0;
+              return currentWaypoints > prevWaypoints ? current : prev;
+            }
+          ) as ConnectionShape;
+
+          this.positionStateAtBottomOfConnection(state, primaryConnection);
+        }
+      });
+    } finally {
+      setTimeout(() => {
+        this._isRepositioningInProgress = false;
+      }, 100);
+    }
   }
 
   private toBPMNEvents(states: State[], lane: StageShape) {
