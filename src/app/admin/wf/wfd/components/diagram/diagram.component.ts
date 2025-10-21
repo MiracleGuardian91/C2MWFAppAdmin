@@ -74,6 +74,7 @@ import {
   NgbDropdownItem,
 } from '@ng-bootstrap/ng-bootstrap';
 import { NgIf, NgFor } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 const t = ElementType;
 
@@ -93,6 +94,7 @@ interface WfosIdToWfoIdMap {
     NgbDropdownMenu,
     NgFor,
     NgbDropdownItem,
+    FormsModule,
   ],
 })
 export class DiagramComponent implements AfterContentInit, OnDestroy {
@@ -135,6 +137,12 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
   public selectedSwimlane: any = null;
   trgConditionDetail: boolean = false;
   undoredoactive = false;
+
+  // Font control properties
+  public selectedState: any = null;
+  public selectedFontFamily: string = 'Arial';
+  public selectedFontSize: string = '14px';
+  public selectedFontColor: string = '#000000';
   constructor(
     private dialog: MatDialog,
     public service: DiagramService,
@@ -1470,11 +1478,28 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       // Check if the selected element is a swimlane (Lane)
       if (selectedElement.type === 'bpmn:Lane') {
         this.selectedSwimlane = selectedElement;
+        this.selectedState = null;
+      }
+      // Check if the selected element is a state (Task, StartEvent, EndEvent, SubProcess)
+      else if (
+        [
+          'bpmn:Task',
+          'bpmn:StartEvent',
+          'bpmn:EndEvent',
+          'bpmn:SubProcess',
+        ].includes(selectedElement.type)
+      ) {
+        this.selectedState = selectedElement;
+        this.selectedSwimlane = null;
+        // Load current font properties from the selected state
+        this.loadStateFontProperties(selectedElement);
       } else {
         this.selectedSwimlane = null;
+        this.selectedState = null;
       }
     } else {
       this.selectedSwimlane = null;
+      this.selectedState = null;
     }
   }
 
@@ -1499,5 +1524,46 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     const alignmentText =
       alignment.charAt(0).toUpperCase() + alignment.slice(1);
     this.toastr.success(`States aligned to ${alignmentText}`);
+  }
+
+  // Font control methods
+  private loadStateFontProperties(element: any): void {
+    // Load current font properties from the selected state
+    this.selectedFontFamily = element.fontFamily || 'Arial';
+    this.selectedFontSize = element.fontSize || '14px';
+    this.selectedFontColor = element.fontColor || '#000000';
+  }
+
+  public applyFontFamily(): void {
+    if (!this.selectedState) {
+      this.toastr.warning('Please select a state first');
+      return;
+    }
+
+    // Apply font family to the selected state
+    this.service.applyFontFamily(this.selectedState, this.selectedFontFamily);
+    this.toastr.success(`Font family changed to ${this.selectedFontFamily}`);
+  }
+
+  public applyFontSize(): void {
+    if (!this.selectedState) {
+      this.toastr.warning('Please select a state first');
+      return;
+    }
+
+    // Apply font size to the selected state
+    this.service.applyFontSize(this.selectedState, this.selectedFontSize);
+    this.toastr.success(`Font size changed to ${this.selectedFontSize}`);
+  }
+
+  public applyFontColor(): void {
+    if (!this.selectedState) {
+      this.toastr.warning('Please select a state first');
+      return;
+    }
+
+    // Apply font color to the selected state
+    this.service.applyFontColor(this.selectedState, this.selectedFontColor);
+    this.toastr.success(`Font color changed to ${this.selectedFontColor}`);
   }
 }

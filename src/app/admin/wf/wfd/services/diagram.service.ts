@@ -1175,6 +1175,28 @@ export class DiagramService implements OnDestroy {
     this.bpmn.destroy();
   }
 
+  // Font control methods
+  public applyFontFamily(element: any, fontFamily: string): void {
+    if (!element) return;
+
+    // Apply font family using the BPMN service
+    this.bpmn.applyFontFamily(element, fontFamily);
+  }
+
+  public applyFontSize(element: any, fontSize: string): void {
+    if (!element) return;
+
+    // Apply font size using the BPMN service
+    this.bpmn.applyFontSize(element, fontSize);
+  }
+
+  public applyFontColor(element: any, fontColor: string): void {
+    if (!element) return;
+
+    // Apply font color using the BPMN service
+    this.bpmn.applyFontColor(element, fontColor);
+  }
+
   public clear() {
     this.bpmn.clear();
   }

@@ -183,6 +183,79 @@
             </button>
           </div>
 
+          <!-- Font Family Dropdown -->
+          <div
+            *ngIf="service.paletteIsOpen"
+            style="display: flex; align-items: center"
+          >
+            <div class="font-control-group">
+              <label class="font-control-label">Font Family:</label>
+              <select
+                class="font-control-select"
+                [disabled]="!selectedState"
+                [(ngModel)]="selectedFontFamily"
+                (change)="applyFontFamily()"
+                title="Select font family"
+              >
+                <option value="Arial">Arial</option>
+                <option value="Helvetica">Helvetica</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Verdana">Verdana</option>
+                <option value="Courier New">Courier New</option>
+                <option value="Comic Sans MS">Comic Sans MS</option>
+                <option value="Impact">Impact</option>
+                <option value="Trebuchet MS">Trebuchet MS</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Font Size Dropdown -->
+          <div
+            *ngIf="service.paletteIsOpen"
+            style="display: flex; align-items: center"
+          >
+            <div class="font-control-group">
+              <label class="font-control-label">Font Size:</label>
+              <select
+                class="font-control-select"
+                [disabled]="!selectedState"
+                [(ngModel)]="selectedFontSize"
+                (change)="applyFontSize()"
+                title="Select font size"
+              >
+                <option value="8px">8px</option>
+                <option value="10px">10px</option>
+                <option value="12px">12px</option>
+                <option value="14px">14px</option>
+                <option value="16px">16px</option>
+                <option value="18px">18px</option>
+                <option value="20px">20px</option>
+                <option value="24px">24px</option>
+                <option value="28px">28px</option>
+                <option value="32px">32px</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Font Color Picker -->
+          <div
+            *ngIf="service.paletteIsOpen"
+            style="display: flex; align-items: center"
+          >
+            <div class="font-control-group">
+              <label class="font-control-label">Font Color:</label>
+              <input
+                type="color"
+                class="font-control-color"
+                [disabled]="!selectedState"
+                [(ngModel)]="selectedFontColor"
+                (change)="applyFontColor()"
+                title="Select font color"
+              />
+            </div>
+          </div>
+
           <div class="d-none">
             <button>
               <svg
@@ -321,18 +394,6 @@
               <span *ngIf="isSaving">Saving...</span>
             </button>
 
-            <!-- Discard Changes Button -->
-            <!-- <button
-              class="btn btn-outline-secondary btn-small ml-1"
-              type="button"
-              (click)="discardChanges()"
-              [disabled]="!hasUnsavedChanges"
-              title="Discard unsaved changes"
-              style="display: flex; align-items: center; gap: 5px"
-            >
-              <i class="fa fa-times"></i>
-              Discard
-            </button> -->
             <div class="mode" ngbDropdown class="d-none">
               <button class="btn btn-light textStyle" ngbDropdownToggle>
                 <i *ngIf="!actionsDisabled">
@@ -354,8 +415,9 @@
                       <clipPath id="clip0_1401_16850">
                         <rect width="20" height="17.7866" fill="white" />
                       </clipPath>
-                    </defs></svg
-                ></i>
+                    </defs>
+                  </svg>
+                </i>
                 <i class="fas fa-lock" *ngIf="actionsDisabled"></i>
                 {{ metadata.Workflow.WorkflowMode }}
               </button>

@@ -189,3 +189,67 @@ button:disabled {
     stroke: black !important;
   }
 }
+
+// Font control styles
+.font-control-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  border-left: 1px solid #e0e0e0;
+  border-right: 1px solid #e0e0e0;
+  background: #f2f2f2;
+  min-width: 120px;
+}
+
+.font-control-label {
+  font-family: 'Museo Sans';
+  font-size: 11px;
+  font-weight: 400;
+  color: #555555;
+  white-space: nowrap;
+  margin: 0;
+}
+
+.font-control-select {
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  padding: 2px 4px;
+  font-family: 'Museo Sans';
+  font-size: 11px;
+  background: white;
+  min-width: 80px;
+
+  &:disabled {
+    background: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #005996;
+    box-shadow: 0 0 0 1px #005996;
+  }
+}
+
+.font-control-color {
+  width: 30px;
+  height: 24px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  cursor: pointer;
+  background: white;
+
+  &:disabled {
+    background: #f5f5f5;
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #005996;
+    box-shadow: 0 0 0 1px #005996;
+  }
+}

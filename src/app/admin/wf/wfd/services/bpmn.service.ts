@@ -197,6 +197,66 @@ export class BpmnService {
     this.labelEditing.update(element, name);
   }
 
+  // Font control methods
+  public applyFontFamily(element: DiagramEl, fontFamily: string): void {
+    if (!element) return;
+
+    // Store font family in element properties for persistence
+    this.modeling.updateProperties(element, {
+      fontFamily: fontFamily,
+    });
+
+    // Apply font family to SVG text elements
+    this.updateTextElements(element, 'font-family', fontFamily);
+  }
+
+  public applyFontSize(element: DiagramEl, fontSize: string): void {
+    if (!element) return;
+
+    // Store font size in element properties for persistence
+    this.modeling.updateProperties(element, {
+      fontSize: fontSize,
+    });
+
+    // Apply font size to SVG text elements
+    this.updateTextElements(element, 'font-size', fontSize);
+  }
+
+  public applyFontColor(element: DiagramEl, fontColor: string): void {
+    if (!element) return;
+
+    // Store font color in element properties for persistence
+    this.modeling.updateProperties(element, {
+      fontColor: fontColor,
+    });
+
+    // Apply font color to SVG text elements
+    this.updateTextElements(element, 'fill', fontColor);
+  }
+
+  private updateTextElements(
+    element: DiagramEl,
+    attribute: string,
+    value: string
+  ): void {
+    // Get the SVG element for this BPMN element using the registry
+    const gfx = this.registry.getGraphics(element.id);
+    if (!gfx) return;
+
+    // Find all text elements within the SVG element
+    const textElements = gfx.querySelectorAll('text');
+
+    textElements.forEach((textEl: SVGTextElement) => {
+      textEl.setAttribute(attribute, value);
+    });
+
+    // Also update tspan elements
+    const tspanElements = gfx.querySelectorAll('tspan');
+    tspanElements.forEach((tspanEl: SVGTSpanElement) => {
+      tspanEl.setAttribute(attribute, value);
+    });
+  }
+
   public updateElementProperties(el: any, updated: any) {
     this.modeling.updateProperties(el, updated);
     if (isConnection(el) && updated.waypoints) {
