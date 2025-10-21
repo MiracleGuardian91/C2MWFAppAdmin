@@ -1,11 +1,11 @@
 import {
+  SharedResizeObserver
+} from "./chunk-WDTZ3ZJU.js";
+import {
   CdkPortal,
   CdkPortalOutlet,
   TemplatePortal
 } from "./chunk-DJXBA42B.js";
-import {
-  SharedResizeObserver
-} from "./chunk-WDTZ3ZJU.js";
 import {
   MAT_RIPPLE_GLOBAL_OPTIONS,
   MatCommonModule,
