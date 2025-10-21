@@ -99,10 +99,11 @@
 
           <!-- Alignment Buttons -->
           <div
-            *ngIf="service.paletteIsOpen && selectedSwimlane"
+            *ngIf="service.paletteIsOpen"
             style="display: flex; align-items: center; padding-bottom: 5px"
           >
             <button
+              [disabled]="!selectedSwimlane"
               style="border-left: 1px solid #e0e0e0; cursor: pointer"
               (click)="alignStatesInSwimlane('top')"
               title="Align states to top"
@@ -126,10 +127,11 @@
             </button>
           </div>
           <div
-            *ngIf="service.paletteIsOpen && selectedSwimlane"
+            *ngIf="service.paletteIsOpen"
             style="display: flex; align-items: center; padding-bottom: 5px"
           >
             <button
+              [disabled]="!selectedSwimlane"
               style="border-left: 1px solid #e0e0e0; cursor: pointer"
               (click)="alignStatesInSwimlane('middle')"
               title="Align states to middle"
@@ -153,10 +155,11 @@
             </button>
           </div>
           <div
-            *ngIf="service.paletteIsOpen && selectedSwimlane"
+            *ngIf="service.paletteIsOpen"
             style="display: flex; align-items: center; padding-bottom: 5px"
           >
             <button
+              [disabled]="!selectedSwimlane"
               style="border-right: 1px solid #e0e0e0; cursor: pointer"
               (click)="alignStatesInSwimlane('bottom')"
               title="Align states to bottom"
