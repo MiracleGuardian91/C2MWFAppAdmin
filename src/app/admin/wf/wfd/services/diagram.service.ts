@@ -978,45 +978,34 @@ export class DiagramService implements OnDestroy {
     }
   }
 
-  /**
-   * Aligns state boxes within a swimlane to the specified position
-   * @param swimlane The swimlane containing the state boxes
-   * @param alignment The alignment type: 'top', 'middle', or 'bottom'
-   */
   alignStatesInSwimlane(swimlane: any, alignment: 'top' | 'middle' | 'bottom') {
     if (!swimlane || !swimlane.children) {
       return;
     }
 
-    // Get all state boxes within the swimlane
+    // Get all state boxes and timer triggers within the swimlane
     const stateBoxes = swimlane.children.filter(
       (child: any) =>
         child.type === t.State ||
         child.type === t.StartState ||
         child.type === t.EndState ||
-        child.type === t.SubProcess
+        child.type === t.SubProcess ||
+        child.type === t.TriggerExtension
     );
 
     console.log(
-      `Found ${stateBoxes.length} state boxes in swimlane:`,
+      `Found ${stateBoxes.length} state boxes and timer triggers in swimlane:`,
       stateBoxes.map((s) => s.id)
     );
 
     if (stateBoxes.length < 2) {
-      console.log('Not enough state boxes to align');
-      return; // Need at least 2 elements to align
+      console.log('Not enough state boxes and timer triggers to align');
+      return;
     }
 
-    // Use BPMN.js command stack for proper alignment
     this.alignElementsWithBPMN(stateBoxes, swimlane, alignment);
   }
 
-  /**
-   * Aligns elements using BPMN.js command stack for proper integration
-   * @param elements Array of elements to align
-   * @param swimlane The parent swimlane
-   * @param alignment The alignment type
-   */
   private alignElementsWithBPMN(
     elements: any[],
     swimlane: any,
@@ -1030,22 +1019,21 @@ export class DiagramService implements OnDestroy {
     const swimlaneLeft = swimlane.x;
     const swimlaneWidth = swimlane.width;
 
-    // Calculate target Y position based on alignment
-    const verticalPadding = 60; // Good spacing from boundaries
+    const verticalPadding = 60;
     let targetY: number;
 
     switch (alignment) {
       case 'top':
-        targetY = swimlaneTop + verticalPadding;
+        targetY = swimlaneTop + verticalPadding + 30; // Center line for top alignment
         break;
       case 'middle':
-        targetY = swimlaneTop + swimlaneHeight / 2 - 30; // Center with element height consideration
+        targetY = swimlaneTop + swimlaneHeight / 2; // True center of swimlane
         break;
       case 'bottom':
-        targetY = swimlaneBottom - verticalPadding - 60; // Account for element height
+        targetY = swimlaneBottom - verticalPadding - 30; // Center line for bottom alignment
         break;
       default:
-        targetY = swimlaneTop + verticalPadding;
+        targetY = swimlaneTop + verticalPadding + 30;
     }
 
     // Calculate horizontal distribution
@@ -1062,10 +1050,14 @@ export class DiagramService implements OnDestroy {
     // Move each element to its new position using BPMN service
     elements.forEach((element: any, index: number) => {
       const newX = startX + index * (elementWidth + spacing);
-      const newY = targetY;
+
+      // Calculate Y position to center-align the element
+      // targetY represents the center line, so we need to offset by half the element height
+      const elementHeight = element.height || 60; // Default height if not available
+      const newY = targetY - elementHeight / 2;
 
       console.log(
-        `Moving element ${index}: ${element.id} to (${newX}, ${newY})`
+        `Moving element ${index}: ${element.id} to (${newX}, ${newY}) - center at Y=${targetY}`
       );
 
       // Calculate delta from current position

@@ -1,4 +1,9 @@
 import {
+  CdkAccordion,
+  CdkAccordionItem,
+  CdkAccordionModule
+} from "./chunk-3TKDPAUF.js";
+import {
   CdkPortalOutlet,
   PortalModule,
   TemplatePortal
@@ -13,11 +18,6 @@ import {
   transition,
   trigger
 } from "./chunk-HQF4VCCY.js";
-import {
-  CdkAccordion,
-  CdkAccordionItem,
-  CdkAccordionModule
-} from "./chunk-3TKDPAUF.js";
 import {
   FocusKeyManager,
   FocusMonitor
