@@ -1528,10 +1528,247 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
 
   // Font control methods
   private loadStateFontProperties(element: any): void {
-    // Load current font properties from the selected state
-    this.selectedFontFamily = element.fontFamily || 'Arial';
-    this.selectedFontSize = element.fontSize || '14px';
-    this.selectedFontColor = element.fontColor || '#000000';
+    console.log('Loading font properties for element:', element);
+
+    // Try to get current values from SVG elements first
+    const currentFontFamily = this.getCurrentFontFamily(element);
+    const currentFontSize = this.getCurrentFontSize(element);
+    const currentFontColor = this.getCurrentFontColor(element);
+
+    console.log(
+      'Raw values:',
+      currentFontFamily,
+      currentFontSize,
+      currentFontColor
+    );
+
+    // Process and convert the values
+    this.selectedFontFamily = this.processFontFamily(
+      element.fontFamily ||
+        (element.props && element.props.fontFamily) ||
+        currentFontFamily ||
+        'Arial'
+    );
+
+    this.selectedFontSize = this.processFontSize(
+      element.fontSize ||
+        (element.props && element.props.fontSize) ||
+        currentFontSize ||
+        '14px'
+    );
+
+    this.selectedFontColor = this.processFontColor(
+      element.fontColor ||
+        (element.props && element.props.fontColor) ||
+        currentFontColor ||
+        '#000000'
+    );
+
+    console.log(
+      'Processed values:',
+      this.selectedFontFamily,
+      this.selectedFontSize,
+      this.selectedFontColor
+    );
+
+    if (!currentFontFamily && !currentFontSize && !currentFontColor) {
+      setTimeout(() => {
+        this.loadStateFontPropertiesDelayed(element);
+      }, 100);
+    }
+  }
+
+  private processFontFamily(fontFamily: string): string {
+    if (!fontFamily) return 'Arial';
+
+    // Clean up font family string
+    const cleaned = fontFamily.replace(/['"]/g, '').trim();
+
+    // Map common font families to dropdown options
+    const fontMap: { [key: string]: string } = {
+      'Museo Sans': 'Museo Sans',
+      Arial: 'Arial',
+      Helvetica: 'Helvetica',
+      'Times New Roman': 'Times New Roman',
+      Georgia: 'Georgia',
+      Verdana: 'Verdana',
+      'Courier New': 'Courier New',
+      'Comic Sans MS': 'Comic Sans MS',
+      Impact: 'Impact',
+      'Trebuchet MS': 'Trebuchet MS',
+    };
+
+    return fontMap[cleaned] || cleaned || 'Arial';
+  }
+
+  private processFontSize(fontSize: string): string {
+    if (!fontSize) return '14px';
+
+    // Clean up font size string
+    const cleaned = fontSize.trim();
+
+    // Map common font sizes to dropdown options
+    const sizeMap: { [key: string]: string } = {
+      '8px': '8px',
+      '10px': '10px',
+      '12px': '12px',
+      '13px': '13px',
+      '14px': '14px',
+      '16px': '16px',
+      '18px': '18px',
+      '20px': '20px',
+      '24px': '24px',
+      '28px': '28px',
+      '32px': '32px',
+    };
+
+    return sizeMap[cleaned] || cleaned || '14px';
+  }
+
+  private processFontColor(fontColor: string): string {
+    if (!fontColor) return '#000000';
+
+    // Convert color names to hex values
+    const colorMap: { [key: string]: string } = {
+      white: '#FFFFFF',
+      black: '#000000',
+      red: '#FF0000',
+      green: '#008000',
+      blue: '#0000FF',
+      yellow: '#FFFF00',
+      orange: '#FFA500',
+      purple: '#800080',
+      pink: '#FFC0CB',
+      gray: '#808080',
+      grey: '#808080',
+    };
+
+    const lowerColor = fontColor.toLowerCase().trim();
+
+    // If it's a named color, convert it
+    if (colorMap[lowerColor]) {
+      return colorMap[lowerColor];
+    }
+
+    // If it's already a hex color, return it
+    if (fontColor.startsWith('#')) {
+      return fontColor;
+    }
+
+    // If it's an rgb/rgba color, try to convert it
+    if (fontColor.startsWith('rgb')) {
+      return this.rgbToHex(fontColor);
+    }
+
+    // Default fallback
+    return '#000000';
+  }
+
+  private rgbToHex(rgb: string): string {
+    try {
+      // Extract numbers from rgb(r, g, b) or rgba(r, g, b, a)
+      const matches = rgb.match(/\d+/g);
+      if (matches && matches.length >= 3) {
+        const r = parseInt(matches[0]);
+        const g = parseInt(matches[1]);
+        const b = parseInt(matches[2]);
+        return `#${((1 << 24) + (r << 16) + (g << 8) + b)
+          .toString(16)
+          .slice(1)}`;
+      }
+    } catch (error) {
+      console.warn('Error converting RGB to hex:', error);
+    }
+    return '#000000';
+  }
+
+  private loadStateFontPropertiesDelayed(element: any): void {
+    console.log('Loading font properties (delayed) for element:', element);
+
+    const currentFontFamily = this.getCurrentFontFamily(element);
+    const currentFontSize = this.getCurrentFontSize(element);
+    const currentFontColor = this.getCurrentFontColor(element);
+
+    // Update only if we found new values, and process them
+    if (currentFontFamily) {
+      this.selectedFontFamily = this.processFontFamily(currentFontFamily);
+    }
+    if (currentFontSize) {
+      this.selectedFontSize = this.processFontSize(currentFontSize);
+    }
+    if (currentFontColor) {
+      this.selectedFontColor = this.processFontColor(currentFontColor);
+    }
+
+    console.log(
+      'Updated font properties (delayed):',
+      this.selectedFontFamily,
+      this.selectedFontSize,
+      this.selectedFontColor
+    );
+  }
+
+  private getCurrentFontFamily(element: any): string | null {
+    try {
+      const gfx = this.service.getGraphics(element);
+      if (gfx) {
+        const textElement = gfx.querySelector('text');
+        if (textElement) {
+          const fontFamily =
+            textElement.getAttribute('font-family') ||
+            textElement.style.fontFamily ||
+            window.getComputedStyle(textElement).fontFamily;
+          return fontFamily && fontFamily !== 'inherit' ? fontFamily : null;
+        }
+      }
+    } catch (error) {
+      console.warn('Error getting font family:', error);
+    }
+    return null;
+  }
+
+  private getCurrentFontSize(element: any): string | null {
+    try {
+      const gfx = this.service.getGraphics(element);
+      if (gfx) {
+        const textElement = gfx.querySelector('text');
+        if (textElement) {
+          // Try multiple ways to get font size
+          const fontSize =
+            textElement.getAttribute('font-size') ||
+            textElement.style.fontSize ||
+            window.getComputedStyle(textElement).fontSize;
+          return fontSize && fontSize !== 'inherit' ? fontSize : null;
+        }
+      }
+    } catch (error) {
+      console.warn('Error getting font size:', error);
+    }
+    return null;
+  }
+
+  private getCurrentFontColor(element: any): string | null {
+    try {
+      const gfx = this.service.getGraphics(element);
+      if (gfx) {
+        const textElement = gfx.querySelector('text');
+        if (textElement) {
+          // Try multiple ways to get font color
+          const fontColor =
+            textElement.getAttribute('fill') ||
+            textElement.style.fill ||
+            window.getComputedStyle(textElement).fill;
+          return fontColor &&
+            fontColor !== 'inherit' &&
+            fontColor !== 'currentColor'
+            ? fontColor
+            : null;
+        }
+      }
+    } catch (error) {
+      console.warn('Error getting font color:', error);
+    }
+    return null;
   }
 
   public applyFontFamily(): void {
@@ -1542,6 +1779,7 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
 
     // Apply font family to the selected state
     this.service.applyFontFamily(this.selectedState, this.selectedFontFamily);
+    this.toastr.success(`Font family changed to ${this.selectedFontFamily}`);
   }
 
   public applyFontSize(): void {
@@ -1552,6 +1790,7 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
 
     // Apply font size to the selected state
     this.service.applyFontSize(this.selectedState, this.selectedFontSize);
+    this.toastr.success(`Font size changed to ${this.selectedFontSize}`);
   }
 
   public applyFontColor(): void {

@@ -390,4 +390,10 @@ export class BpmnService {
       </bpmn:definitions>
       `;
   }
+
+  // Method to get graphics element for font property loading
+  public getGraphics(element: any): SVGElement | null {
+    if (!this.registry) return null;
+    return this.registry.getGraphics(element.id);
+  }
 }
