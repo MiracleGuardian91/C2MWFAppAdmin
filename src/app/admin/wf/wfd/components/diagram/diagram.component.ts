@@ -1542,7 +1542,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
 
     // Apply font family to the selected state
     this.service.applyFontFamily(this.selectedState, this.selectedFontFamily);
-    this.toastr.success(`Font family changed to ${this.selectedFontFamily}`);
   }
 
   public applyFontSize(): void {
@@ -1553,7 +1552,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
 
     // Apply font size to the selected state
     this.service.applyFontSize(this.selectedState, this.selectedFontSize);
-    this.toastr.success(`Font size changed to ${this.selectedFontSize}`);
   }
 
   public applyFontColor(): void {
@@ -1564,6 +1562,5 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
 
     // Apply font color to the selected state
     this.service.applyFontColor(this.selectedState, this.selectedFontColor);
-    this.toastr.success(`Font color changed to ${this.selectedFontColor}`);
   }
 }
