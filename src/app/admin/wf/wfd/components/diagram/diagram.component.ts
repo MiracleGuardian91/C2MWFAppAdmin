@@ -402,7 +402,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
           this.IsRedoAllowed = !!response?.Redo && response.Redo > 0;
           this.IsUndoAllowed = !!response?.Undo && response.Undo > 0;
 
-          // Reset values **after** successful API call
           this.resetValues();
         },
         error: (error) => {
@@ -1462,13 +1461,8 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     }
   };
 
-  /**
-   * Handles selection changes to detect when a swimlane is selected
-   */
   private handleSelectionChange(event: any): void {
     const selection = event?.newSelection || [];
-
-    console.log('Selection changed:', selection);
 
     if (selection.length === 1) {
       const selectedElement = selection[0];
@@ -1476,20 +1470,14 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       // Check if the selected element is a swimlane (Lane)
       if (selectedElement.type === 'bpmn:Lane') {
         this.selectedSwimlane = selectedElement;
-        console.log('Swimlane selected:', selectedElement);
       } else {
         this.selectedSwimlane = null;
-        console.log('Non-swimlane element selected:', selectedElement.type);
       }
     } else {
       this.selectedSwimlane = null;
-      console.log('No element or multiple elements selected');
     }
   }
 
-  /**
-   * Aligns state boxes within the selected swimlane
-   */
   public alignStatesInSwimlane(alignment: 'top' | 'middle' | 'bottom'): void {
     if (!this.selectedSwimlane) {
       console.warn('No swimlane selected');

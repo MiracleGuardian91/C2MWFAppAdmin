@@ -1164,9 +1164,9 @@ export class DiagramService implements OnDestroy {
   public updateElementProperties(element: any, updated: any) {
     if (updated.name) {
       this.name = updated.name;
-    }
-    if (element.props) {
-      element.props.FriendlyName = this.name;
+      if (element.props) {
+        element.props.FriendlyName = updated.name;
+      }
     }
     this.bpmn.updateElementProperties(element, updated);
   }
