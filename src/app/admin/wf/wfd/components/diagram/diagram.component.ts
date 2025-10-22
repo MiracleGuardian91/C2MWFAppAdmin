@@ -1475,13 +1475,10 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     if (selection.length === 1) {
       const selectedElement = selection[0];
 
-      // Check if the selected element is a swimlane (Lane)
       if (selectedElement.type === 'bpmn:Lane') {
         this.selectedSwimlane = selectedElement;
         this.selectedState = null;
-      }
-      // Check if the selected element is a state (Task, StartEvent, EndEvent, SubProcess)
-      else if (
+      } else if (
         [
           'bpmn:Task',
           'bpmn:StartEvent',
@@ -1491,7 +1488,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       ) {
         this.selectedState = selectedElement;
         this.selectedSwimlane = null;
-        // Load current font properties from the selected state
         this.loadStateFontProperties(selectedElement);
       } else {
         this.selectedSwimlane = null;
@@ -1517,31 +1513,25 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       alignment
     );
 
-    // Call the service method to align states
     this.service.alignStatesInSwimlane(this.selectedSwimlane, alignment);
 
-    // Show feedback to user
     const alignmentText =
       alignment.charAt(0).toUpperCase() + alignment.slice(1);
     this.toastr.success(`States aligned to ${alignmentText}`);
   }
 
-  // Font control methods
   private loadStateFontProperties(element: any): void {
     console.log('Loading font properties for element:', element);
 
-    // Try to get current values from SVG elements first
     const currentFontFamily = this.getCurrentFontFamily(element);
     const currentFontSize = this.getCurrentFontSize(element);
     const currentFontColor = this.getCurrentFontColor(element);
 
-    // Also check business object for stored properties
     const bo = element.businessObject;
     const boFontFamily = bo?.fontFamily;
     const boFontSize = bo?.fontSize;
     const boFontColor = bo?.fontColor;
 
-    // Process and convert the values with priority: business object > element > SVG > defaults
     this.selectedFontFamily = this.processFontFamily(
       boFontFamily ||
         element.fontFamily ||
@@ -1590,10 +1580,8 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
   private processFontFamily(fontFamily: string): string {
     if (!fontFamily) return 'Arial';
 
-    // Clean up font family string
     const cleaned = fontFamily.replace(/['"]/g, '').trim();
 
-    // Map common font families to dropdown options
     const fontMap: { [key: string]: string } = {
       'Museo Sans': 'Museo Sans',
       Arial: 'Arial',
@@ -1613,10 +1601,8 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
   private processFontSize(fontSize: string): string {
     if (!fontSize) return '14px';
 
-    // Clean up font size string
     const cleaned = fontSize.trim();
 
-    // Map common font sizes to dropdown options
     const sizeMap: { [key: string]: string } = {
       '8px': '8px',
       '10px': '10px',
@@ -1637,7 +1623,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
   private processFontColor(fontColor: string): string {
     if (!fontColor) return '#000000';
 
-    // Convert color names to hex values
     const colorMap: { [key: string]: string } = {
       white: '#FFFFFF',
       black: '#000000',
@@ -1654,28 +1639,23 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
 
     const lowerColor = fontColor.toLowerCase().trim();
 
-    // If it's a named color, convert it
     if (colorMap[lowerColor]) {
       return colorMap[lowerColor];
     }
 
-    // If it's already a hex color, return it
     if (fontColor.startsWith('#')) {
       return fontColor;
     }
 
-    // If it's an rgb/rgba color, try to convert it
     if (fontColor.startsWith('rgb')) {
       return this.rgbToHex(fontColor);
     }
 
-    // Default fallback
     return '#000000';
   }
 
   private rgbToHex(rgb: string): string {
     try {
-      // Extract numbers from rgb(r, g, b) or rgba(r, g, b, a)
       const matches = rgb.match(/\d+/g);
       if (matches && matches.length >= 3) {
         const r = parseInt(matches[0]);
@@ -1698,7 +1678,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     const currentFontSize = this.getCurrentFontSize(element);
     const currentFontColor = this.getCurrentFontColor(element);
 
-    // Update only if we found new values, and process them
     if (currentFontFamily) {
       this.selectedFontFamily = this.processFontFamily(currentFontFamily);
     }
@@ -1742,7 +1721,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       if (gfx) {
         const textElement = gfx.querySelector('text');
         if (textElement) {
-          // Try multiple ways to get font size
           const fontSize =
             textElement.getAttribute('font-size') ||
             textElement.style.fontSize ||
@@ -1762,7 +1740,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       if (gfx) {
         const textElement = gfx.querySelector('text');
         if (textElement) {
-          // Try multiple ways to get font color
           const fontColor =
             textElement.getAttribute('fill') ||
             textElement.style.fill ||
@@ -1786,7 +1763,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       return;
     }
 
-    // Apply all font properties together to preserve existing values
     this.applyAllFontProperties();
     this.toastr.success(`Font family changed to ${this.selectedFontFamily}`);
   }
@@ -1797,7 +1773,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       return;
     }
 
-    // Apply all font properties together to preserve existing values
     this.applyAllFontProperties();
     this.toastr.success(`Font size changed to ${this.selectedFontSize}`);
   }
@@ -1808,11 +1783,9 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       return;
     }
 
-    // Apply all font properties together to preserve existing values
     this.applyAllFontProperties();
   }
 
-  // Helper method to apply all current font properties together
   private applyAllFontProperties(): void {
     if (!this.selectedState) return;
 
@@ -1822,7 +1795,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       fontColor: this.selectedFontColor,
     });
 
-    // Apply all font properties at once using the BPMN service
     this.service.applyAllFontProperties(
       this.selectedState,
       this.selectedFontFamily,
