@@ -1205,8 +1205,13 @@ export class DiagramService implements OnDestroy {
   ): void {
     if (!element) return;
 
-    // Apply all font properties using the BPMN service
     this.bpmn.applyAllFontProperties(element, fontFamily, fontSize, fontColor);
+  }
+
+  // Method to restore font properties after element changes
+  public restoreFontProperties(element: any): void {
+    if (!element) return;
+    this.bpmn.restoreFontProperties(element);
   }
 
   public clear() {

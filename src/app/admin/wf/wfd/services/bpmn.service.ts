@@ -288,6 +288,22 @@ export class BpmnService {
     this.updateTextElements(element, 'font-family', fontFamily);
     this.updateTextElements(element, 'font-size', fontSize);
     this.updateTextElements(element, 'fill', fontColor);
+
+    // Store font properties in the element's business object for persistence
+    const bo = element.businessObject;
+    if (bo) {
+      bo.fontFamily = fontFamily;
+      bo.fontSize = fontSize;
+      bo.fontColor = fontColor;
+    }
+
+    // Also store in the element itself for immediate access
+    element.fontFamily = fontFamily;
+    element.fontSize = fontSize;
+    element.fontColor = fontColor;
+
+    // Trigger element changed event to ensure re-render
+    this.eventBus.fire('element.changed', { element });
   }
 
   private updateTextElements(
@@ -451,5 +467,43 @@ export class BpmnService {
   public getGraphics(element: any): SVGElement | null {
     if (!this.registry) return null;
     return this.registry.getGraphics(element.id);
+  }
+
+  // Method to restore font properties after element changes
+  public restoreFontProperties(element: DiagramEl): void {
+    if (!element) return;
+
+    const bo = element.businessObject;
+    const fontFamily = bo?.fontFamily || element.fontFamily;
+    const fontSize = bo?.fontSize || element.fontSize;
+    const fontColor = bo?.fontColor || element.fontColor;
+
+    if (fontFamily || fontSize || fontColor) {
+      // Use setTimeout to ensure the element is fully rendered
+      setTimeout(() => {
+        if (fontFamily) {
+          this.updateTextElements(element, 'font-family', fontFamily);
+        }
+        if (fontSize) {
+          this.updateTextElements(element, 'font-size', fontSize);
+        }
+        if (fontColor) {
+          this.updateTextElements(element, 'fill', fontColor);
+        }
+      }, 50);
+    }
+  }
+
+  // Method to check if element is a state type
+  private isStateType(element: any): boolean {
+    return (
+      element &&
+      [
+        'bpmn:Task',
+        'bpmn:StartEvent',
+        'bpmn:EndEvent',
+        'bpmn:SubProcess',
+      ].includes(element.type)
+    );
   }
 }
