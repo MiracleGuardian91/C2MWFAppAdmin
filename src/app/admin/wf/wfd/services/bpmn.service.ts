@@ -463,13 +463,11 @@ export class BpmnService {
       `;
   }
 
-  // Method to get graphics element for font property loading
   public getGraphics(element: any): SVGElement | null {
     if (!this.registry) return null;
     return this.registry.getGraphics(element.id);
   }
 
-  // Method to restore font properties after element changes
   public restoreFontProperties(element: DiagramEl): void {
     if (!element) return;
 
@@ -479,7 +477,6 @@ export class BpmnService {
     const fontColor = bo?.fontColor || element.fontColor;
 
     if (fontFamily || fontSize || fontColor) {
-      // Use setTimeout to ensure the element is fully rendered
       setTimeout(() => {
         if (fontFamily) {
           this.updateTextElements(element, 'font-family', fontFamily);
@@ -494,7 +491,6 @@ export class BpmnService {
     }
   }
 
-  // Method to check if element is a state type
   private isStateType(element: any): boolean {
     return (
       element &&

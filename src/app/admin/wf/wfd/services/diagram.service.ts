@@ -1208,7 +1208,6 @@ export class DiagramService implements OnDestroy {
     this.bpmn.applyAllFontProperties(element, fontFamily, fontSize, fontColor);
   }
 
-  // Method to restore font properties after element changes
   public restoreFontProperties(element: any): void {
     if (!element) return;
     this.bpmn.restoreFontProperties(element);
