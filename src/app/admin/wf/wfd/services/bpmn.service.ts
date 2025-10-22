@@ -197,6 +197,122 @@ export class BpmnService {
     this.labelEditing.update(element, name);
   }
 
+  // Font control methods
+  public applyFontFamily(element: DiagramEl, fontFamily: string): void {
+    if (!element) return;
+
+    // Get current font properties to preserve them
+    const currentProps = this.getCurrentFontProperties(element);
+
+    // Update all font properties together
+    this.modeling.updateProperties(element, {
+      fontFamily: fontFamily,
+      fontSize: currentProps.fontSize,
+      fontColor: currentProps.fontColor,
+    });
+
+    // Apply font family to SVG text elements
+    this.updateTextElements(element, 'font-family', fontFamily);
+  }
+
+  public applyFontSize(element: DiagramEl, fontSize: string): void {
+    if (!element) return;
+
+    // Get current font properties to preserve them
+    const currentProps = this.getCurrentFontProperties(element);
+
+    // Update all font properties together
+    this.modeling.updateProperties(element, {
+      fontFamily: currentProps.fontFamily,
+      fontSize: fontSize,
+      fontColor: currentProps.fontColor,
+    });
+
+    // Apply font size to SVG text elements
+    this.updateTextElements(element, 'font-size', fontSize);
+  }
+
+  public applyFontColor(element: DiagramEl, fontColor: string): void {
+    if (!element) return;
+
+    // Get current font properties to preserve them
+    const currentProps = this.getCurrentFontProperties(element);
+
+    // Update all font properties together
+    this.modeling.updateProperties(element, {
+      fontFamily: currentProps.fontFamily,
+      fontSize: currentProps.fontSize,
+      fontColor: fontColor,
+    });
+
+    // Apply font color to SVG text elements
+    this.updateTextElements(element, 'fill', fontColor);
+  }
+
+  // Helper method to get current font properties from element
+  private getCurrentFontProperties(element: DiagramEl): {
+    fontFamily: string;
+    fontSize: string;
+    fontColor: string;
+  } {
+    // Get current properties from the element's business object
+    const bo = element.businessObject;
+    const currentFontFamily = bo?.fontFamily || element.fontFamily || 'Arial';
+    const currentFontSize = bo?.fontSize || element.fontSize || '14px';
+    const currentFontColor = bo?.fontColor || element.fontColor || '#000000';
+
+    return {
+      fontFamily: currentFontFamily,
+      fontSize: currentFontSize,
+      fontColor: currentFontColor,
+    };
+  }
+
+  // Method to apply all font properties at once
+  public applyAllFontProperties(
+    element: DiagramEl,
+    fontFamily: string,
+    fontSize: string,
+    fontColor: string
+  ): void {
+    if (!element) return;
+
+    // Update all font properties together
+    this.modeling.updateProperties(element, {
+      fontFamily: fontFamily,
+      fontSize: fontSize,
+      fontColor: fontColor,
+    });
+
+    // Apply all properties to SVG text elements
+    this.updateTextElements(element, 'font-family', fontFamily);
+    this.updateTextElements(element, 'font-size', fontSize);
+    this.updateTextElements(element, 'fill', fontColor);
+  }
+
+  private updateTextElements(
+    element: DiagramEl,
+    attribute: string,
+    value: string
+  ): void {
+    // Get the SVG element for this BPMN element using the registry
+    const gfx = this.registry.getGraphics(element.id);
+    if (!gfx) return;
+
+    // Find all text elements within the SVG element
+    const textElements = gfx.querySelectorAll('text');
+
+    textElements.forEach((textEl: SVGTextElement) => {
+      textEl.setAttribute(attribute, value);
+    });
+
+    // Also update tspan elements
+    const tspanElements = gfx.querySelectorAll('tspan');
+    tspanElements.forEach((tspanEl: SVGTSpanElement) => {
+      tspanEl.setAttribute(attribute, value);
+    });
+  }
+
   public updateElementProperties(el: any, updated: any) {
     this.modeling.updateProperties(el, updated);
     if (isConnection(el) && updated.waypoints) {
@@ -329,5 +445,11 @@ export class BpmnService {
         </bpmndi:BPMNDiagram>
       </bpmn:definitions>
       `;
+  }
+
+  // Method to get graphics element for font property loading
+  public getGraphics(element: any): SVGElement | null {
+    if (!this.registry) return null;
+    return this.registry.getGraphics(element.id);
   }
 }

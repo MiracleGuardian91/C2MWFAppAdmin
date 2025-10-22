@@ -74,6 +74,7 @@ import {
   NgbDropdownItem,
 } from '@ng-bootstrap/ng-bootstrap';
 import { NgIf, NgFor } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 const t = ElementType;
 
@@ -93,6 +94,7 @@ interface WfosIdToWfoIdMap {
     NgbDropdownMenu,
     NgFor,
     NgbDropdownItem,
+    FormsModule,
   ],
 })
 export class DiagramComponent implements AfterContentInit, OnDestroy {
@@ -135,6 +137,12 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
   public selectedSwimlane: any = null;
   trgConditionDetail: boolean = false;
   undoredoactive = false;
+
+  // Font control properties
+  public selectedState: any = null;
+  public selectedFontFamily: string = 'Arial';
+  public selectedFontSize: string = '14px';
+  public selectedFontColor: string = '#000000';
   constructor(
     private dialog: MatDialog,
     public service: DiagramService,
@@ -1470,11 +1478,28 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       // Check if the selected element is a swimlane (Lane)
       if (selectedElement.type === 'bpmn:Lane') {
         this.selectedSwimlane = selectedElement;
+        this.selectedState = null;
+      }
+      // Check if the selected element is a state (Task, StartEvent, EndEvent, SubProcess)
+      else if (
+        [
+          'bpmn:Task',
+          'bpmn:StartEvent',
+          'bpmn:EndEvent',
+          'bpmn:SubProcess',
+        ].includes(selectedElement.type)
+      ) {
+        this.selectedState = selectedElement;
+        this.selectedSwimlane = null;
+        // Load current font properties from the selected state
+        this.loadStateFontProperties(selectedElement);
       } else {
         this.selectedSwimlane = null;
+        this.selectedState = null;
       }
     } else {
       this.selectedSwimlane = null;
+      this.selectedState = null;
     }
   }
 
@@ -1499,5 +1524,310 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     const alignmentText =
       alignment.charAt(0).toUpperCase() + alignment.slice(1);
     this.toastr.success(`States aligned to ${alignmentText}`);
+  }
+
+  // Font control methods
+  private loadStateFontProperties(element: any): void {
+    console.log('Loading font properties for element:', element);
+
+    // Try to get current values from SVG elements first
+    const currentFontFamily = this.getCurrentFontFamily(element);
+    const currentFontSize = this.getCurrentFontSize(element);
+    const currentFontColor = this.getCurrentFontColor(element);
+
+    // Also check business object for stored properties
+    const bo = element.businessObject;
+    const boFontFamily = bo?.fontFamily;
+    const boFontSize = bo?.fontSize;
+    const boFontColor = bo?.fontColor;
+
+    // Process and convert the values with priority: business object > element > SVG > defaults
+    this.selectedFontFamily = this.processFontFamily(
+      boFontFamily ||
+        element.fontFamily ||
+        (element.props && element.props.fontFamily) ||
+        currentFontFamily ||
+        'Arial'
+    );
+
+    this.selectedFontSize = this.processFontSize(
+      boFontSize ||
+        element.fontSize ||
+        (element.props && element.props.fontSize) ||
+        currentFontSize ||
+        '14px'
+    );
+
+    this.selectedFontColor = this.processFontColor(
+      boFontColor ||
+        element.fontColor ||
+        (element.props && element.props.fontColor) ||
+        currentFontColor ||
+        '#000000'
+    );
+
+    console.log(
+      'Processed values:',
+      this.selectedFontFamily,
+      this.selectedFontSize,
+      this.selectedFontColor
+    );
+
+    if (
+      !currentFontFamily &&
+      !currentFontSize &&
+      !currentFontColor &&
+      !boFontFamily &&
+      !boFontSize &&
+      !boFontColor
+    ) {
+      setTimeout(() => {
+        this.loadStateFontPropertiesDelayed(element);
+      }, 100);
+    }
+  }
+
+  private processFontFamily(fontFamily: string): string {
+    if (!fontFamily) return 'Arial';
+
+    // Clean up font family string
+    const cleaned = fontFamily.replace(/['"]/g, '').trim();
+
+    // Map common font families to dropdown options
+    const fontMap: { [key: string]: string } = {
+      'Museo Sans': 'Museo Sans',
+      Arial: 'Arial',
+      Helvetica: 'Helvetica',
+      'Times New Roman': 'Times New Roman',
+      Georgia: 'Georgia',
+      Verdana: 'Verdana',
+      'Courier New': 'Courier New',
+      'Comic Sans MS': 'Comic Sans MS',
+      Impact: 'Impact',
+      'Trebuchet MS': 'Trebuchet MS',
+    };
+
+    return fontMap[cleaned] || cleaned || 'Arial';
+  }
+
+  private processFontSize(fontSize: string): string {
+    if (!fontSize) return '14px';
+
+    // Clean up font size string
+    const cleaned = fontSize.trim();
+
+    // Map common font sizes to dropdown options
+    const sizeMap: { [key: string]: string } = {
+      '8px': '8px',
+      '10px': '10px',
+      '12px': '12px',
+      '13px': '13px',
+      '14px': '14px',
+      '16px': '16px',
+      '18px': '18px',
+      '20px': '20px',
+      '24px': '24px',
+      '28px': '28px',
+      '32px': '32px',
+    };
+
+    return sizeMap[cleaned] || cleaned || '14px';
+  }
+
+  private processFontColor(fontColor: string): string {
+    if (!fontColor) return '#000000';
+
+    // Convert color names to hex values
+    const colorMap: { [key: string]: string } = {
+      white: '#FFFFFF',
+      black: '#000000',
+      red: '#FF0000',
+      green: '#008000',
+      blue: '#0000FF',
+      yellow: '#FFFF00',
+      orange: '#FFA500',
+      purple: '#800080',
+      pink: '#FFC0CB',
+      gray: '#808080',
+      grey: '#808080',
+    };
+
+    const lowerColor = fontColor.toLowerCase().trim();
+
+    // If it's a named color, convert it
+    if (colorMap[lowerColor]) {
+      return colorMap[lowerColor];
+    }
+
+    // If it's already a hex color, return it
+    if (fontColor.startsWith('#')) {
+      return fontColor;
+    }
+
+    // If it's an rgb/rgba color, try to convert it
+    if (fontColor.startsWith('rgb')) {
+      return this.rgbToHex(fontColor);
+    }
+
+    // Default fallback
+    return '#000000';
+  }
+
+  private rgbToHex(rgb: string): string {
+    try {
+      // Extract numbers from rgb(r, g, b) or rgba(r, g, b, a)
+      const matches = rgb.match(/\d+/g);
+      if (matches && matches.length >= 3) {
+        const r = parseInt(matches[0]);
+        const g = parseInt(matches[1]);
+        const b = parseInt(matches[2]);
+        return `#${((1 << 24) + (r << 16) + (g << 8) + b)
+          .toString(16)
+          .slice(1)}`;
+      }
+    } catch (error) {
+      console.warn('Error converting RGB to hex:', error);
+    }
+    return '#000000';
+  }
+
+  private loadStateFontPropertiesDelayed(element: any): void {
+    console.log('Loading font properties (delayed) for element:', element);
+
+    const currentFontFamily = this.getCurrentFontFamily(element);
+    const currentFontSize = this.getCurrentFontSize(element);
+    const currentFontColor = this.getCurrentFontColor(element);
+
+    // Update only if we found new values, and process them
+    if (currentFontFamily) {
+      this.selectedFontFamily = this.processFontFamily(currentFontFamily);
+    }
+    if (currentFontSize) {
+      this.selectedFontSize = this.processFontSize(currentFontSize);
+    }
+    if (currentFontColor) {
+      this.selectedFontColor = this.processFontColor(currentFontColor);
+    }
+
+    console.log(
+      'Updated font properties (delayed):',
+      this.selectedFontFamily,
+      this.selectedFontSize,
+      this.selectedFontColor
+    );
+  }
+
+  private getCurrentFontFamily(element: any): string | null {
+    try {
+      const gfx = this.service.getGraphics(element);
+      if (gfx) {
+        const textElement = gfx.querySelector('text');
+        if (textElement) {
+          const fontFamily =
+            textElement.getAttribute('font-family') ||
+            textElement.style.fontFamily ||
+            window.getComputedStyle(textElement).fontFamily;
+          return fontFamily && fontFamily !== 'inherit' ? fontFamily : null;
+        }
+      }
+    } catch (error) {
+      console.warn('Error getting font family:', error);
+    }
+    return null;
+  }
+
+  private getCurrentFontSize(element: any): string | null {
+    try {
+      const gfx = this.service.getGraphics(element);
+      if (gfx) {
+        const textElement = gfx.querySelector('text');
+        if (textElement) {
+          // Try multiple ways to get font size
+          const fontSize =
+            textElement.getAttribute('font-size') ||
+            textElement.style.fontSize ||
+            window.getComputedStyle(textElement).fontSize;
+          return fontSize && fontSize !== 'inherit' ? fontSize : null;
+        }
+      }
+    } catch (error) {
+      console.warn('Error getting font size:', error);
+    }
+    return null;
+  }
+
+  private getCurrentFontColor(element: any): string | null {
+    try {
+      const gfx = this.service.getGraphics(element);
+      if (gfx) {
+        const textElement = gfx.querySelector('text');
+        if (textElement) {
+          // Try multiple ways to get font color
+          const fontColor =
+            textElement.getAttribute('fill') ||
+            textElement.style.fill ||
+            window.getComputedStyle(textElement).fill;
+          return fontColor &&
+            fontColor !== 'inherit' &&
+            fontColor !== 'currentColor'
+            ? fontColor
+            : null;
+        }
+      }
+    } catch (error) {
+      console.warn('Error getting font color:', error);
+    }
+    return null;
+  }
+
+  public applyFontFamily(): void {
+    if (!this.selectedState) {
+      this.toastr.warning('Please select a state first');
+      return;
+    }
+
+    // Apply all font properties together to preserve existing values
+    this.applyAllFontProperties();
+    this.toastr.success(`Font family changed to ${this.selectedFontFamily}`);
+  }
+
+  public applyFontSize(): void {
+    if (!this.selectedState) {
+      this.toastr.warning('Please select a state first');
+      return;
+    }
+
+    // Apply all font properties together to preserve existing values
+    this.applyAllFontProperties();
+    this.toastr.success(`Font size changed to ${this.selectedFontSize}`);
+  }
+
+  public applyFontColor(): void {
+    if (!this.selectedState) {
+      this.toastr.warning('Please select a state first');
+      return;
+    }
+
+    // Apply all font properties together to preserve existing values
+    this.applyAllFontProperties();
+  }
+
+  // Helper method to apply all current font properties together
+  private applyAllFontProperties(): void {
+    if (!this.selectedState) return;
+
+    console.log('Applying all font properties:', {
+      fontFamily: this.selectedFontFamily,
+      fontSize: this.selectedFontSize,
+      fontColor: this.selectedFontColor,
+    });
+
+    // Apply all font properties at once using the BPMN service
+    this.service.applyAllFontProperties(
+      this.selectedState,
+      this.selectedFontFamily,
+      this.selectedFontSize,
+      this.selectedFontColor
+    );
   }
 }
