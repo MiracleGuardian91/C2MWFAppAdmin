@@ -1535,30 +1535,32 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     const currentFontSize = this.getCurrentFontSize(element);
     const currentFontColor = this.getCurrentFontColor(element);
 
-    console.log(
-      'Raw values:',
-      currentFontFamily,
-      currentFontSize,
-      currentFontColor
-    );
+    // Also check business object for stored properties
+    const bo = element.businessObject;
+    const boFontFamily = bo?.fontFamily;
+    const boFontSize = bo?.fontSize;
+    const boFontColor = bo?.fontColor;
 
-    // Process and convert the values
+    // Process and convert the values with priority: business object > element > SVG > defaults
     this.selectedFontFamily = this.processFontFamily(
-      element.fontFamily ||
+      boFontFamily ||
+        element.fontFamily ||
         (element.props && element.props.fontFamily) ||
         currentFontFamily ||
         'Arial'
     );
 
     this.selectedFontSize = this.processFontSize(
-      element.fontSize ||
+      boFontSize ||
+        element.fontSize ||
         (element.props && element.props.fontSize) ||
         currentFontSize ||
         '14px'
     );
 
     this.selectedFontColor = this.processFontColor(
-      element.fontColor ||
+      boFontColor ||
+        element.fontColor ||
         (element.props && element.props.fontColor) ||
         currentFontColor ||
         '#000000'
@@ -1571,7 +1573,14 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       this.selectedFontColor
     );
 
-    if (!currentFontFamily && !currentFontSize && !currentFontColor) {
+    if (
+      !currentFontFamily &&
+      !currentFontSize &&
+      !currentFontColor &&
+      !boFontFamily &&
+      !boFontSize &&
+      !boFontColor
+    ) {
       setTimeout(() => {
         this.loadStateFontPropertiesDelayed(element);
       }, 100);
@@ -1777,8 +1786,8 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       return;
     }
 
-    // Apply font family to the selected state
-    this.service.applyFontFamily(this.selectedState, this.selectedFontFamily);
+    // Apply all font properties together to preserve existing values
+    this.applyAllFontProperties();
     this.toastr.success(`Font family changed to ${this.selectedFontFamily}`);
   }
 
@@ -1788,8 +1797,8 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       return;
     }
 
-    // Apply font size to the selected state
-    this.service.applyFontSize(this.selectedState, this.selectedFontSize);
+    // Apply all font properties together to preserve existing values
+    this.applyAllFontProperties();
     this.toastr.success(`Font size changed to ${this.selectedFontSize}`);
   }
 
@@ -1799,7 +1808,26 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       return;
     }
 
-    // Apply font color to the selected state
-    this.service.applyFontColor(this.selectedState, this.selectedFontColor);
+    // Apply all font properties together to preserve existing values
+    this.applyAllFontProperties();
+  }
+
+  // Helper method to apply all current font properties together
+  private applyAllFontProperties(): void {
+    if (!this.selectedState) return;
+
+    console.log('Applying all font properties:', {
+      fontFamily: this.selectedFontFamily,
+      fontSize: this.selectedFontSize,
+      fontColor: this.selectedFontColor,
+    });
+
+    // Apply all font properties at once using the BPMN service
+    this.service.applyAllFontProperties(
+      this.selectedState,
+      this.selectedFontFamily,
+      this.selectedFontSize,
+      this.selectedFontColor
+    );
   }
 }

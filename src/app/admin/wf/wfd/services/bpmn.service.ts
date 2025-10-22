@@ -201,9 +201,14 @@ export class BpmnService {
   public applyFontFamily(element: DiagramEl, fontFamily: string): void {
     if (!element) return;
 
-    // Store font family in element properties for persistence
+    // Get current font properties to preserve them
+    const currentProps = this.getCurrentFontProperties(element);
+
+    // Update all font properties together
     this.modeling.updateProperties(element, {
       fontFamily: fontFamily,
+      fontSize: currentProps.fontSize,
+      fontColor: currentProps.fontColor,
     });
 
     // Apply font family to SVG text elements
@@ -213,9 +218,14 @@ export class BpmnService {
   public applyFontSize(element: DiagramEl, fontSize: string): void {
     if (!element) return;
 
-    // Store font size in element properties for persistence
+    // Get current font properties to preserve them
+    const currentProps = this.getCurrentFontProperties(element);
+
+    // Update all font properties together
     this.modeling.updateProperties(element, {
+      fontFamily: currentProps.fontFamily,
       fontSize: fontSize,
+      fontColor: currentProps.fontColor,
     });
 
     // Apply font size to SVG text elements
@@ -225,12 +235,58 @@ export class BpmnService {
   public applyFontColor(element: DiagramEl, fontColor: string): void {
     if (!element) return;
 
-    // Store font color in element properties for persistence
+    // Get current font properties to preserve them
+    const currentProps = this.getCurrentFontProperties(element);
+
+    // Update all font properties together
     this.modeling.updateProperties(element, {
+      fontFamily: currentProps.fontFamily,
+      fontSize: currentProps.fontSize,
       fontColor: fontColor,
     });
 
     // Apply font color to SVG text elements
+    this.updateTextElements(element, 'fill', fontColor);
+  }
+
+  // Helper method to get current font properties from element
+  private getCurrentFontProperties(element: DiagramEl): {
+    fontFamily: string;
+    fontSize: string;
+    fontColor: string;
+  } {
+    // Get current properties from the element's business object
+    const bo = element.businessObject;
+    const currentFontFamily = bo?.fontFamily || element.fontFamily || 'Arial';
+    const currentFontSize = bo?.fontSize || element.fontSize || '14px';
+    const currentFontColor = bo?.fontColor || element.fontColor || '#000000';
+
+    return {
+      fontFamily: currentFontFamily,
+      fontSize: currentFontSize,
+      fontColor: currentFontColor,
+    };
+  }
+
+  // Method to apply all font properties at once
+  public applyAllFontProperties(
+    element: DiagramEl,
+    fontFamily: string,
+    fontSize: string,
+    fontColor: string
+  ): void {
+    if (!element) return;
+
+    // Update all font properties together
+    this.modeling.updateProperties(element, {
+      fontFamily: fontFamily,
+      fontSize: fontSize,
+      fontColor: fontColor,
+    });
+
+    // Apply all properties to SVG text elements
+    this.updateTextElements(element, 'font-family', fontFamily);
+    this.updateTextElements(element, 'font-size', fontSize);
     this.updateTextElements(element, 'fill', fontColor);
   }
 

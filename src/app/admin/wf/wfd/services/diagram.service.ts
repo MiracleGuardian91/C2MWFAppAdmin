@@ -1197,6 +1197,18 @@ export class DiagramService implements OnDestroy {
     this.bpmn.applyFontColor(element, fontColor);
   }
 
+  public applyAllFontProperties(
+    element: any,
+    fontFamily: string,
+    fontSize: string,
+    fontColor: string
+  ): void {
+    if (!element) return;
+
+    // Apply all font properties using the BPMN service
+    this.bpmn.applyAllFontProperties(element, fontFamily, fontSize, fontColor);
+  }
+
   public clear() {
     this.bpmn.clear();
   }
