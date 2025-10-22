@@ -1812,7 +1812,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       return;
     }
 
-    // Apply all font properties together to preserve existing values
     this.applyAllFontProperties();
   }
 
@@ -1822,7 +1821,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       return;
     }
 
-    // Apply all font properties together to preserve existing values
     this.applyAllFontProperties();
   }
 
@@ -1832,7 +1830,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       return;
     }
 
-    // Apply all font properties together to preserve existing values
     this.applyAllFontProperties();
   }
 
@@ -1845,7 +1842,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       fontColor: this.selectedFontColor,
     });
 
-    // Apply all font properties at once using the BPMN service
     this.service.applyAllFontProperties(
       this.selectedState,
       this.selectedFontFamily,
