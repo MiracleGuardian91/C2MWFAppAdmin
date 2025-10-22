@@ -297,6 +297,32 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       .subscribe((event: any) => {
         this.handleSelectionChange(event);
       });
+
+    this.bpmnService.eventBus.on('element.changed', (event: any) => {
+      if (event.element && this.isStateType(event.element)) {
+        setTimeout(() => {
+          this.service.restoreFontProperties(event.element);
+        }, 100);
+      }
+    });
+
+    this.bpmnService.eventBus.on('element.move', (event: any) => {
+      const element = event.element;
+      if (element && this.isStateType(element)) {
+        setTimeout(() => {
+          this.service.restoreFontProperties(element);
+        }, 100);
+      }
+    });
+
+    this.bpmnService.eventBus.on('element.render', (event: any) => {
+      const element = event.element;
+      if (element && this.isStateType(element)) {
+        setTimeout(() => {
+          this.service.restoreFontProperties(element);
+        }, 50);
+      }
+    });
   }
 
   changeUndoRedo(id: string, type: string, Action: string) {
@@ -1788,7 +1814,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
 
     // Apply all font properties together to preserve existing values
     this.applyAllFontProperties();
-    this.toastr.success(`Font family changed to ${this.selectedFontFamily}`);
   }
 
   public applyFontSize(): void {
@@ -1799,7 +1824,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
 
     // Apply all font properties together to preserve existing values
     this.applyAllFontProperties();
-    this.toastr.success(`Font size changed to ${this.selectedFontSize}`);
   }
 
   public applyFontColor(): void {
@@ -1812,7 +1836,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     this.applyAllFontProperties();
   }
 
-  // Helper method to apply all current font properties together
   private applyAllFontProperties(): void {
     if (!this.selectedState) return;
 
@@ -1828,6 +1851,19 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       this.selectedFontFamily,
       this.selectedFontSize,
       this.selectedFontColor
+    );
+  }
+
+  // Helper method to check if element is a state type
+  private isStateType(element: any): boolean {
+    return (
+      element &&
+      [
+        'bpmn:Task',
+        'bpmn:StartEvent',
+        'bpmn:EndEvent',
+        'bpmn:SubProcess',
+      ].includes(element.type)
     );
   }
 }
