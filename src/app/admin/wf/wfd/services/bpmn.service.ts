@@ -273,7 +273,10 @@ export class BpmnService {
     element: DiagramEl,
     fontFamily: string,
     fontSize: string,
-    fontColor: string
+    fontColor: string,
+    fontBold: boolean = false,
+    fontItalic: boolean = false,
+    fontUnderline: boolean = false
   ): void {
     if (!element) return;
 
@@ -282,25 +285,27 @@ export class BpmnService {
       fontFamily: fontFamily,
       fontSize: fontSize,
       fontColor: fontColor,
+      fontBold: fontBold,
+      fontItalic: fontItalic,
+      fontUnderline: fontUnderline,
     });
 
-    // Apply all properties to SVG text elements
-    this.updateTextElements(element, 'font-family', fontFamily);
-    this.updateTextElements(element, 'font-size', fontSize);
-    this.updateTextElements(element, 'fill', fontColor);
-
-    // Store font properties in the element's business object for persistence
     const bo = element.businessObject;
     if (bo) {
       bo.fontFamily = fontFamily;
       bo.fontSize = fontSize;
       bo.fontColor = fontColor;
+      bo.fontBold = fontBold;
+      bo.fontItalic = fontItalic;
+      bo.fontUnderline = fontUnderline;
     }
 
-    // Also store in the element itself for immediate access
     element.fontFamily = fontFamily;
     element.fontSize = fontSize;
     element.fontColor = fontColor;
+    element.fontBold = fontBold;
+    element.fontItalic = fontItalic;
+    element.fontUnderline = fontUnderline;
 
     // Trigger element changed event to ensure re-render
     this.eventBus.fire('element.changed', { element });

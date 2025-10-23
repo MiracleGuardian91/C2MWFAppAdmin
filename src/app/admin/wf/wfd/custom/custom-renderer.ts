@@ -27,7 +27,14 @@ import {
 } from 'tiny-svg';
 import { ElementType, EventDef } from '../models/bpmn';
 import { getElementStyle } from '../util/bpmn';
-import { DATA_SCHEMA, HUMAN_IN_LOOP, LLM, PROMPT_VARIABLE, SQL_QUERY, VECTOR } from '@app/ai-flow-builder/icons/icon-images';
+import {
+  DATA_SCHEMA,
+  HUMAN_IN_LOOP,
+  LLM,
+  PROMPT_VARIABLE,
+  SQL_QUERY,
+  VECTOR,
+} from '@app/ai-flow-builder/icons/icon-images';
 import { SharedData } from './share-data';
 
 const RENDERER_IDS = new Ids();
@@ -48,7 +55,7 @@ export default class CustomRenderer extends BaseRenderer {
   private computeStyle: any;
   private rendererId = RENDERER_IDS.next();
   private markers = {};
-  stateName:string;
+  stateName: string;
 
   constructor(
     // private config,
@@ -59,7 +66,7 @@ export default class CustomRenderer extends BaseRenderer {
     private textRenderer: any,
     private sharedData: SharedData,
     private priority = 1000,
-    stateFriendlyName: string 
+    stateFriendlyName: string
   ) {
     super(eventBus, priority);
     this.computeStyle = this.styles.computeStyle;
@@ -99,11 +106,11 @@ export default class CustomRenderer extends BaseRenderer {
     'pathMap',
     'canvas',
     'textRenderer',
-    'sharedData'
+    'sharedData',
   ];
 
   public canRender = (element) => {
-   return is(element, 'bpmn:BaseElement') || /^custom:/.test(element.type);
+    return is(element, 'bpmn:BaseElement') || /^custom:/.test(element.type);
   };
 
   public drawShape = (parentGfx, element) => {
@@ -114,20 +121,19 @@ export default class CustomRenderer extends BaseRenderer {
     return h(parentGfx, element);
   };
 
-
-  public drawConnection = function(p, element) {
+  public drawConnection = function (p, element) {
     return this.drawCustomConnection(p, element);
   };
-  
-  public drawCustomConnection = (parentGfx, connection)=>{
+
+  public drawCustomConnection = (parentGfx, connection) => {
     const { fill, stroke } = getElementStyle(connection);
     const attrs = this.computeStyle({
       stroke: 'black',
       markerEnd: this.marker('sequenceflow-end', fill, stroke),
-      strokeWidth: 2
+      strokeWidth: 2,
     });
 
-    if(connection.type === t.DottedFlow){
+    if (connection.type === t.DottedFlow) {
       attrs.strokeDasharray = 5.5;
     }
     return svgAppend(parentGfx, createLine(connection.waypoints, attrs, 6));
@@ -513,7 +519,6 @@ export default class CustomRenderer extends BaseRenderer {
     };
 
     return this.renderLabel(parentGfx, getLabel(element), {
-      
       box: box,
       fitBox: true,
       style: assign({}, this.textRenderer.getExternalStyle(), {
@@ -526,46 +531,43 @@ export default class CustomRenderer extends BaseRenderer {
   };
 
   private renderLaneLabel = (parentGfx, text, element) => {
-    if(element.type == 'bpmn:Lane')
-    {
-    const textBox = this.renderLabel(parentGfx, text, {
-      box: {
-        height: 35,
-        width: element.height,
-        
-      },
-      align: 'center-middle',
-      style: {
-        fill: getElementStyle(element).stroke,
-        fontSize: '16px', // Increase the font size here (adjust the value as needed)
-        fontFamily: 'Museo Sans',
-        fontWeight: '500', // Set font weight to 500
-      },
-    });
+    if (element.type == 'bpmn:Lane') {
+      const textBox = this.renderLabel(parentGfx, text, {
+        box: {
+          height: 35,
+          width: element.height,
+        },
+        align: 'center-middle',
+        style: {
+          fill: getElementStyle(element).stroke,
+          fontSize: '16px', // Increase the font size here (adjust the value as needed)
+          fontFamily: 'Museo Sans',
+          fontWeight: '500', // Set font weight to 500
+        },
+      });
 
-    const top = -1 * element.height;
+      const top = -1 * element.height;
 
-    transform(textBox, 0, -top, 270);
-  }
-else{
-  const textBox = this.renderLabel(parentGfx, text, {
-    box: {
-      height: 30,
-      width: element.height,
-    },
-    align: 'center-middle',
-    style: {
-      fill: getElementStyle(element).stroke,
-      fontSize: '16px', // Increase the font size here (adjust the value as needed)
-      fontFamily: 'Museo Sans',
-      fontWeight: '500', // Set font weight to 500
-    },
-  });
+      transform(textBox, 0, -top, 270);
+    } else {
+      const textBox = this.renderLabel(parentGfx, text, {
+        box: {
+          height: 30,
+          width: element.height,
+        },
+        align: 'center-middle',
+        style: {
+          fill: getElementStyle(element).stroke,
+          fontSize: '16px', // Increase the font size here (adjust the value as needed)
+          fontFamily: 'Museo Sans',
+          fontWeight: '500', // Set font weight to 500
+        },
+      });
 
-  const top = -1 * element.height;
+      const top = -1 * element.height;
 
-  transform(textBox, 0, -top, 270);
-}
+      transform(textBox, 0, -top, 270);
+    }
   };
 
   private createPathFromConnection = (connection) => {
@@ -576,22 +578,22 @@ else{
 
     // Loop through the waypoints to create line segments
     for (let i = 1; i < waypoints.length; i++) {
-        const currentWaypoint = waypoints[i];
-        const prevWaypoint = waypoints[i - 1];
+      const currentWaypoint = waypoints[i];
+      const prevWaypoint = waypoints[i - 1];
 
-        // If the current waypoint is not the last one, create a bend
-        if (i < waypoints.length - 1) {
-            // Create a bend point
-            pathData += ` L ${currentWaypoint.x} ${prevWaypoint.y}`; // Horizontal line to the bend
-            pathData += ` L ${currentWaypoint.x} ${currentWaypoint.y}`; // Vertical line to the current waypoint
-        } else {
-            // For the last waypoint, just connect directly
-            pathData += ` L ${currentWaypoint.x} ${currentWaypoint.y}`;
-        }
+      // If the current waypoint is not the last one, create a bend
+      if (i < waypoints.length - 1) {
+        // Create a bend point
+        pathData += ` L ${currentWaypoint.x} ${prevWaypoint.y}`; // Horizontal line to the bend
+        pathData += ` L ${currentWaypoint.x} ${currentWaypoint.y}`; // Vertical line to the current waypoint
+      } else {
+        // For the last waypoint, just connect directly
+        pathData += ` L ${currentWaypoint.x} ${currentWaypoint.y}`;
+      }
     }
 
     return pathData;
-};
+  };
 
   private drawEvent = (parentGfx, element, attrs) => {
     if (!('fillOpacity' in attrs)) {
@@ -638,43 +640,42 @@ else{
         my: 0.315,
       },
     });
-     
+
     const { fill, stroke } = getElementStyle(element);
     const defaultStroke = 'black';
-    
+
     // Function to determine contrast color
     const getContrastColor = (color?: string) => {
-        if (!color?.trim()) {
-            return defaultStroke;
-        }
-        return this.isColorDark(color) ? 'white' : 'black';
+      if (!color?.trim()) {
+        return defaultStroke;
+      }
+      return this.isColorDark(color) ? 'white' : 'black';
     };
-    
+
     // Determine the color based on isThrowing condition
     const selectedColor = isThrowing ? fill : stroke;
     const contrastColor = getContrastColor(selectedColor);
-    
+
     const messagePath = this.drawPath(parentGfx, pathData, {
-        strokeWidth: 1,
-        fill: contrastColor,
-        stroke: contrastColor,
-        fillOpacity: 0.1,
+      strokeWidth: 1,
+      fill: contrastColor,
+      stroke: contrastColor,
+      fillOpacity: 0.1,
     });
 
     return messagePath;
   };
 
   private drawTimerEventDef = (parentGfx, element) => {
-    const { fill, stroke,fillOpacity } = getElementStyle(element);
+    const { fill, stroke, fillOpacity } = getElementStyle(element);
     const defaultStroke = 'black';
     const trimmedStroke = stroke?.trim();
     let strokeColor = defaultStroke;
-    
+
     if (trimmedStroke) {
-        strokeColor = this.isColorDark(trimmedStroke) ? 'white' : 'black';
+      strokeColor = this.isColorDark(trimmedStroke) ? 'white' : 'black';
     }
-    
-    
+
     const circle = this.drawCircle(
       parentGfx,
       element.width,
@@ -702,7 +703,7 @@ else{
     this.drawPath(parentGfx, pathData, {
       strokeWidth: 2,
       strokeLinecap: 'square',
-      stroke:strokeColor,
+      stroke: strokeColor,
       fillOpacity,
     });
 
@@ -722,18 +723,18 @@ else{
       const height = element.height / 2;
 
       const defaultStroke = 'black';
-const trimmedStroke = stroke?.trim();
-let strokeColor = defaultStroke;
+      const trimmedStroke = stroke?.trim();
+      let strokeColor = defaultStroke;
 
-if (trimmedStroke) {
-    strokeColor = this.isColorDark(trimmedStroke) ? 'white' : 'black';
-}
+      if (trimmedStroke) {
+        strokeColor = this.isColorDark(trimmedStroke) ? 'white' : 'black';
+      }
 
       this.drawPath(parentGfx, linePathData, {
         strokeWidth: 1,
         strokeLinecap: 'square',
         transform: 'rotate(' + i * 30 + ',' + height + ',' + width + ')',
-        stroke:strokeColor,
+        stroke: strokeColor,
       });
     }
 
@@ -751,39 +752,38 @@ if (trimmedStroke) {
         my: 0.222,
       },
     });
-    
+
     const strokeColor = getElementStyle(event).stroke?.trim();
     const defaultStroke = 'black';
-let finalStroke = defaultStroke;
+    let finalStroke = defaultStroke;
 
-if (strokeColor) {
-    finalStroke = this.isColorDark(strokeColor) ? 'white' : 'black';
-}
+    if (strokeColor) {
+      finalStroke = this.isColorDark(strokeColor) ? 'white' : 'black';
+    }
     return this.drawPath(parentGfx, pathData, {
       strokeWidth: 1,
-      stroke : finalStroke,
+      stroke: finalStroke,
     });
   };
 
   private drawEndEvent = (parentGfx, element) => {
     const style = getElementStyle(element);
     const defaultStroke = 'black';
-const color = element.color?.trim();
-let strokeColor = defaultStroke;
+    const color = element.color?.trim();
+    let strokeColor = defaultStroke;
 
-if (color) {
-    strokeColor = this.isColorDark(color) ? 'white' : 'black';
-}
+    if (color) {
+      strokeColor = this.isColorDark(color) ? 'white' : 'black';
+    }
 
-    if(element.color&&element.color!=='none')
-      {
-        style.fill =element.color;
-        style.stroke =strokeColor;
-      }
+    if (element.color && element.color !== 'none') {
+      style.fill = element.color;
+      style.stroke = strokeColor;
+    }
 
     // Override strokeWidth to always be 4
     style.strokeWidth = 4;
-  
+
     const circle = this.drawEvent(parentGfx, element, style);
 
     this.renderEventContent(element, parentGfx);
@@ -792,404 +792,435 @@ if (color) {
   };
 
   private truncateText(text: string, maxLength: number): string {
-    return text.length > maxLength ? text.substring(0, maxLength - 3) + '...' : text;
+    return text.length > maxLength
+      ? text.substring(0, maxLength - 3) + '...'
+      : text;
   }
   private drawState = (parentGfx, element) => {
     const style = getElementStyle(element);
-    
+
     if (element.color && element.color !== 'none') {
       style.fill = element.color;
       style.stroke = element.color;
     }
-  
+
     // Create a group for the rectangle and text
     const group = svgCreate('g');
     svgAppend(parentGfx, group);
-  
+
     // Draw the rectangle
-    const rect = this.drawRect(group, element.width, element.height, 10, 0, style);
-  
+    const rect = this.drawRect(
+      group,
+      element.width,
+      element.height,
+      10,
+      0,
+      style
+    );
+
     // Create the text element
     const text = svgCreate('text');
+
+    // Get font properties from element's business object or use defaults
+    const bo = element.businessObject;
+    const fontFamily = bo?.fontFamily || element.fontFamily || 'Museo Sans';
+    const fontSize = bo?.fontSize || element.fontSize || '13px';
+    const fontColor =
+      bo?.fontColor ||
+      element.fontColor ||
+      (!element.color || !element.color.trim()
+        ? 'black'
+        : this.isColorDark(element.color)
+        ? 'white'
+        : 'black');
+    const fontWeight = bo?.fontBold || element.fontBold ? 'bold' : '500';
+    const fontStyle =
+      bo?.fontItalic || element.fontItalic ? 'italic' : 'normal';
+    const textDecoration =
+      bo?.fontUnderline || element.fontUnderline ? 'underline' : 'none';
+
     svgAttr(text, {
-      x: element.width / 2, 
-      y: element?.props?.FriendlyName.length >12?element.height / 2.3:element.height / 2, 
-      fill: (!element.color || !element.color.trim()) ? 
-      'black' : 
-      (this.isColorDark(element.color) ? 'white' : 'black'),
+      x: element.width / 2,
+      y:
+        element?.props?.FriendlyName.length > 12
+          ? element.height / 2.3
+          : element.height / 2,
+      fill: fontColor,
       'text-anchor': 'middle',
       'dominant-baseline': 'middle',
-      'font-size': '13px',
-      'font-weight': '500',
-      'font-family': 'Museo Sans',
-      'pointer-events': 'none'
+      'font-size': fontSize,
+      'font-weight': fontWeight,
+      'font-family': fontFamily,
+      'font-style': fontStyle,
+      'text-decoration': textDecoration,
+      'pointer-events': 'none',
     });
-  
+
     // Function to format text based on the first space after 10 characters
-   
-  
+
     // Get FriendlyName safely
-    const friendlyName = element?.props?.FriendlyName || this.isAiFlow('Agent') || 'State';
+    const friendlyName =
+      element?.props?.FriendlyName || this.isAiFlow('Agent') || 'State';
     const lines = this.formatText(friendlyName, 12);
-  
+
     // Append each line to the text element
     lines.forEach((line, index) => {
       const tspan = svgCreate('tspan');
       tspan.textContent = line;
       svgAttr(tspan, {
-        x: element.width / 2, 
+        x: element.width / 2,
         dy: index === 0 ? 0 : '1.2em',
       });
       text.appendChild(tspan);
     });
-  
+
     // Append text to group
     svgAppend(group, text);
-    
+
     this.renderEventContent(element, parentGfx);
     return group;
   };
-  
-  private drawTestElectric = (parentGfx, element) =>{
+
+  private drawTestElectric = (parentGfx, element) => {
     //  const customTask = this.drawShape(parentGfx, element);
     const icon = svgCreate('image', {
       x: 5,
       y: 5,
       width: 80,
       height: 80,
-      href: '../../../../../assets/images/test-electric.svg'  // <== Replace this with your SVG URL or data URI
+      href: '../../../../../assets/images/test-electric.svg', // <== Replace this with your SVG URL or data URI
     });
 
     return svgAppend(parentGfx, icon);
 
     // return customTask;
-  }
+  };
 
-  private drawApi(parentGfx, element){
-     const color = element.color ?? 'black';
-      const width = element.width;
-      const height = element.height;
+  private drawApi(parentGfx, element) {
+    const color = element.color ?? 'black';
+    const width = element.width;
+    const height = element.height;
 
-      const cx = width / 2;
-      const cy = height / 2;
+    const cx = width / 2;
+    const cy = height / 2;
 
-      const group = svgCreate('g');
+    const group = svgCreate('g');
 
-      const circle = svgCreate('circle');
-      svgAttr(circle, {
-          cx: cx,
-          cy: cy,
-          r: Math.round((width + height) / 4),
-          fill: 'white',
-          stroke: color,
-          strokeWidth: 2
-      });
+    const circle = svgCreate('circle');
+    svgAttr(circle, {
+      cx: cx,
+      cy: cy,
+      r: Math.round((width + height) / 4),
+      fill: 'white',
+      stroke: color,
+      strokeWidth: 2,
+    });
     const path = svgCreate('path');
-    svgAttr(path, { d: "M29.8789 9H23.0029L18.623 19H23.0029L19.2529 29L29.252 16.5H24.251L29.8789 9Z", fill: color, transform: `translate(${-10}, ${0}) scale(1.7)` });
+    svgAttr(path, {
+      d: 'M29.8789 9H23.0029L18.623 19H23.0029L19.2529 29L29.252 16.5H24.251L29.8789 9Z',
+      fill: color,
+      transform: `translate(${-10}, ${0}) scale(1.7)`,
+    });
 
     svgAppend(group, circle);
     svgAppend(group, path);
 
     return svgAppend(parentGfx, group);
-
   }
 
   private drawDataSchema(parentGfx, element) {
-      const color = element.color ?? 'black';
-      const width = element.width;
-      const height = element.height;
-
-      const cx = width / 2;
-      const cy = height / 2;
-
-      const group = svgCreate('g');
-
-      const circle = svgCreate('circle');
-      svgAttr(circle, {
-          cx: cx,
-          cy: cy,
-          r: Math.round((width + height) / 4),
-          fill: 'white',
-          stroke: color,
-          strokeWidth: 2
-      });
-
-
-      const image = svgCreate('image');
-      svgAttr(image, {
-          width: 55,
-          height: 30,
-          x: cx - 55 / 2,
-          y: cy - 30 / 2,
-          href: DATA_SCHEMA
-      });
-
-      svgAppend(group, circle);
-      svgAppend(group, image);
-
-      return svgAppend(parentGfx, group);
-  }
-
-  private drawHumanInLoop (parentGfx, element){
-     const color = element.color ?? 'black';
-      const width = element.width;
-      const height = element.height;
-
-      const cx = width / 2;
-      const cy = height / 2;
-
-      const group = svgCreate('g');
-
-      const circle = svgCreate('circle');
-      svgAttr(circle, {
-          cx: cx,
-          cy: cy,
-          r: Math.round((width + height) / 4),
-          fill: 'white',
-          stroke: color,
-          strokeWidth: 2
-      });
-
-
-      const image = svgCreate('image');
-      svgAttr(image, {
-          width: 55,
-          height: 30,
-          x: cx - 55 / 2,
-          y: cy - 30 / 2,
-          href: HUMAN_IN_LOOP
-      });
-
-      svgAppend(group, circle);
-      svgAppend(group, image);
-
-      return svgAppend(parentGfx, group);
-
-  }
-
-  private drawLLM (parentGfx, element){
     const color = element.color ?? 'black';
-      const width = element.width;
-      const height = element.height;
+    const width = element.width;
+    const height = element.height;
 
-      const cx = width / 2;
-      const cy = height / 2;
+    const cx = width / 2;
+    const cy = height / 2;
 
-      const group = svgCreate('g');
+    const group = svgCreate('g');
 
-      const circle = svgCreate('circle');
-      svgAttr(circle, {
-          cx: cx,
-          cy: cy,
-          r: Math.round((width + height) / 4),
-          fill: 'white',
-          stroke: color,
-          strokeWidth: 2
-      });
+    const circle = svgCreate('circle');
+    svgAttr(circle, {
+      cx: cx,
+      cy: cy,
+      r: Math.round((width + height) / 4),
+      fill: 'white',
+      stroke: color,
+      strokeWidth: 2,
+    });
 
+    const image = svgCreate('image');
+    svgAttr(image, {
+      width: 55,
+      height: 30,
+      x: cx - 55 / 2,
+      y: cy - 30 / 2,
+      href: DATA_SCHEMA,
+    });
 
-      const image = svgCreate('image');
-      svgAttr(image, {
-          width: 55,
-          height: 30,
-          x: cx - 55 / 2,
-          y: cy - 30 / 2,
-          href: LLM
-      });
+    svgAppend(group, circle);
+    svgAppend(group, image);
 
-      svgAppend(group, circle);
-      svgAppend(group, image);
-
-      return svgAppend(parentGfx, group);
+    return svgAppend(parentGfx, group);
   }
 
-   private drawPromptVariable (parentGfx, element){
+  private drawHumanInLoop(parentGfx, element) {
     const color = element.color ?? 'black';
-      const width = element.width;
-      const height = element.height;
+    const width = element.width;
+    const height = element.height;
 
-      const cx = width / 2;
-      const cy = height / 2;
+    const cx = width / 2;
+    const cy = height / 2;
 
-      const group = svgCreate('g');
+    const group = svgCreate('g');
 
-      const circle = svgCreate('circle');
-      svgAttr(circle, {
-          cx: cx,
-          cy: cy,
-          r: Math.round((width + height) / 4),
-          fill: 'white',
-          stroke: color,
-          strokeWidth: 2
-      });
+    const circle = svgCreate('circle');
+    svgAttr(circle, {
+      cx: cx,
+      cy: cy,
+      r: Math.round((width + height) / 4),
+      fill: 'white',
+      stroke: color,
+      strokeWidth: 2,
+    });
 
+    const image = svgCreate('image');
+    svgAttr(image, {
+      width: 55,
+      height: 30,
+      x: cx - 55 / 2,
+      y: cy - 30 / 2,
+      href: HUMAN_IN_LOOP,
+    });
 
-      const image = svgCreate('image');
-      svgAttr(image, {
-          width: 55,
-          height: 30,
-          x: cx - 55 / 2,
-          y: cy - 30 / 2,
-          href: PROMPT_VARIABLE
-      });
+    svgAppend(group, circle);
+    svgAppend(group, image);
 
-      svgAppend(group, circle);
-      svgAppend(group, image);
-
-      return svgAppend(parentGfx, group);
+    return svgAppend(parentGfx, group);
   }
 
-  private drawScheduler (parentGfx, element){
-const color = element.color ?? 'black';
-const width = element.width;
-const height = element.height;
-
-const group = svgCreate('g');
-
-const scale = height / 36; 
-const offsetX = (width - 45 * scale) / 2;
-const offsetY = 0; 
-
-svgAttr(group, {
-  transform: `translate(${offsetX}, ${offsetY}) scale(${scale})`
-});
-
-const circle = svgCreate('circle');
-svgAttr(circle, {
-  cx: 23, cy: 18, r: 17.25,
-  fill: 'white', stroke: color, 'stroke-width': 1.5
-});
-
-const circle1 = svgCreate('circle');
-svgAttr(circle1, {
-  cx: 23, cy: 18, r: 10.75,
-  fill: 'none', stroke: color, 'stroke-width': 1.5
-});
-
-const rawPaths = [
-  "M23 7.5V11",
-  "M23 24.5V28",
-  "M28.0625 8.8374L26.3339 11.8808",
-  "M19.667 23.6194L17.9384 26.6628",
-  "M32.0195 12.8794L28.9399 14.5425",
-  "M17.0605 20.9575L13.9809 22.6206",
-  "M33.2461 18.0415L29.7475 17.942",
-  "M16.2529 17.5581L12.7543 17.4586",
-  "M31.8281 22.9595L28.8139 21.1807",
-  "M17.1875 14.3193L14.1732 12.5405",
-  "M28.4424 26.4358L26.584 23.4699",
-  "M19.416 12.0303L17.5576 9.06441",
-  "M25.2222 12L23 18H28"
-];
-
-const paths = rawPaths.map(d => {
-  const p = svgCreate('path');
-  svgAttr(p, { d, stroke: color, fill: 'none' });
-  return p;
-});
-
-svgAppend(group, circle);
-svgAppend(group, circle1);
-paths.forEach(p => svgAppend(group, p));
-
-return svgAppend(parentGfx, group);
-
-
-  }
-
-  private drawSqlQuery (parentGfx, element){
+  private drawLLM(parentGfx, element) {
     const color = element.color ?? 'black';
-      const width = element.width;
-      const height = element.height;
+    const width = element.width;
+    const height = element.height;
 
-      const cx = width / 2;
-      const cy = height / 2;
+    const cx = width / 2;
+    const cy = height / 2;
 
-      const group = svgCreate('g');
+    const group = svgCreate('g');
 
-      const circle = svgCreate('circle');
-      svgAttr(circle, {
-          cx: cx,
-          cy: cy,
-          r: Math.round((width + height) / 4),
-          fill: 'white',
-          stroke: color,
-          strokeWidth: 2
-      });
+    const circle = svgCreate('circle');
+    svgAttr(circle, {
+      cx: cx,
+      cy: cy,
+      r: Math.round((width + height) / 4),
+      fill: 'white',
+      stroke: color,
+      strokeWidth: 2,
+    });
 
+    const image = svgCreate('image');
+    svgAttr(image, {
+      width: 55,
+      height: 30,
+      x: cx - 55 / 2,
+      y: cy - 30 / 2,
+      href: LLM,
+    });
 
-      const image = svgCreate('image');
-      svgAttr(image, {
-          width: 55,
-          height: 30,
-          x: cx - 55 / 2,
-          y: cy - 30 / 2,
-          href: SQL_QUERY
-      });
+    svgAppend(group, circle);
+    svgAppend(group, image);
 
-      svgAppend(group, circle);
-      svgAppend(group, image);
-
-      return svgAppend(parentGfx, group);
+    return svgAppend(parentGfx, group);
   }
 
- private drawVector (parentGfx, element){
+  private drawPromptVariable(parentGfx, element) {
     const color = element.color ?? 'black';
-      const width = element.width;
-      const height = element.height;
+    const width = element.width;
+    const height = element.height;
 
-      const cx = width / 2;
-      const cy = height / 2;
+    const cx = width / 2;
+    const cy = height / 2;
 
-      const group = svgCreate('g');
+    const group = svgCreate('g');
 
-      const circle = svgCreate('circle');
-      svgAttr(circle, {
-          cx: cx,
-          cy: cy,
-          r: Math.round((width + height) / 4),
-          fill: 'white',
-          stroke: color,
-          strokeWidth: 2
-      });
+    const circle = svgCreate('circle');
+    svgAttr(circle, {
+      cx: cx,
+      cy: cy,
+      r: Math.round((width + height) / 4),
+      fill: 'white',
+      stroke: color,
+      strokeWidth: 2,
+    });
 
+    const image = svgCreate('image');
+    svgAttr(image, {
+      width: 55,
+      height: 30,
+      x: cx - 55 / 2,
+      y: cy - 30 / 2,
+      href: PROMPT_VARIABLE,
+    });
 
-      const image = svgCreate('image');
-      svgAttr(image, {
-          width: 55,
-          height: 30,
-          x: cx - 55 / 2,
-          y: cy - 30 / 2,
-          href: VECTOR
-      });
+    svgAppend(group, circle);
+    svgAppend(group, image);
 
-      svgAppend(group, circle);
-      svgAppend(group, image);
+    return svgAppend(parentGfx, group);
+  }
 
-      return svgAppend(parentGfx, group);
-}
+  private drawScheduler(parentGfx, element) {
+    const color = element.color ?? 'black';
+    const width = element.width;
+    const height = element.height;
 
-  
- private drawAgenticFlow (parentGfx, element){
-      const icon = svgCreate('image', {
+    const group = svgCreate('g');
+
+    const scale = height / 36;
+    const offsetX = (width - 45 * scale) / 2;
+    const offsetY = 0;
+
+    svgAttr(group, {
+      transform: `translate(${offsetX}, ${offsetY}) scale(${scale})`,
+    });
+
+    const circle = svgCreate('circle');
+    svgAttr(circle, {
+      cx: 23,
+      cy: 18,
+      r: 17.25,
+      fill: 'white',
+      stroke: color,
+      'stroke-width': 1.5,
+    });
+
+    const circle1 = svgCreate('circle');
+    svgAttr(circle1, {
+      cx: 23,
+      cy: 18,
+      r: 10.75,
+      fill: 'none',
+      stroke: color,
+      'stroke-width': 1.5,
+    });
+
+    const rawPaths = [
+      'M23 7.5V11',
+      'M23 24.5V28',
+      'M28.0625 8.8374L26.3339 11.8808',
+      'M19.667 23.6194L17.9384 26.6628',
+      'M32.0195 12.8794L28.9399 14.5425',
+      'M17.0605 20.9575L13.9809 22.6206',
+      'M33.2461 18.0415L29.7475 17.942',
+      'M16.2529 17.5581L12.7543 17.4586',
+      'M31.8281 22.9595L28.8139 21.1807',
+      'M17.1875 14.3193L14.1732 12.5405',
+      'M28.4424 26.4358L26.584 23.4699',
+      'M19.416 12.0303L17.5576 9.06441',
+      'M25.2222 12L23 18H28',
+    ];
+
+    const paths = rawPaths.map((d) => {
+      const p = svgCreate('path');
+      svgAttr(p, { d, stroke: color, fill: 'none' });
+      return p;
+    });
+
+    svgAppend(group, circle);
+    svgAppend(group, circle1);
+    paths.forEach((p) => svgAppend(group, p));
+
+    return svgAppend(parentGfx, group);
+  }
+
+  private drawSqlQuery(parentGfx, element) {
+    const color = element.color ?? 'black';
+    const width = element.width;
+    const height = element.height;
+
+    const cx = width / 2;
+    const cy = height / 2;
+
+    const group = svgCreate('g');
+
+    const circle = svgCreate('circle');
+    svgAttr(circle, {
+      cx: cx,
+      cy: cy,
+      r: Math.round((width + height) / 4),
+      fill: 'white',
+      stroke: color,
+      strokeWidth: 2,
+    });
+
+    const image = svgCreate('image');
+    svgAttr(image, {
+      width: 55,
+      height: 30,
+      x: cx - 55 / 2,
+      y: cy - 30 / 2,
+      href: SQL_QUERY,
+    });
+
+    svgAppend(group, circle);
+    svgAppend(group, image);
+
+    return svgAppend(parentGfx, group);
+  }
+
+  private drawVector(parentGfx, element) {
+    const color = element.color ?? 'black';
+    const width = element.width;
+    const height = element.height;
+
+    const cx = width / 2;
+    const cy = height / 2;
+
+    const group = svgCreate('g');
+
+    const circle = svgCreate('circle');
+    svgAttr(circle, {
+      cx: cx,
+      cy: cy,
+      r: Math.round((width + height) / 4),
+      fill: 'white',
+      stroke: color,
+      strokeWidth: 2,
+    });
+
+    const image = svgCreate('image');
+    svgAttr(image, {
+      width: 55,
+      height: 30,
+      x: cx - 55 / 2,
+      y: cy - 30 / 2,
+      href: VECTOR,
+    });
+
+    svgAppend(group, circle);
+    svgAppend(group, image);
+
+    return svgAppend(parentGfx, group);
+  }
+
+  private drawAgenticFlow(parentGfx, element) {
+    const icon = svgCreate('image', {
       x: 5,
       y: 5,
       width: 80,
       height: 80,
-      href: '../../../../../assets/images/bpmn-agentic-flow.svg' 
+      href: '../../../../../assets/images/bpmn-agentic-flow.svg',
     });
 
     return svgAppend(parentGfx, icon);
   }
 
-
-  private drawImage(parentGfx, element, image){
-        const icon = svgCreate('image', {
+  private drawImage(parentGfx, element, image) {
+    const icon = svgCreate('image', {
       x: 5,
       y: 5,
       width: 80,
       height: 80,
-      href: image  // <== Replace this with your SVG URL or data URI
+      href: image, // <== Replace this with your SVG URL or data URI
     });
 
     return svgAppend(parentGfx, icon);
@@ -1197,32 +1228,30 @@ return svgAppend(parentGfx, group);
 
   readonly formatText = (input: string, maxLength: number): string[] => {
     input = (input || '').trim().replace(/\s+/g, ' '); // Clean spaces
-  
+
     if (input.length <= maxLength) return [input]; // No need to wrap
-  
+
     const midIndex = Math.floor(input.length / 2); // Find middle index
     let spaceIndexBefore = input.lastIndexOf(' ', midIndex); // Space before mid
     let spaceIndexAfter = input.indexOf(' ', midIndex); // Space after mid
-  
+
     let breakIndex;
-    if (spaceIndexBefore !== -1 && spaceIndexBefore >= midIndex - maxLength / 2) {
+    if (
+      spaceIndexBefore !== -1 &&
+      spaceIndexBefore >= midIndex - maxLength / 2
+    ) {
       breakIndex = spaceIndexBefore; // Prefer break before mid
     } else if (spaceIndexAfter !== -1) {
       breakIndex = spaceIndexAfter; // Otherwise, break after mid
     } else {
       breakIndex = midIndex; // No space found, force break at mid
     }
-  
+
     return [
       input.substring(0, breakIndex).trim(),
-      input.substring(breakIndex).trim() // Ensure no characters are lost
+      input.substring(breakIndex).trim(), // Ensure no characters are lost
     ];
   };
-  
-  
-    
-  
-
 
   private drawIntermediateEvent = (parentGfx, element) => {
     const style = getElementStyle(element);
@@ -1243,15 +1272,15 @@ return svgAppend(parentGfx, group);
   };
   private drawSubProcess = (parentGfx, element, attrs) => {
     const style = getElementStyle(element);
-  
+
     if (element.color && element.color !== 'none') {
       style.fill = element.color;
       style.stroke = element.color;
     }
-  
+
     const rectWidth = element.width;
     const rectHeight = element.height;
-  
+
     // Draw the main rectangle
     const rect = this.drawRect(parentGfx, rectWidth, rectHeight, 10, {
       fill: style.fill,
@@ -1259,27 +1288,52 @@ return svgAppend(parentGfx, group);
       strokeWidth: style.strokeWidth || 2,
       fillOpacity: style.fillOpacity,
     });
-  
+
     // Create a text element
     const text = svgCreate('text');
+
+    // Get font properties from element's business object or use defaults
+    const bo = element.businessObject;
+    const fontFamily = bo?.fontFamily || element.fontFamily || 'Museo Sans';
+    const fontSize = bo?.fontSize || element.fontSize || '13px';
+    const fontColor =
+      bo?.fontColor ||
+      element.fontColor ||
+      (!element.color || !element.color.trim()
+        ? 'black'
+        : this.isColorDark(element.color)
+        ? 'white'
+        : 'black');
+    const fontWeight = bo?.fontBold || element.fontBold ? 'bold' : '450';
+    const fontStyle =
+      bo?.fontItalic || element.fontItalic ? 'italic' : 'normal';
+    const textDecoration =
+      bo?.fontUnderline || element.fontUnderline ? 'underline' : 'none';
+
     svgAttr(text, {
       x: rectWidth / 2,
-      y: element?.props?.FriendlyName.length>12? rectHeight / 2.5:rectHeight / 2,
-      fill:     (!element.color || !element.color.trim()) ? 
-      'black' : 
-      (this.isColorDark(element.color) ? 'white' : 'black'),
+      y:
+        element?.props?.FriendlyName.length > 12
+          ? rectHeight / 2.5
+          : rectHeight / 2,
+      fill: fontColor,
       'text-anchor': 'middle',
       'dominant-baseline': 'middle',
-      'font-size': '13px',
-      'font-weight': '450',
-      'font-family': 'Museo Sans',
+      'font-size': fontSize,
+      'font-weight': fontWeight,
+      'font-family': fontFamily,
+      'font-style': fontStyle,
+      'text-decoration': textDecoration,
       'pointer-events': 'none',
     });
 
     // Get FriendlyName safely
-    const friendlyName = element?.props?.FriendlyName || this.isAiFlow('Agentic Flow') || 'Subprocess';
+    const friendlyName =
+      element?.props?.FriendlyName ||
+      this.isAiFlow('Agentic Flow') ||
+      'Subprocess';
     const lines = this.formatText(friendlyName, 12);
-  
+
     // Append each line to the text element
     lines.forEach((line, index) => {
       const tspan = svgCreate('tspan');
@@ -1290,33 +1344,32 @@ return svgAppend(parentGfx, group);
       });
       text.appendChild(tspan);
     });
-  
+
     // Append text to parent graphics
     svgAppend(parentGfx, text);
-  
+
     // Draw a smaller box for the icon
     const iconBoxSize = 15;
     const iconBoxX = (rectWidth - iconBoxSize) / 2;
     const iconBoxY = rectHeight - iconBoxSize - 8;
 
     const defaultStroke = 'black';
-const color = element.color?.trim();
-let strokeColor = defaultStroke;
+    const color = element.color?.trim();
+    let strokeColor = defaultStroke;
 
-if (color) {
-    strokeColor = this.isColorDark(color) ? 'white' : 'black';
-}
+    if (color) {
+      strokeColor = this.isColorDark(color) ? 'white' : 'black';
+    }
 
-  
     this.drawRect(parentGfx, iconBoxSize, iconBoxSize, 0, {
-     //fill: element.color==='black'?'white':'black',
-     stroke: strokeColor,
+      //fill: element.color==='black'?'white':'black',
+      stroke: strokeColor,
       strokeWidth: 1,
       fillOpacity: 1,
       x: iconBoxX,
       y: iconBoxY,
     });
-  
+
     // Position the parallel gateway icon
     const pathData = this.pathMap.getScaledPath('GATEWAY_PARALLEL', {
       xScaleFactor: 0.15,
@@ -1328,29 +1381,27 @@ if (color) {
         my: 0.73,
       },
     });
-  
+
     // Draw the gateway inside the square
     this.drawPath(parentGfx, pathData, {
       strokeWidth: 1,
       fill: style.stroke,
       stroke: style.stroke,
     });
-  
+
     // Render additional event content
     this.renderEventContent(element, parentGfx);
-  
+
     return rect;
   };
 
-
   private isColorDark(color: string): boolean {
-
     let r, g, b;
-  
+
     // Check if the color is in hex format
-    if (color.startsWith("#")) {
+    if (color.startsWith('#')) {
       // Convert hex to RGB
-      const hex = color.replace("#", "");
+      const hex = color.replace('#', '');
       if (hex.length === 3) {
         // Expand shorthand hex (e.g., #000 -> #000000)
         r = parseInt(hex[0] + hex[0], 16);
@@ -1361,9 +1412,9 @@ if (color) {
         g = parseInt(hex.substring(2, 4), 16);
         b = parseInt(hex.substring(4, 6), 16);
       }
-    } 
+    }
     // Check if the color is in RGB format
-    else if (color.startsWith("rgb")) {
+    else if (color.startsWith('rgb')) {
       const rgbValues = color.match(/\d+/g); // Extract numbers
       if (rgbValues) {
         r = parseInt(rgbValues[0], 10);
@@ -1371,25 +1422,22 @@ if (color) {
         b = parseInt(rgbValues[2], 10);
       }
     }
-  
+
     if (r === undefined || g === undefined || b === undefined) {
       return false; // Default to false if color parsing fails
     }
-  
+
     // Calculate brightness (perceived luminance)
-    const brightness = (r * 0.299 + g * 0.587 + b * 0.114);
-    
+    const brightness = r * 0.299 + g * 0.587 + b * 0.114;
+
     // If brightness is below a threshold, consider it dark
     return brightness < 128;
-   
   }
-  
-  
-  
+
   private drawPool = (parentGfx, element) => {
     const { fill, stroke } = getElementStyle(element);
     const attrs = {
-     fillOpacity: DEFAULT_FILL_OPACITY,
+      fillOpacity: DEFAULT_FILL_OPACITY,
       fill: fill || 'none',
       stroke,
     };
@@ -1456,19 +1504,18 @@ if (color) {
   private drawExclusiveGateway = (parentGfx, element) => {
     const style = getElementStyle(element);
     const defaultStroke = 'black';
-const color = element.color?.trim();
-let strokeColor: string;
+    const color = element.color?.trim();
+    let strokeColor: string;
 
-if (color) {
-    strokeColor = this.isColorDark(color) ? 'white' : 'black';
-} else {
-    strokeColor = defaultStroke;
-}
-    if(element.color&&element.color!=='none')
-      {
-        style.fill =element.color;
-        style.stroke = strokeColor;
-      }
+    if (color) {
+      strokeColor = this.isColorDark(color) ? 'white' : 'black';
+    } else {
+      strokeColor = defaultStroke;
+    }
+    if (element.color && element.color !== 'none') {
+      style.fill = element.color;
+      style.stroke = strokeColor;
+    }
     const diamond = this.drawDiamond(
       parentGfx,
       element.width,
@@ -1486,8 +1533,6 @@ if (color) {
         my: 0.3,
       },
     });
-
-
 
     if (getDi(element).isMarkerVisible) {
       this.drawPath(parentGfx, pathData, { fill: stroke, stroke, strokeWidth });
@@ -1553,7 +1598,7 @@ if (color) {
       strokeLinejoin: 'round',
       markerEnd: this.marker('sequenceflow-end', fill, stroke),
       stroke,
-      strokeDasharray: 5.5
+      strokeDasharray: 5.5,
     };
 
     const path = this.drawPath(parentGfx, pathData, attrs);
@@ -1663,13 +1708,13 @@ if (color) {
   };
 
   private isCustom(element) {
-  return element && /custom:/.test(element.type);
-}
-
- private isAiFlow(type){
-  if(location.pathname?.includes('ai-flow')){
-    return type
+    return element && /custom:/.test(element.type);
   }
-  return undefined;
- }
+
+  private isAiFlow(type) {
+    if (location.pathname?.includes('ai-flow')) {
+      return type;
+    }
+    return undefined;
+  }
 }
