@@ -1201,11 +1201,22 @@ export class DiagramService implements OnDestroy {
     element: any,
     fontFamily: string,
     fontSize: string,
-    fontColor: string
+    fontColor: string,
+    fontBold: boolean = false,
+    fontItalic: boolean = false,
+    fontUnderline: boolean = false
   ): void {
     if (!element) return;
 
-    this.bpmn.applyAllFontProperties(element, fontFamily, fontSize, fontColor);
+    this.bpmn.applyAllFontProperties(
+      element,
+      fontFamily,
+      fontSize,
+      fontColor,
+      fontBold,
+      fontItalic,
+      fontUnderline
+    );
   }
 
   public restoreFontProperties(element: any): void {

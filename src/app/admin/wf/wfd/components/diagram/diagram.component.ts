@@ -143,6 +143,9 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
   public selectedFontFamily: string = 'Arial';
   public selectedFontSize: string = '14px';
   public selectedFontColor: string = '#000000';
+  public selectedFontBold: boolean = false;
+  public selectedFontItalic: boolean = false;
+  public selectedFontUnderline: boolean = false;
   constructor(
     private dialog: MatDialog,
     public service: DiagramService,
@@ -1560,12 +1563,18 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     const currentFontFamily = this.getCurrentFontFamily(element);
     const currentFontSize = this.getCurrentFontSize(element);
     const currentFontColor = this.getCurrentFontColor(element);
+    const currentFontBold = this.getCurrentFontBold(element);
+    const currentFontItalic = this.getCurrentFontItalic(element);
+    const currentFontUnderline = this.getCurrentFontUnderline(element);
 
     // Also check business object for stored properties
     const bo = element.businessObject;
     const boFontFamily = bo?.fontFamily;
     const boFontSize = bo?.fontSize;
     const boFontColor = bo?.fontColor;
+    const boFontBold = bo?.fontBold;
+    const boFontItalic = bo?.fontItalic;
+    const boFontUnderline = bo?.fontUnderline;
 
     // Process and convert the values with priority: business object > element > SVG > defaults
     this.selectedFontFamily = this.processFontFamily(
@@ -1592,11 +1601,41 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
         '#000000'
     );
 
+    this.selectedFontBold =
+      boFontBold !== undefined
+        ? boFontBold
+        : element.fontBold !== undefined
+        ? element.fontBold
+        : element.props && element.props.fontBold !== undefined
+        ? element.props.fontBold
+        : currentFontBold || false;
+
+    this.selectedFontItalic =
+      boFontItalic !== undefined
+        ? boFontItalic
+        : element.fontItalic !== undefined
+        ? element.fontItalic
+        : element.props && element.props.fontItalic !== undefined
+        ? element.props.fontItalic
+        : currentFontItalic || false;
+
+    this.selectedFontUnderline =
+      boFontUnderline !== undefined
+        ? boFontUnderline
+        : element.fontUnderline !== undefined
+        ? element.fontUnderline
+        : element.props && element.props.fontUnderline !== undefined
+        ? element.props.fontUnderline
+        : currentFontUnderline || false;
+
     console.log(
       'Processed values:',
       this.selectedFontFamily,
       this.selectedFontSize,
-      this.selectedFontColor
+      this.selectedFontColor,
+      this.selectedFontBold,
+      this.selectedFontItalic,
+      this.selectedFontUnderline
     );
 
     if (
@@ -1723,6 +1762,9 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     const currentFontFamily = this.getCurrentFontFamily(element);
     const currentFontSize = this.getCurrentFontSize(element);
     const currentFontColor = this.getCurrentFontColor(element);
+    const currentFontBold = this.getCurrentFontBold(element);
+    const currentFontItalic = this.getCurrentFontItalic(element);
+    const currentFontUnderline = this.getCurrentFontUnderline(element);
 
     // Update only if we found new values, and process them
     if (currentFontFamily) {
@@ -1734,12 +1776,24 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     if (currentFontColor) {
       this.selectedFontColor = this.processFontColor(currentFontColor);
     }
+    if (currentFontBold !== undefined) {
+      this.selectedFontBold = currentFontBold;
+    }
+    if (currentFontItalic !== undefined) {
+      this.selectedFontItalic = currentFontItalic;
+    }
+    if (currentFontUnderline !== undefined) {
+      this.selectedFontUnderline = currentFontUnderline;
+    }
 
     console.log(
       'Updated font properties (delayed):',
       this.selectedFontFamily,
       this.selectedFontSize,
-      this.selectedFontColor
+      this.selectedFontColor,
+      this.selectedFontBold,
+      this.selectedFontItalic,
+      this.selectedFontUnderline
     );
   }
 
@@ -1806,6 +1860,68 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     return null;
   }
 
+  private getCurrentFontBold(element: any): boolean {
+    try {
+      const gfx = this.service.getGraphics(element);
+      if (gfx) {
+        const textElement = gfx.querySelector('text');
+        if (textElement) {
+          const fontWeight =
+            textElement.getAttribute('font-weight') ||
+            textElement.style.fontWeight ||
+            window.getComputedStyle(textElement).fontWeight;
+          return (
+            fontWeight === 'bold' ||
+            fontWeight === '700' ||
+            fontWeight === '800' ||
+            fontWeight === '900'
+          );
+        }
+      }
+    } catch (error) {
+      console.warn('Error getting font bold:', error);
+    }
+    return false;
+  }
+
+  private getCurrentFontItalic(element: any): boolean {
+    try {
+      const gfx = this.service.getGraphics(element);
+      if (gfx) {
+        const textElement = gfx.querySelector('text');
+        if (textElement) {
+          const fontStyle =
+            textElement.getAttribute('font-style') ||
+            textElement.style.fontStyle ||
+            window.getComputedStyle(textElement).fontStyle;
+          return fontStyle === 'italic' || fontStyle === 'oblique';
+        }
+      }
+    } catch (error) {
+      console.warn('Error getting font italic:', error);
+    }
+    return false;
+  }
+
+  private getCurrentFontUnderline(element: any): boolean {
+    try {
+      const gfx = this.service.getGraphics(element);
+      if (gfx) {
+        const textElement = gfx.querySelector('text');
+        if (textElement) {
+          const textDecoration =
+            textElement.getAttribute('text-decoration') ||
+            textElement.style.textDecoration ||
+            window.getComputedStyle(textElement).textDecoration;
+          return textDecoration.includes('underline');
+        }
+      }
+    } catch (error) {
+      console.warn('Error getting font underline:', error);
+    }
+    return false;
+  }
+
   public applyFontFamily(): void {
     if (!this.selectedState) {
       this.toastr.warning('Please select a state first');
@@ -1833,6 +1949,36 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     this.applyAllFontProperties();
   }
 
+  public toggleFontBold(): void {
+    if (!this.selectedState) {
+      this.toastr.warning('Please select a state first');
+      return;
+    }
+
+    this.selectedFontBold = !this.selectedFontBold;
+    this.applyAllFontProperties();
+  }
+
+  public toggleFontItalic(): void {
+    if (!this.selectedState) {
+      this.toastr.warning('Please select a state first');
+      return;
+    }
+
+    this.selectedFontItalic = !this.selectedFontItalic;
+    this.applyAllFontProperties();
+  }
+
+  public toggleFontUnderline(): void {
+    if (!this.selectedState) {
+      this.toastr.warning('Please select a state first');
+      return;
+    }
+
+    this.selectedFontUnderline = !this.selectedFontUnderline;
+    this.applyAllFontProperties();
+  }
+
   private applyAllFontProperties(): void {
     if (!this.selectedState) return;
 
@@ -1840,13 +1986,19 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       fontFamily: this.selectedFontFamily,
       fontSize: this.selectedFontSize,
       fontColor: this.selectedFontColor,
+      fontBold: this.selectedFontBold,
+      fontItalic: this.selectedFontItalic,
+      fontUnderline: this.selectedFontUnderline,
     });
 
     this.service.applyAllFontProperties(
       this.selectedState,
       this.selectedFontFamily,
       this.selectedFontSize,
-      this.selectedFontColor
+      this.selectedFontColor,
+      this.selectedFontBold,
+      this.selectedFontItalic,
+      this.selectedFontUnderline
     );
   }
 

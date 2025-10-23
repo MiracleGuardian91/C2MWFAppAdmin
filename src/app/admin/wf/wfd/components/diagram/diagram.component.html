@@ -258,7 +258,48 @@
             </div>
           </div>
 
-          <div class="d-none">
+          <!-- Font Style Buttons -->
+          <div
+            *ngIf="service.paletteIsOpen"
+            style="display: flex; align-items: center"
+          >
+            <div class="font-control-group">
+              <div class="font-style-buttons">
+                <button
+                  type="button"
+                  class="font-style-btn"
+                  [class.active]="selectedFontBold"
+                  [disabled]="!selectedState"
+                  (click)="toggleFontBold()"
+                  title="Toggle Bold"
+                >
+                  <strong>B</strong>
+                </button>
+                <button
+                  type="button"
+                  class="font-style-btn"
+                  [class.active]="selectedFontItalic"
+                  [disabled]="!selectedState"
+                  (click)="toggleFontItalic()"
+                  title="Toggle Italic"
+                >
+                  <em>I</em>
+                </button>
+                <button
+                  type="button"
+                  class="font-style-btn"
+                  [class.active]="selectedFontUnderline"
+                  [disabled]="!selectedState"
+                  (click)="toggleFontUnderline()"
+                  title="Toggle Underline"
+                >
+                  <u>U</u>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- <div class="d-none">
             <button>
               <svg
                 width="20"
@@ -332,7 +373,7 @@
                 />
               </svg>
             </button>
-          </div>
+          </div> -->
         </div>
 
         <div class="d-flex">
