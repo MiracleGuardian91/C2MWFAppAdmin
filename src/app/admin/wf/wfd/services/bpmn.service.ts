@@ -153,13 +153,7 @@ export class BpmnService {
     this.commandStack.redo();
   }
 
-  /**
-   * Manually fix overlapping connections
-   */
-  public fixOverlappingConnections(): void {
-    // This will be called by the ConnectionOverlapModule when needed
-    // The actual implementation is in the custom module
-  }
+  public fixOverlappingConnections(): void {}
 
   public commandStackLength() {
     return this.commandStack._stack.length ?? -1;
@@ -197,65 +191,53 @@ export class BpmnService {
     this.labelEditing.update(element, name);
   }
 
-  // Font control methods
   public applyFontFamily(element: DiagramEl, fontFamily: string): void {
     if (!element) return;
 
-    // Get current font properties to preserve them
     const currentProps = this.getCurrentFontProperties(element);
 
-    // Update all font properties together
     this.modeling.updateProperties(element, {
       fontFamily: fontFamily,
       fontSize: currentProps.fontSize,
       fontColor: currentProps.fontColor,
     });
 
-    // Apply font family to SVG text elements
     this.updateTextElements(element, 'font-family', fontFamily);
   }
 
   public applyFontSize(element: DiagramEl, fontSize: string): void {
     if (!element) return;
 
-    // Get current font properties to preserve them
     const currentProps = this.getCurrentFontProperties(element);
 
-    // Update all font properties together
     this.modeling.updateProperties(element, {
       fontFamily: currentProps.fontFamily,
       fontSize: fontSize,
       fontColor: currentProps.fontColor,
     });
 
-    // Apply font size to SVG text elements
     this.updateTextElements(element, 'font-size', fontSize);
   }
 
   public applyFontColor(element: DiagramEl, fontColor: string): void {
     if (!element) return;
 
-    // Get current font properties to preserve them
     const currentProps = this.getCurrentFontProperties(element);
 
-    // Update all font properties together
     this.modeling.updateProperties(element, {
       fontFamily: currentProps.fontFamily,
       fontSize: currentProps.fontSize,
       fontColor: fontColor,
     });
 
-    // Apply font color to SVG text elements
     this.updateTextElements(element, 'fill', fontColor);
   }
 
-  // Helper method to get current font properties from element
   private getCurrentFontProperties(element: DiagramEl): {
     fontFamily: string;
     fontSize: string;
     fontColor: string;
   } {
-    // Get current properties from the element's business object
     const bo = element.businessObject;
     const currentFontFamily = bo?.fontFamily || element.fontFamily || 'Arial';
     const currentFontSize = bo?.fontSize || element.fontSize || '14px';
@@ -268,19 +250,19 @@ export class BpmnService {
     };
   }
 
-  // Method to apply all font properties at once
-  public applyAllFontProperties(
+  public applyAllElementProperties(
     element: DiagramEl,
     fontFamily: string,
     fontSize: string,
     fontColor: string,
     fontBold: boolean = false,
     fontItalic: boolean = false,
-    fontUnderline: boolean = false
+    fontUnderline: boolean = false,
+    alignment: string = 'center',
+    verticalAlignment: string = 'middle'
   ): void {
     if (!element) return;
 
-    // Update all font properties together
     this.modeling.updateProperties(element, {
       fontFamily: fontFamily,
       fontSize: fontSize,
@@ -288,6 +270,8 @@ export class BpmnService {
       fontBold: fontBold,
       fontItalic: fontItalic,
       fontUnderline: fontUnderline,
+      alignment: alignment,
+      verticalAlignment: verticalAlignment,
     });
 
     const bo = element.businessObject;
@@ -298,6 +282,8 @@ export class BpmnService {
       bo.fontBold = fontBold;
       bo.fontItalic = fontItalic;
       bo.fontUnderline = fontUnderline;
+      bo.alignment = alignment;
+      bo.verticalAlignment = verticalAlignment;
     }
 
     element.fontFamily = fontFamily;
@@ -306,8 +292,9 @@ export class BpmnService {
     element.fontBold = fontBold;
     element.fontItalic = fontItalic;
     element.fontUnderline = fontUnderline;
+    element.alignment = alignment;
+    element.verticalAlignment = verticalAlignment;
 
-    // Trigger element changed event to ensure re-render
     this.eventBus.fire('element.changed', { element });
   }
 
@@ -316,18 +303,15 @@ export class BpmnService {
     attribute: string,
     value: string
   ): void {
-    // Get the SVG element for this BPMN element using the registry
     const gfx = this.registry.getGraphics(element.id);
     if (!gfx) return;
 
-    // Find all text elements within the SVG element
     const textElements = gfx.querySelectorAll('text');
 
     textElements.forEach((textEl: SVGTextElement) => {
       textEl.setAttribute(attribute, value);
     });
 
-    // Also update tspan elements
     const tspanElements = gfx.querySelectorAll('tspan');
     tspanElements.forEach((tspanEl: SVGTSpanElement) => {
       tspanEl.setAttribute(attribute, value);
@@ -473,28 +457,28 @@ export class BpmnService {
     return this.registry.getGraphics(element.id);
   }
 
-  public restoreFontProperties(element: DiagramEl): void {
-    if (!element) return;
+  // public restoreFontProperties(element: DiagramEl): void {
+  //   if (!element) return;
 
-    const bo = element.businessObject;
-    const fontFamily = bo?.fontFamily || element.fontFamily;
-    const fontSize = bo?.fontSize || element.fontSize;
-    const fontColor = bo?.fontColor || element.fontColor;
+  //   const bo = element.businessObject;
+  //   const fontFamily = bo?.fontFamily || element.fontFamily;
+  //   const fontSize = bo?.fontSize || element.fontSize;
+  //   const fontColor = bo?.fontColor || element.fontColor;
 
-    if (fontFamily || fontSize || fontColor) {
-      setTimeout(() => {
-        if (fontFamily) {
-          this.updateTextElements(element, 'font-family', fontFamily);
-        }
-        if (fontSize) {
-          this.updateTextElements(element, 'font-size', fontSize);
-        }
-        if (fontColor) {
-          this.updateTextElements(element, 'fill', fontColor);
-        }
-      }, 50);
-    }
-  }
+  //   if (fontFamily || fontSize || fontColor) {
+  //     setTimeout(() => {
+  //       if (fontFamily) {
+  //         this.updateTextElements(element, 'font-family', fontFamily);
+  //       }
+  //       if (fontSize) {
+  //         this.updateTextElements(element, 'font-size', fontSize);
+  //       }
+  //       if (fontColor) {
+  //         this.updateTextElements(element, 'fill', fontColor);
+  //       }
+  //     }, 50);
+  //   }
+  // }
 
   private isStateType(element: any): boolean {
     return (
