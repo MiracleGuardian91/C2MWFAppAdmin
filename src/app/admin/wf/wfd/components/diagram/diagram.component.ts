@@ -1427,7 +1427,7 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     if (this.canUndo && this.bpmnService) {
       this.bpmnService.undo();
       this.updateUndoRedoState();
-      this.toastr.info('Undo applied');
+      this.updateFontPropertiesFromSelectedElement();
     }
   }
 
@@ -1435,7 +1435,7 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     if (this.canRedo && this.bpmnService) {
       this.bpmnService.redo();
       this.updateUndoRedoState();
-      this.toastr.info('Redo applied');
+      this.updateFontPropertiesFromSelectedElement();
     }
   }
 
@@ -1449,11 +1449,13 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       // Listen for command execution
       this.bpmnService.eventBus.on('commandStack.executed', () => {
         this.updateUndoRedoState();
+        this.updateFontPropertiesFromSelectedElement();
       });
 
       // Listen for command reverted
       this.bpmnService.eventBus.on('commandStack.reverted', () => {
         this.updateUndoRedoState();
+        this.updateFontPropertiesFromSelectedElement();
       });
     }
   }
@@ -1504,13 +1506,10 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     if (selection.length === 1) {
       const selectedElement = selection[0];
 
-      // Check if the selected element is a swimlane (Lane)
       if (selectedElement.type === 'bpmn:Lane') {
         this.selectedSwimlane = selectedElement;
         this.selectedState = null;
-      }
-      // Check if the selected element is a state (Task, StartEvent, EndEvent, SubProcess)
-      else if (
+      } else if (
         [
           'bpmn:Task',
           'bpmn:StartEvent',
@@ -1520,7 +1519,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       ) {
         this.selectedState = selectedElement;
         this.selectedSwimlane = null;
-        // Load current font properties from the selected state
         this.loadStateFontProperties(selectedElement);
       } else {
         this.selectedSwimlane = null;
@@ -1546,20 +1544,14 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       alignment
     );
 
-    // Call the service method to align states
     this.service.alignStatesInSwimlane(this.selectedSwimlane, alignment);
 
-    // Show feedback to user
     const alignmentText =
       alignment.charAt(0).toUpperCase() + alignment.slice(1);
     this.toastr.success(`States aligned to ${alignmentText}`);
   }
 
-  // Font control methods
   private loadStateFontProperties(element: any): void {
-    console.log('Loading font properties for element:', element);
-
-    // Try to get current values from SVG elements first
     const currentFontFamily = this.getCurrentFontFamily(element);
     const currentFontSize = this.getCurrentFontSize(element);
     const currentFontColor = this.getCurrentFontColor(element);
@@ -1567,7 +1559,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     const currentFontItalic = this.getCurrentFontItalic(element);
     const currentFontUnderline = this.getCurrentFontUnderline(element);
 
-    // Also check business object for stored properties
     const bo = element.businessObject;
     const boFontFamily = bo?.fontFamily;
     const boFontSize = bo?.fontSize;
@@ -1576,7 +1567,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     const boFontItalic = bo?.fontItalic;
     const boFontUnderline = bo?.fontUnderline;
 
-    // Process and convert the values with priority: business object > element > SVG > defaults
     this.selectedFontFamily = this.processFontFamily(
       boFontFamily ||
         element.fontFamily ||
@@ -2013,5 +2003,34 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
         'bpmn:SubProcess',
       ].includes(element.type)
     );
+  }
+
+  private updateFontPropertiesFromSelectedElement(): void {
+    if (this.selectedState) {
+      const bo = this.selectedState.businessObject;
+      if (bo) {
+        this.selectedFontFamily =
+          bo.fontFamily || this.selectedState.fontFamily || 'Arial';
+        this.selectedFontSize =
+          bo.fontSize || this.selectedState.fontSize || '14px';
+        this.selectedFontColor =
+          bo.fontColor || this.selectedState.fontColor || '#000000';
+        this.selectedFontBold =
+          bo.fontBold || this.selectedState.fontBold || false;
+        this.selectedFontItalic =
+          bo.fontItalic || this.selectedState.fontItalic || false;
+        this.selectedFontUnderline =
+          bo.fontUnderline || this.selectedState.fontUnderline || false;
+      } else {
+        this.selectedFontFamily = this.selectedState.fontFamily || 'Arial';
+        this.selectedFontSize = this.selectedState.fontSize || '14px';
+        this.selectedFontColor = this.selectedState.fontColor || '#000000';
+        this.selectedFontBold = this.selectedState.fontBold || false;
+        this.selectedFontItalic = this.selectedState.fontItalic || false;
+        this.selectedFontUnderline = this.selectedState.fontUnderline || false;
+      }
+
+      this.cdr.detectChanges();
+    }
   }
 }

@@ -17,6 +17,7 @@ import { CustomAutoResize } from './custom-autoresize';
 import LassoTool from './LassoTool';
 import OutlineProvider from './outlineProvider';
 import customElementRuleProvider from './custom-element-ruleProvider';
+import { FontPropertiesCommand } from './font-properties-command';
 import BpmnRules from './bpmnRules';
 import { SharedData } from './share-data';
 
@@ -27,6 +28,7 @@ export const customModules = {
     'labelEditingProvider',
     'customRules',
     'customCommands',
+    'fontPropertiesCommand',
     'readonly',
     'diagramInit',
     'bpmnAutoResize',
@@ -45,6 +47,7 @@ export const customModules = {
   contextPadProvider: ['type', CustomContextPad],
   customRules: ['type', CustomRules],
   customCommands: ['type', CustomCommandInterceptor],
+  fontPropertiesCommand: ['type', FontPropertiesCommand],
   readonly: ['type', ReadOnly],
   diagramInit: ['type', DiagramInit],
   labelEditingProvider: ['type', CustomLabelEditingProvider], // disables editing labels on double click
