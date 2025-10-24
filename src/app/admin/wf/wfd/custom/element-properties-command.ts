@@ -1,6 +1,6 @@
 import CommandInterceptor from 'diagram-js/lib/command/CommandInterceptor';
 
-export class FontPropertiesCommand extends CommandInterceptor {
+export class ElementPropertiesCommand extends CommandInterceptor {
   private modeling: any;
   private elementRegistry: any;
   private eventBus: any;
@@ -17,9 +17,10 @@ export class FontPropertiesCommand extends CommandInterceptor {
       const element = context.element;
       const properties = context.properties;
 
-      if (this.isFontPropertyChange(properties)) {
-        if (!context.oldFontProperties) {
-          context.oldFontProperties = this.getCurrentFontProperties(element);
+      if (this.isElementPropertyChange(properties)) {
+        if (!context.oldElementProperties) {
+          context.oldElementProperties =
+            this.getCurrentElementProperties(element);
         }
       }
     });
@@ -29,8 +30,8 @@ export class FontPropertiesCommand extends CommandInterceptor {
       const element = context.element;
       const properties = context.properties;
 
-      if (this.isFontPropertyChange(properties)) {
-        this.applyFontPropertiesToElement(element, properties);
+      if (this.isElementPropertyChange(properties)) {
+        this.applyElementPropertiesToElement(element, properties);
         this.eventBus.fire('element.changed', { element });
       }
     });
@@ -38,27 +39,33 @@ export class FontPropertiesCommand extends CommandInterceptor {
     this.reverted('element.updateProperties', (event) => {
       const context = event.context;
       const element = context.element;
-      const oldFontProperties = context.oldFontProperties;
+      const oldElementProperties = context.oldElementProperties;
 
-      if (oldFontProperties && this.isFontPropertyChange(context.properties)) {
-        this.applyFontPropertiesToElement(element, oldFontProperties);
+      if (
+        oldElementProperties &&
+        this.isElementPropertyChange(context.properties)
+      ) {
+        this.applyElementPropertiesToElement(element, oldElementProperties);
         this.eventBus.fire('element.changed', { element });
       }
     });
   }
 
-  private isFontPropertyChange(properties: any): boolean {
+  private isElementPropertyChange(properties: any): boolean {
     return (
       properties.fontFamily !== undefined ||
       properties.fontSize !== undefined ||
       properties.fontColor !== undefined ||
       properties.fontBold !== undefined ||
       properties.fontItalic !== undefined ||
-      properties.fontUnderline !== undefined
+      properties.fontUnderline !== undefined ||
+      properties.alignment !== undefined ||
+      properties.verticalAlignment !== undefined ||
+      properties.horizontalAlignment !== undefined
     );
   }
 
-  private getCurrentFontProperties(element: any): any {
+  private getCurrentElementProperties(element: any): any {
     const bo = element.businessObject;
     return {
       fontFamily: bo?.fontFamily || element.fontFamily || 'Arial',
@@ -67,10 +74,15 @@ export class FontPropertiesCommand extends CommandInterceptor {
       fontBold: bo?.fontBold || element.fontBold || false,
       fontItalic: bo?.fontItalic || element.fontItalic || false,
       fontUnderline: bo?.fontUnderline || element.fontUnderline || false,
+      alignment: bo?.alignment || element.alignment || 'center',
+      verticalAlignment:
+        bo?.verticalAlignment || element.verticalAlignment || 'middle',
+      horizontalAlignment:
+        bo?.horizontalAlignment || element.horizontalAlignment || 'center',
     };
   }
 
-  private applyFontPropertiesToElement(element: any, properties: any): void {
+  private applyElementPropertiesToElement(element: any, properties: any): void {
     const bo = element.businessObject;
     if (bo) {
       if (properties.fontFamily !== undefined)
@@ -83,6 +95,12 @@ export class FontPropertiesCommand extends CommandInterceptor {
         bo.fontItalic = properties.fontItalic;
       if (properties.fontUnderline !== undefined)
         bo.fontUnderline = properties.fontUnderline;
+      if (properties.alignment !== undefined)
+        bo.alignment = properties.alignment;
+      if (properties.verticalAlignment !== undefined)
+        bo.verticalAlignment = properties.verticalAlignment;
+      if (properties.horizontalAlignment !== undefined)
+        bo.horizontalAlignment = properties.horizontalAlignment;
     }
 
     if (properties.fontFamily !== undefined)
@@ -97,6 +115,12 @@ export class FontPropertiesCommand extends CommandInterceptor {
       element.fontItalic = properties.fontItalic;
     if (properties.fontUnderline !== undefined)
       element.fontUnderline = properties.fontUnderline;
+    if (properties.alignment !== undefined)
+      element.alignment = properties.alignment;
+    if (properties.verticalAlignment !== undefined)
+      element.verticalAlignment = properties.verticalAlignment;
+    if (properties.horizontalAlignment !== undefined)
+      element.horizontalAlignment = properties.horizontalAlignment;
 
     this.updateTextElements(element, properties);
   }
@@ -134,6 +158,18 @@ export class FontPropertiesCommand extends CommandInterceptor {
           properties.fontUnderline ? 'underline' : 'none'
         );
       }
+      if (properties.alignment !== undefined) {
+        textEl.setAttribute(
+          'text-anchor',
+          this.getTextAnchor(properties.alignment)
+        );
+      }
+      if (properties.verticalAlignment !== undefined) {
+        textEl.setAttribute(
+          'dominant-baseline',
+          this.getDominantBaseline(properties.verticalAlignment)
+        );
+      }
     });
 
     const tspanElements = gfx.querySelectorAll('tspan');
@@ -165,7 +201,45 @@ export class FontPropertiesCommand extends CommandInterceptor {
           properties.fontUnderline ? 'underline' : 'none'
         );
       }
+      if (properties.alignment !== undefined) {
+        tspanEl.setAttribute(
+          'text-anchor',
+          this.getTextAnchor(properties.alignment)
+        );
+      }
+      if (properties.verticalAlignment !== undefined) {
+        tspanEl.setAttribute(
+          'dominant-baseline',
+          this.getDominantBaseline(properties.verticalAlignment)
+        );
+      }
     });
+  }
+
+  private getTextAnchor(alignment: string): string {
+    switch (alignment) {
+      case 'left':
+        return 'start';
+      case 'center':
+        return 'middle';
+      case 'right':
+        return 'end';
+      default:
+        return 'middle';
+    }
+  }
+
+  private getDominantBaseline(verticalAlignment: string): string {
+    switch (verticalAlignment) {
+      case 'top':
+        return 'text-before-edge';
+      case 'middle':
+        return 'central';
+      case 'bottom':
+        return 'text-after-edge';
+      default:
+        return 'central';
+    }
   }
 
   static $inject = ['eventBus', 'modeling', 'elementRegistry'];

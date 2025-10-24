@@ -250,14 +250,16 @@ export class BpmnService {
     };
   }
 
-  public applyAllFontProperties(
+  public applyAllElementProperties(
     element: DiagramEl,
     fontFamily: string,
     fontSize: string,
     fontColor: string,
     fontBold: boolean = false,
     fontItalic: boolean = false,
-    fontUnderline: boolean = false
+    fontUnderline: boolean = false,
+    alignment: string = 'center',
+    verticalAlignment: string = 'middle'
   ): void {
     if (!element) return;
 
@@ -268,6 +270,8 @@ export class BpmnService {
       fontBold: fontBold,
       fontItalic: fontItalic,
       fontUnderline: fontUnderline,
+      alignment: alignment,
+      verticalAlignment: verticalAlignment,
     });
 
     const bo = element.businessObject;
@@ -278,6 +282,8 @@ export class BpmnService {
       bo.fontBold = fontBold;
       bo.fontItalic = fontItalic;
       bo.fontUnderline = fontUnderline;
+      bo.alignment = alignment;
+      bo.verticalAlignment = verticalAlignment;
     }
 
     element.fontFamily = fontFamily;
@@ -286,6 +292,8 @@ export class BpmnService {
     element.fontBold = fontBold;
     element.fontItalic = fontItalic;
     element.fontUnderline = fontUnderline;
+    element.alignment = alignment;
+    element.verticalAlignment = verticalAlignment;
 
     this.eventBus.fire('element.changed', { element });
   }
