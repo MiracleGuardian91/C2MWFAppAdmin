@@ -301,31 +301,31 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
         this.handleSelectionChange(event);
       });
 
-    this.bpmnService.eventBus.on('element.changed', (event: any) => {
-      if (event.element && this.isStateType(event.element)) {
-        setTimeout(() => {
-          this.service.restoreFontProperties(event.element);
-        }, 100);
-      }
-    });
+    // this.bpmnService.eventBus.on('element.changed', (event: any) => {
+    //   if (event.element && this.isStateType(event.element)) {
+    //     setTimeout(() => {
+    //       this.service.restoreFontProperties(event.element);
+    //     }, 100);
+    //   }
+    // });
 
-    this.bpmnService.eventBus.on('element.move', (event: any) => {
-      const element = event.element;
-      if (element && this.isStateType(element)) {
-        setTimeout(() => {
-          this.service.restoreFontProperties(element);
-        }, 100);
-      }
-    });
+    // this.bpmnService.eventBus.on('element.move', (event: any) => {
+    //   const element = event.element;
+    //   if (element && this.isStateType(element)) {
+    //     setTimeout(() => {
+    //       this.service.restoreFontProperties(element);
+    //     }, 100);
+    //   }
+    // });
 
-    this.bpmnService.eventBus.on('element.render', (event: any) => {
-      const element = event.element;
-      if (element && this.isStateType(element)) {
-        setTimeout(() => {
-          this.service.restoreFontProperties(element);
-        }, 50);
-      }
-    });
+    // this.bpmnService.eventBus.on('element.render', (event: any) => {
+    //   const element = event.element;
+    //   if (element && this.isStateType(element)) {
+    //     setTimeout(() => {
+    //       this.service.restoreFontProperties(element);
+    //     }, 50);
+    //   }
+    // });
   }
 
   changeUndoRedo(id: string, type: string, Action: string) {

@@ -1219,10 +1219,10 @@ export class DiagramService implements OnDestroy {
     );
   }
 
-  public restoreFontProperties(element: any): void {
-    if (!element) return;
-    this.bpmn.restoreFontProperties(element);
-  }
+  // public restoreFontProperties(element: any): void {
+  //   if (!element) return;
+  //   this.bpmn.restoreFontProperties(element);
+  // }
 
   public clear() {
     this.bpmn.clear();

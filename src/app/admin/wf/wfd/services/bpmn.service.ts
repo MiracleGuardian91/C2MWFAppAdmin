@@ -473,28 +473,28 @@ export class BpmnService {
     return this.registry.getGraphics(element.id);
   }
 
-  public restoreFontProperties(element: DiagramEl): void {
-    if (!element) return;
+  // public restoreFontProperties(element: DiagramEl): void {
+  //   if (!element) return;
 
-    const bo = element.businessObject;
-    const fontFamily = bo?.fontFamily || element.fontFamily;
-    const fontSize = bo?.fontSize || element.fontSize;
-    const fontColor = bo?.fontColor || element.fontColor;
+  //   const bo = element.businessObject;
+  //   const fontFamily = bo?.fontFamily || element.fontFamily;
+  //   const fontSize = bo?.fontSize || element.fontSize;
+  //   const fontColor = bo?.fontColor || element.fontColor;
 
-    if (fontFamily || fontSize || fontColor) {
-      setTimeout(() => {
-        if (fontFamily) {
-          this.updateTextElements(element, 'font-family', fontFamily);
-        }
-        if (fontSize) {
-          this.updateTextElements(element, 'font-size', fontSize);
-        }
-        if (fontColor) {
-          this.updateTextElements(element, 'fill', fontColor);
-        }
-      }, 50);
-    }
-  }
+  //   if (fontFamily || fontSize || fontColor) {
+  //     setTimeout(() => {
+  //       if (fontFamily) {
+  //         this.updateTextElements(element, 'font-family', fontFamily);
+  //       }
+  //       if (fontSize) {
+  //         this.updateTextElements(element, 'font-size', fontSize);
+  //       }
+  //       if (fontColor) {
+  //         this.updateTextElements(element, 'fill', fontColor);
+  //       }
+  //     }, 50);
+  //   }
+  // }
 
   private isStateType(element: any): boolean {
     return (
