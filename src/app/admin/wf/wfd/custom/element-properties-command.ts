@@ -58,10 +58,7 @@ export class ElementPropertiesCommand extends CommandInterceptor {
       properties.fontColor !== undefined ||
       properties.fontBold !== undefined ||
       properties.fontItalic !== undefined ||
-      properties.fontUnderline !== undefined ||
-      properties.alignment !== undefined ||
-      properties.verticalAlignment !== undefined ||
-      properties.horizontalAlignment !== undefined
+      properties.fontUnderline !== undefined
     );
   }
 
@@ -74,11 +71,6 @@ export class ElementPropertiesCommand extends CommandInterceptor {
       fontBold: bo?.fontBold || element.fontBold || false,
       fontItalic: bo?.fontItalic || element.fontItalic || false,
       fontUnderline: bo?.fontUnderline || element.fontUnderline || false,
-      alignment: bo?.alignment || element.alignment || 'center',
-      verticalAlignment:
-        bo?.verticalAlignment || element.verticalAlignment || 'middle',
-      horizontalAlignment:
-        bo?.horizontalAlignment || element.horizontalAlignment || 'center',
     };
   }
 
@@ -95,12 +87,6 @@ export class ElementPropertiesCommand extends CommandInterceptor {
         bo.fontItalic = properties.fontItalic;
       if (properties.fontUnderline !== undefined)
         bo.fontUnderline = properties.fontUnderline;
-      if (properties.alignment !== undefined)
-        bo.alignment = properties.alignment;
-      if (properties.verticalAlignment !== undefined)
-        bo.verticalAlignment = properties.verticalAlignment;
-      if (properties.horizontalAlignment !== undefined)
-        bo.horizontalAlignment = properties.horizontalAlignment;
     }
 
     if (properties.fontFamily !== undefined)
@@ -115,12 +101,6 @@ export class ElementPropertiesCommand extends CommandInterceptor {
       element.fontItalic = properties.fontItalic;
     if (properties.fontUnderline !== undefined)
       element.fontUnderline = properties.fontUnderline;
-    if (properties.alignment !== undefined)
-      element.alignment = properties.alignment;
-    if (properties.verticalAlignment !== undefined)
-      element.verticalAlignment = properties.verticalAlignment;
-    if (properties.horizontalAlignment !== undefined)
-      element.horizontalAlignment = properties.horizontalAlignment;
 
     this.updateTextElements(element, properties);
   }
@@ -158,18 +138,6 @@ export class ElementPropertiesCommand extends CommandInterceptor {
           properties.fontUnderline ? 'underline' : 'none'
         );
       }
-      if (properties.alignment !== undefined) {
-        textEl.setAttribute(
-          'text-anchor',
-          this.getTextAnchor(properties.alignment)
-        );
-      }
-      if (properties.verticalAlignment !== undefined) {
-        textEl.setAttribute(
-          'dominant-baseline',
-          this.getDominantBaseline(properties.verticalAlignment)
-        );
-      }
     });
 
     const tspanElements = gfx.querySelectorAll('tspan');
@@ -201,45 +169,7 @@ export class ElementPropertiesCommand extends CommandInterceptor {
           properties.fontUnderline ? 'underline' : 'none'
         );
       }
-      if (properties.alignment !== undefined) {
-        tspanEl.setAttribute(
-          'text-anchor',
-          this.getTextAnchor(properties.alignment)
-        );
-      }
-      if (properties.verticalAlignment !== undefined) {
-        tspanEl.setAttribute(
-          'dominant-baseline',
-          this.getDominantBaseline(properties.verticalAlignment)
-        );
-      }
     });
-  }
-
-  private getTextAnchor(alignment: string): string {
-    switch (alignment) {
-      case 'left':
-        return 'start';
-      case 'center':
-        return 'middle';
-      case 'right':
-        return 'end';
-      default:
-        return 'middle';
-    }
-  }
-
-  private getDominantBaseline(verticalAlignment: string): string {
-    switch (verticalAlignment) {
-      case 'top':
-        return 'text-before-edge';
-      case 'middle':
-        return 'central';
-      case 'bottom':
-        return 'text-after-edge';
-      default:
-        return 'central';
-    }
   }
 
   static $inject = ['eventBus', 'modeling', 'elementRegistry'];

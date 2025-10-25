@@ -146,8 +146,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
   public selectedFontBold: boolean = false;
   public selectedFontItalic: boolean = false;
   public selectedFontUnderline: boolean = false;
-  public selectedAlignment: string = 'center';
-  public selectedVerticalAlignment: string = 'middle';
   constructor(
     private dialog: MatDialog,
     public service: DiagramService,
@@ -1981,8 +1979,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       fontBold: this.selectedFontBold,
       fontItalic: this.selectedFontItalic,
       fontUnderline: this.selectedFontUnderline,
-      alignment: this.selectedAlignment,
-      verticalAlignment: this.selectedVerticalAlignment,
     });
 
     this.service.applyAllElementProperties(
@@ -1992,30 +1988,8 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       this.selectedFontColor,
       this.selectedFontBold,
       this.selectedFontItalic,
-      this.selectedFontUnderline,
-      this.selectedAlignment,
-      this.selectedVerticalAlignment
+      this.selectedFontUnderline
     );
-  }
-
-  public applyAlignment(alignment: string): void {
-    if (!this.selectedState) {
-      this.toastr.warning('Please select a state first');
-      return;
-    }
-
-    this.selectedAlignment = alignment;
-    this.applyAllElementProperties();
-  }
-
-  public applyVerticalAlignment(verticalAlignment: string): void {
-    if (!this.selectedState) {
-      this.toastr.warning('Please select a state first');
-      return;
-    }
-
-    this.selectedVerticalAlignment = verticalAlignment;
-    this.applyAllElementProperties();
   }
 
   // Helper method to check if element is a state type
@@ -2047,12 +2021,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
           bo.fontItalic || this.selectedState.fontItalic || false;
         this.selectedFontUnderline =
           bo.fontUnderline || this.selectedState.fontUnderline || false;
-        this.selectedAlignment =
-          bo.alignment || this.selectedState.alignment || 'center';
-        this.selectedVerticalAlignment =
-          bo.verticalAlignment ||
-          this.selectedState.verticalAlignment ||
-          'middle';
       } else {
         this.selectedFontFamily = this.selectedState.fontFamily || 'Arial';
         this.selectedFontSize = this.selectedState.fontSize || '14px';
@@ -2060,9 +2028,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
         this.selectedFontBold = this.selectedState.fontBold || false;
         this.selectedFontItalic = this.selectedState.fontItalic || false;
         this.selectedFontUnderline = this.selectedState.fontUnderline || false;
-        this.selectedAlignment = this.selectedState.alignment || 'center';
-        this.selectedVerticalAlignment =
-          this.selectedState.verticalAlignment || 'middle';
       }
 
       this.cdr.detectChanges();
