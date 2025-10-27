@@ -239,8 +239,9 @@ export class BpmnService {
     fontColor: string;
   } {
     const bo = element.businessObject;
-    const currentFontFamily = bo?.fontFamily || element.fontFamily || 'Arial';
-    const currentFontSize = bo?.fontSize || element.fontSize || '14px';
+    const currentFontFamily =
+      bo?.fontFamily || element.fontFamily || 'Museo Sans';
+    const currentFontSize = bo?.fontSize || element.fontSize || '13px';
     const currentFontColor = bo?.fontColor || element.fontColor || '#000000';
 
     return {

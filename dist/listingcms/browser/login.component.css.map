@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/modules/auth/pages/login/login.component.scss"],
+  "sourcesContent": [".container{max-width: 500px; margin: 5% auto!important;}\r\n.btn-primary {\r\n    color: #fff;\r\n    background-color: #D96347;\r\n    border-color: #D96347;\r\n}\r\n.password{\r\n    color: #D96347;\r\n}"],
+  "mappings": ";AAAA,CAAA;AAAW,aAAA;AAAkB,UAAA,GAAA;;AAC7B,CAAA;AACI,SAAA;AACA,oBAAA;AACA,gBAAA;;AAEJ,CAAA;AACI,SAAA;;",
+  "names": []
+}

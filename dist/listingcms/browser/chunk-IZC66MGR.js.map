@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/lib/common/const/form.const.ts"],
+  "sourcesContent": ["import { ValidatorFn, Validators } from '@angular/forms';\r\n\r\nexport const VALID_NAME_RE = /^[a-zA-Z0-9_]*$/;\r\n\r\nexport const NAME_VALIDATORS: ReadonlyArray<ValidatorFn> = [\r\n  Validators.required,\r\n  Validators.pattern(VALID_NAME_RE),\r\n  Validators.minLength(4),\r\n  Validators.maxLength(25),\r\n];\r\n"],
+  "mappings": ";;;;;AAEO,IAAM,gBAAgB;AAEtB,IAAM,kBAA8C;EACzD,WAAW;EACX,WAAW,QAAQ,aAAa;EAChC,WAAW,UAAU,CAAC;EACtB,WAAW,UAAU,EAAE;;",
+  "names": []
+}

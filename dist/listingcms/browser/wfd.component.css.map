@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/admin/wf/wfd/wfd.component.scss"],
+  "sourcesContent": [".diagram-parent {\r\n  height: 100vh;\r\n  border: solid 3px #EEE;\r\n  position: relative;\r\n  .enableDisable{\r\n    width: 42px;\r\n    height: 42px;\r\n    flex-shrink: 0;\r\n    border-radius: 3px;\r\n   background: #005996;\r\n   .svg{\r\n  \r\n    width: 26px;\r\n  height: 24px;\r\n  flex-shrink: 0;\r\n   }\r\n   }\r\n}\r\n\r\n.import-error {\r\n  color: red;\r\n  padding: 20px;\r\n\r\n  position: absolute;\r\n  top: 0;\r\n  left: 0;\r\n}\r\n\r\n.diagram-container {\r\n  display: flex; /* Enable Flexbox */\r\n  justify-content: space-between; /* Space elements evenly with one on each side */\r\n  align-items: center; /* Align items vertically */\r\n  width: 100%; /* Full width container */\r\n}\r\n\r\n.diagram-parent {\r\n  flex: 0 0 auto; /* Prevent resizing */\r\n}\r\n\r\n.modeler {\r\n  flex: 1; /* Grow to occupy remaining space */\r\n  text-align: right; /* Align the content to the right */\r\n}\r\n\r\n.breadcrumbs {\r\n    margin-top: -18px;\r\n}\r\n"],
+  "mappings": ";AAAA,CAAA;AACE,UAAA;AACA,UAAA,MAAA,IAAA;AACA,YAAA;;AACA,CAJF,eAIE,CAAA;AACE,SAAA;AACA,UAAA;AACA,eAAA;AACA,iBAAA;AACD,cAAA;;AACA,CAVH,eAUG,CAND,cAMC,CAAA;AAEC,SAAA;AACF,UAAA;AACA,eAAA;;AAKF,CAAA;AACE,SAAA;AACA,WAAA;AAEA,YAAA;AACA,OAAA;AACA,QAAA;;AAGF,CAAA;AACE,WAAA;AACA,mBAAA;AACA,eAAA;AACA,SAAA;;AAGF,CAnCA;AAoCE,QAAA,EAAA,EAAA;;AAGF,CAAA;AACE,QAAA;AACA,cAAA;;AAGF,CAAA;AACI,cAAA;;",
+  "names": []
+}

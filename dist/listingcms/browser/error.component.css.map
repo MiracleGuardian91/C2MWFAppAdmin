@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/modules/auth/pages/error/error.component.scss"],
+  "sourcesContent": [".not-found {\r\n    height: calc(100vh - 170px);\r\n    background-image: url('/assets/styles/images/bg1.jpg');\r\n    background-repeat: no-repeat;\r\n    background-position: center;\r\n    background-size: cover;\r\n}"],
+  "mappings": ";AAAA,CAAA;AACI,UAAA,KAAA,MAAA,EAAA;AACA,oBAAA;AACA,qBAAA;AACA,uBAAA;AACA,mBAAA;;",
+  "names": []
+}

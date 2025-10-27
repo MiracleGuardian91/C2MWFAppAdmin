@@ -140,7 +140,7 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
 
   // Element properties
   public selectedState: any = null;
-  public selectedFontFamily: string = 'Arial';
+  public selectedFontFamily: string = 'Museo Sans';
   public selectedFontSize: string = '14px';
   public selectedFontColor: string = '#000000';
   public selectedFontBold: boolean = false;
@@ -1575,7 +1575,7 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
         element.fontFamily ||
         (element.props && element.props.fontFamily) ||
         currentFontFamily ||
-        'Arial'
+        'Museo Sans'
     );
 
     this.selectedFontSize = this.processFontSize(
@@ -1583,7 +1583,7 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
         element.fontSize ||
         (element.props && element.props.fontSize) ||
         currentFontSize ||
-        '14px'
+        '13px'
     );
 
     this.selectedFontColor = this.processFontColor(
@@ -1654,7 +1654,7 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
   }
 
   private processFontFamily(fontFamily: string): string {
-    if (!fontFamily) return 'Arial';
+    if (!fontFamily) return 'Museo Sans';
 
     // Clean up font family string
     const cleaned = fontFamily.replace(/['"]/g, '').trim();
@@ -1673,11 +1673,11 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       'Trebuchet MS': 'Trebuchet MS',
     };
 
-    return fontMap[cleaned] || cleaned || 'Arial';
+    return fontMap[cleaned] || cleaned || 'Museo Sans';
   }
 
   private processFontSize(fontSize: string): string {
-    if (!fontSize) return '14px';
+    if (!fontSize) return '13px';
 
     // Clean up font size string
     const cleaned = fontSize.trim();
@@ -1697,7 +1697,7 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       '32px': '32px',
     };
 
-    return sizeMap[cleaned] || cleaned || '14px';
+    return sizeMap[cleaned] || cleaned || '13px';
   }
 
   private processFontColor(fontColor: string): string {
@@ -2080,9 +2080,9 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       const bo = this.selectedState.businessObject;
       if (bo) {
         this.selectedFontFamily =
-          bo.fontFamily || this.selectedState.fontFamily || 'Arial';
+          bo.fontFamily || this.selectedState.fontFamily || 'Museo Sans';
         this.selectedFontSize =
-          bo.fontSize || this.selectedState.fontSize || '14px';
+          bo.fontSize || this.selectedState.fontSize || '13px';
         this.selectedFontColor =
           bo.fontColor || this.selectedState.fontColor || '#000000';
         this.selectedFontBold =
@@ -2094,8 +2094,8 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
         this.selectedFillColor =
           bo.color || this.selectedState.color || '#ffffff';
       } else {
-        this.selectedFontFamily = this.selectedState.fontFamily || 'Arial';
-        this.selectedFontSize = this.selectedState.fontSize || '14px';
+        this.selectedFontFamily = this.selectedState.fontFamily || 'Museo Sans';
+        this.selectedFontSize = this.selectedState.fontSize || '13px';
         this.selectedFontColor = this.selectedState.fontColor || '#000000';
         this.selectedFontBold = this.selectedState.fontBold || false;
         this.selectedFontItalic = this.selectedState.fontItalic || false;

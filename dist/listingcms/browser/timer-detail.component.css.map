@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/admin/wf/wfd/components/timer-detail/timer-detail.component.scss"],
+  "sourcesContent": [".form-group.flex {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 5px;\r\n  label {\r\n    margin: 0;\r\n  }\r\n  .form-control {\r\n    max-width: 50%;\r\n  }\r\n}\r\n\r\n.wf-inline-checkbox input {\r\n  position: inherit;\r\n  height: inherit;\r\n  width: inherit;\r\n}\r\n\r\ninput {\r\n  appearance: auto; /* ✅ Standard property */\r\n  -webkit-appearance: auto; /* ✅ For Safari/iOS compatibility */\r\n  -moz-appearance: auto; /* ✅ For older Firefox */\r\n}"],
+  "mappings": ";;;AAAA,CAAA,UAAA,CAAA;AACE,WAAA;AACA,eAAA;AACA,OAAA;;AACA,CAJF,UAIE,CAJF,KAIE;AACE,UAAA;;AAEF,CAPF,UAOE,CAPF,KAOE,CAAA;AACE,aAAA;;AAIJ,CAAA,mBAAA;AACE,YAAA;AACA,UAAA;AACA,SAAA;;AAGF;AACE,cAAA;AACA,sBAAA;AACA,mBAAA;;",
+  "names": []
+}

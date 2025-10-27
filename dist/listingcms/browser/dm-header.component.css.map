@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["angular:styles/component:css;9ac5c5e53c645cfa5e2c02d329cc3524ae6a9f77af27ed8d7a947e1e5a8f5015;E:/Projects/38.C2MWFAppAdmin/src/app/admin/data-modeler1/components1/dm-header/dm-header.component.ts"],
+  "sourcesContent": ["\n      header {\n      display: flex;\n      align-items: center;\n      gap: 10px;\n      color: #fff;\n      background: #aaadaa;\n      text-transform: uppercase;\n      padding: 0.2rem 1rem;\n      display:none;\n    }\n  "],
+  "mappings": ";AACM;AACA,WAAS;AACT,eAAa;AACb,OAAK;AACL,SAAO;AACP,cAAY;AACZ,kBAAgB;AAChB,WAAS,OAAO;AAChB,WAAQ;AACV;",
+  "names": []
+}

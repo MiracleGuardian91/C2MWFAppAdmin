@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/shared/components/forgot-pwd/forgot-pwd.component.scss"],
+  "sourcesContent": [".forgotpwd_wrapper{\r\n    padding: 15px;\r\n    .whiteBgSection{\r\n        padding: 20px 46px 20px 20px;\r\n        .smallCenteredContainer{\r\n            h1{\r\n                font-size: 2.2rem;\r\n                color: #333;\r\n            }\r\n        }\r\n    }\r\n    .corner-button{\r\n        right: 16px;\r\n        top: 12px;\r\n        position: absolute;\r\n    }\r\n    .forgotpwd_content{\r\n        padding: 0px 20px 20px;\r\n        p{\r\n            font-size: 1.6rem;\r\n            margin: 0px;\r\n        }\r\n        .cta-button-group{\r\n            padding-bottom: 0px;\r\n        }\r\n        .form-row{\r\n            margin-left: 0px;\r\n        }\r\n    }\r\n}"],
+  "mappings": ";AAAA,CAAA;AACI,WAAA;;AACA,CAFJ,kBAEI,CAAA;AACI,WAAA,KAAA,KAAA,KAAA;;AAEI,CALZ,kBAKY,CAHR,eAGQ,CAAA,uBAAA;AACI,aAAA;AACA,SAAA;;AAIZ,CAXJ,kBAWI,CAAA;AACI,SAAA;AACA,OAAA;AACA,YAAA;;AAEJ,CAhBJ,kBAgBI,CAAA;AACI,WAAA,IAAA,KAAA;;AACA,CAlBR,kBAkBQ,CAFJ,kBAEI;AACI,aAAA;AACA,UAAA;;AAEJ,CAtBR,kBAsBQ,CANJ,kBAMI,CAAA;AACI,kBAAA;;AAEJ,CAzBR,kBAyBQ,CATJ,kBASI,CAAA;AACI,eAAA;;",
+  "names": []
+}

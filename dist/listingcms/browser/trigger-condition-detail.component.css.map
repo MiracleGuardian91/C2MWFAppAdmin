@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/admin/wf/wfd/components/trigger-condition-detail/trigger-condition-detail.component.scss"],
+  "sourcesContent": ["mat-accordion, mat-expansion-panel {\r\n    box-shadow: unset;\r\n    background: none;\r\n    border-radius: 0;\r\n    margin-bottom: 2rem;\r\n  }\r\n \r\n  mat-expansion-panel {\r\n    overflow: unset;\r\n  \r\n  }\r\n  .mat-expansion-panel-header{\r\n    height: 35px;\r\n  }\r\n  .mat-expansion-panel-header.mat-expanded\r\n  {\r\n    height: 35px;\r\n  }\r\n  \r\n  ::ng-deep .mat-expansion-panel-content > .mat-expansion-panel-body {\r\n    padding: 0px;\r\n  }\r\n  \r\n   mat-expansion-panel-header {\r\n   padding: 0px;\r\n   border-bottom: 1px solid #ccc;\r\n  }\r\n  \r\n  .mat-expansion-panel:not([class*=mat-elevation-z]) {\r\n    box-shadow: none;\r\n  }\r\n \r\n  .disable_ripple:hover{\r\n    background-color: white !important;\r\n    }\r\n  "],
+  "mappings": ";AAAA;AAAA;AACI,cAAA;AACA,cAAA;AACA,iBAAA;AACA,iBAAA;;AAGF;AACE,YAAA;;AAGF,CAAA;AACE,UAAA;;AAEF,CAHA,0BAGA,CAAA;AAEE,UAAA;;AAGF,UAAA,CAAA,4BAAA,EAAA,CAAA;AACE,WAAA;;AAGD;AACA,WAAA;AACA,iBAAA,IAAA,MAAA;;AAGD,CAAA,mBAAA,KAAA,CAAA;AACE,cAAA;;AAGF,CAAA,cAAA;AACE,oBAAA;;",
+  "names": []
+}

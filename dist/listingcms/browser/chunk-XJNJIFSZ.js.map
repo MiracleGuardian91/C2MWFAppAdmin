@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/admin/lib/object-control/object-control.module.ts"],
+  "sourcesContent": ["import { NgModule } from '@angular/core';\r\nimport { CommonModule } from '@angular/common';\r\nimport { ObjectControlComponent } from './object-control.component';\r\n\r\n\r\nimport { ReactiveFormsModule } from '@angular/forms';\r\n\r\nimport { MatSlideToggleModule } from '@angular/material/slide-toggle';\r\nimport { MatRadioModule } from '@angular/material/radio';\r\nimport { SharedModule } from '@app/shared';\r\nimport { QuillModule } from 'ngx-quill';\r\n\r\n\r\n\r\n\r\n@NgModule({\r\n    imports: [\r\n    CommonModule,\r\n    SharedModule,\r\n    MatSlideToggleModule,\r\n    ReactiveFormsModule,\r\n    MatRadioModule,\r\n    QuillModule.forRoot(),\r\n    ObjectControlComponent\r\n  ],\r\n  exports: [ObjectControlComponent],\r\n})\r\nexport class ObjectControlModule { }\r\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;;;;AA2BM,IAAO,sBAAP,MAAO,qBAAmB;;;uCAAnB,sBAAmB;IAAA;EAAA;;wEAAnB,qBAAmB,CAAA;EAAA;;;MAV5B;MACA;MACA;MACA;MACA;MACA,YAAY,QAAO;MACnB;IAAsB,EAAA,CAAA;EAAA;;",
+  "names": []
+}

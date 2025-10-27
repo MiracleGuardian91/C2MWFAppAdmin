@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/layouts/footer/footer.component.scss"],
+  "sourcesContent": [".cms-footer {\r\n    background-color: #F1F0F2;\r\n    border-top: 3px solid #E2DFDB;\r\n    position: relative;  \r\n    .logoWrap {\r\n        padding-left: 42px;\r\n\r\n        span {\r\n            margin-top: 8px;\r\n            font-weight: 500;\r\n            display: block;\r\n            color: #57575C;\r\n            font-size: 12px;\r\n            letter-spacing: 0.85px;\r\n            line-height: 14px;\r\n        }\r\n    }\r\n\r\n}\r\n.C2M-Black-Logo{\r\n    width: 3rem;\r\n    height: 3rem;\r\n}"],
+  "mappings": ";AAAA,CAAA;AACI,oBAAA;AACA,cAAA,IAAA,MAAA;AACA,YAAA;;AACA,CAJJ,WAII,CAAA;AACI,gBAAA;;AAEA,CAPR,WAOQ,CAHJ,SAGI;AACI,cAAA;AACA,eAAA;AACA,WAAA;AACA,SAAA;AACA,aAAA;AACA,kBAAA;AACA,eAAA;;AAKZ,CAAA;AACI,SAAA;AACA,UAAA;;",
+  "names": []
+}

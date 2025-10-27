@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/modules/auth/pages/reset-pwd/reset-pwd.component.scss"],
+  "sourcesContent": ["\r\n.container{max-width: 550px; margin: 5% auto!important;}"],
+  "mappings": ";AACA,CAAA;AAAW,aAAA;AAAkB,UAAA,GAAA;;",
+  "names": []
+}

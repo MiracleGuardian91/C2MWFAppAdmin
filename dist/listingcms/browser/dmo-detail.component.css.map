@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["angular:styles/component:css;b016b934c9f086e98066c0eaba9479e3a31f107651c582f4572f3150bfe1ce45;E:/Projects/38.C2MWFAppAdmin/src/app/admin/data-modeler1/components1/dmo-detail/dmo-detail.component.ts"],
+  "sourcesContent": ["\n    ::ng-deep li.form-invalid a::after {\n          content: \" \u26A0\uFE0F\";\n      color: #ea485b; \n    }\n  "],
+  "mappings": ";AACI,UAAU,EAAE,CAAC,aAAa,CAAC;AACrB,WAAS;AACb,SAAO;AACT;",
+  "names": []
+}
