@@ -62,7 +62,7 @@ var routes = [
   { path: "", component: AdminComponent },
   {
     path: "wf",
-    loadChildren: () => import("./chunk-DAWEX5V6.js").then((m) => m.WfModule)
+    loadChildren: () => import("./chunk-5XYFIPU7.js").then((m) => m.WfModule)
   },
   {
     path: "wf-app-list",
@@ -75,7 +75,7 @@ var routes = [
   },
   {
     path: "ai-flow",
-    loadChildren: () => import("./chunk-2JONSAPG.js").then((a) => a.routes)
+    loadChildren: () => import("./chunk-TADX7VJA.js").then((a) => a.routes)
   }
 ];
 var AdminRoutingModule = class _AdminRoutingModule {
@@ -116,4 +116,4 @@ var AdminModule = class _AdminModule {
 export {
   AdminModule
 };
-//# sourceMappingURL=chunk-HHYWZZ55.js.map
+//# sourceMappingURL=chunk-FGPTXOXT.js.map

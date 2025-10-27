@@ -276,6 +276,24 @@
             </div>
           </div>
 
+          <!-- Elements Color Picker -->
+          <div
+            *ngIf="service.paletteIsOpen"
+            style="display: flex; align-items: center"
+          >
+            <div class="font-control-group">
+              <label class="font-control-label">Elements Color:</label>
+              <input
+                type="color"
+                class="font-control-color"
+                [disabled]="!selectedSwimlane"
+                [(ngModel)]="selectedElementsColor"
+                (input)="applyElementsColor()"
+                title="Select color for all state boxes in the selected stage"
+              />
+            </div>
+          </div>
+
           <!-- Font Style Buttons -->
           <div
             *ngIf="service.paletteIsOpen"

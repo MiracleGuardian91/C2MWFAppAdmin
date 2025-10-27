@@ -1221,10 +1221,11 @@ export class DiagramService implements OnDestroy {
     );
   }
 
-  // public restoreFontProperties(element: any): void {
-  //   if (!element) return;
-  //   this.bpmn.restoreFontProperties(element);
-  // }
+  public applyFillColorOnly(element: any, fillColor: string): void {
+    if (!element) return;
+
+    this.bpmn.applyFillColorOnly(element, fillColor);
+  }
 
   public clear() {
     this.bpmn.clear();

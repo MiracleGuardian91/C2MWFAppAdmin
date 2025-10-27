@@ -147,6 +147,8 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
   public selectedFontItalic: boolean = false;
   public selectedFontUnderline: boolean = false;
   public selectedFillColor: string = '#ffffff';
+  public selectedElementsColor: string = '#ffffff';
+
   constructor(
     private dialog: MatDialog,
     public service: DiagramService,
@@ -1998,6 +2000,46 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     this.applyAllElementProperties();
   }
 
+  public applyElementsColor(): void {
+    if (!this.selectedSwimlane) {
+      this.toastr.warning('Please select a stage first');
+      return;
+    }
+
+    const stateBoxes = this.getStateBoxesInStage(this.selectedSwimlane);
+
+    console.log(stateBoxes.length);
+
+    if (stateBoxes.length === 0) {
+      this.toastr.warning('No state boxes found in the selected stage');
+      return;
+    }
+
+    stateBoxes.forEach((stateBox) => {
+      this.service.applyFillColorOnly(stateBox, this.selectedElementsColor);
+    });
+  }
+
+  private getStateBoxesInStage(stage: any): any[] {
+    const stateBoxes: any[] = [];
+
+    const allElements = this.bpmnService.registry.getAll();
+
+    allElements.forEach((element) => {
+      if (this.isStateType(element)) {
+        if (this.isElementInStage(element, stage)) {
+          stateBoxes.push(element);
+        }
+      }
+    });
+
+    return stateBoxes;
+  }
+
+  private isElementInStage(element: any, stage: any): boolean {
+    return element.parent && element.parent.id === stage.id;
+  }
+
   public applyFontSize(): void {
     if (!this.selectedState) {
       this.toastr.warning('Please select a state first');
@@ -2071,6 +2113,7 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
         'bpmn:StartEvent',
         'bpmn:EndEvent',
         'bpmn:SubProcess',
+        'bpmn:IntermediateCatchEvent', // Timer Trigger
       ].includes(element.type)
     );
   }

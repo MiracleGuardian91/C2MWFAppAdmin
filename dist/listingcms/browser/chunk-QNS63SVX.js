@@ -2790,14 +2790,6 @@ var CustomContextPad = class {
             dragstart: this._connect.start
           }
         };
-        actions["color-picker"] = {
-          group: "edit",
-          className: "custom-paintbrush-icon",
-          title: "Pick Color",
-          action: {
-            click: () => this.showColorPicker(element)
-          }
-        };
         if (type === t12.SubProcess) {
           actions["redirect-to-SubProcess"] = {
             group: "navigation",
@@ -42067,4 +42059,4 @@ export {
   BpmnService,
   DiagramService
 };
-//# sourceMappingURL=chunk-I4JDELKK.js.map
+//# sourceMappingURL=chunk-QNS63SVX.js.map

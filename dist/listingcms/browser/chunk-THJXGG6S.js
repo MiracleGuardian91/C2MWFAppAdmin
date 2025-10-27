@@ -9,7 +9,7 @@ import {
   WorkflowDetailComponent,
   getTriggerType,
   require_guid
-} from "./chunk-I4JDELKK.js";
+} from "./chunk-QNS63SVX.js";
 import {
   NAME_VALIDATORS
 } from "./chunk-IZC66MGR.js";
@@ -4843,4 +4843,4 @@ var WfdModule = class _WfdModule {
 export {
   WfdModule
 };
-//# sourceMappingURL=chunk-2ETRWXVE.js.map
+//# sourceMappingURL=chunk-THJXGG6S.js.map

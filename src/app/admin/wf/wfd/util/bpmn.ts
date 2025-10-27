@@ -10,7 +10,9 @@ import {
 
 const t = ElementType;
 
-export const COLORS: Partial<Record<ElementType | EventDef, ElementStyle | ElementStyle[]>> = {};
+export const COLORS: Partial<
+  Record<ElementType | EventDef, ElementStyle | ElementStyle[]>
+> = {};
 COLORS[t.Pool] = {
   stroke: 'black',
   fill: 'none',
@@ -28,8 +30,8 @@ COLORS[t.State] = { stroke: 'black', fill: ' white', strokeWidth: 2 };
 COLORS[t.EndState] = { stroke: 'black', fill: ' white', strokeWidth: 4 };
 COLORS[t.SubProcess] = { stroke: 'black', fill: ' white' };
 COLORS[t.TriggerExtension] = { stroke: 'black', fill: ' white' };
-COLORS[EventDef.Timer] = { stroke: 'black', fill: ' white' }; 
-COLORS[EventDef.Notify] = { stroke: 'black', fill: ' white' }; 
+COLORS[EventDef.Timer] = { stroke: 'black', fill: ' white' };
+COLORS[EventDef.Notify] = { stroke: 'black', fill: ' white' };
 COLORS[EventDef.System] = { stroke: 'black', fill: ' white' };
 COLORS[t.Gateway] = { stroke: 'black', fill: ' white', strokeWidth: 2 };
 COLORS[t.Association] = {
@@ -67,7 +69,7 @@ export const isStateType = (el: DiagramEl) => {
       el.type === t.PromptVariable ||
       el.type === t.Scheduler ||
       el.type === t.SqlQuery ||
-      el.type === t.Vector) 
+      el.type === t.Vector)
   );
 };
 
@@ -86,7 +88,7 @@ export const getShapeSize = (type: ElementType): Dimension => {
     case t.TriggerExtension:
       return { width: 36, height: 36 };
     case t.State:
-        return {width: 100, height: 80}
+      return { width: 100, height: 80 };
     case t.Gateway:
       return { width: 50, height: 50 };
     case t.Annotation:
@@ -101,10 +103,11 @@ export const isConditionType = (el: TriggerConditionConnection) => {
 };
 
 export const isConnection = (el: DiagramEl) =>
-  el.type === t.Trigger || el.type === t.Association || el.type === t.DottedFlow;
-
-export const isCustomConnection = (el: DiagramEl) =>
+  el.type === t.Trigger ||
+  el.type === t.Association ||
   el.type === t.DottedFlow;
+
+export const isCustomConnection = (el: DiagramEl) => el.type === t.DottedFlow;
 
 export const getElementStyle = (el: any): ElementStyle => {
   let style: ElementStyle = null;
@@ -119,56 +122,89 @@ export const getElementStyle = (el: any): ElementStyle => {
     const len = colors.length;
     const triggerColors = colors[index % len || 0];
     style = { ...triggerColors };
-  } else if (el?.def === EventDef.Timer && !el.color){
-     style = style = { stroke: 'black', fill: 'white' };
-  }
-  else if (el?.def === EventDef.Notify && !el.color){
-      style = { stroke: 'black', fill: 'white' };
-  }
-  else if (el?.def === EventDef.System && !el.color){
-    style ={ stroke: 'black', fill: 'white' };
-  }
-   else {
-    if (elementType === t.Pool && (!el.color || el.color==='none')) {
-      style = { stroke: 'black', fill: 'none', strokeWidth: 2, fillOpacity: 0.35 };
-    } 
-    else if (elementType === t.Stage && el.color) { // Stage has default black stroke color
-      style = { stroke: 'black', fill: el.color, strokeWidth: 2, fillOpacity: 0.35 };
-    } 
-    else if (elementType === t.Stage && (!el.color || el.color==='none')) {
-      style = { stroke: 'black', fill: 'white', strokeWidth: 2, fillOpacity: 0.35 };
-    } 
-    else if (elementType === t.State && (!el.color || el.color==='none')) {
+  } else if (el?.def === EventDef.Timer && !el.color) {
+    style = style = { stroke: 'black', fill: 'white' };
+  } else if (el?.def === EventDef.Notify && !el.color) {
+    style = { stroke: 'black', fill: 'white' };
+  } else if (el?.def === EventDef.System && !el.color) {
+    style = { stroke: 'black', fill: 'white' };
+  } else {
+    if (elementType === t.Pool && (!el.color || el.color === 'none')) {
+      style = {
+        stroke: 'black',
+        fill: 'none',
+        strokeWidth: 2,
+        fillOpacity: 0.35,
+      };
+    } else if (elementType === t.Stage && el.color) {
+      // Stage has default black stroke color
+      style = {
+        stroke: 'black',
+        fill: el.color,
+        strokeWidth: 2,
+        fillOpacity: 0.35,
+      };
+    } else if (elementType === t.Stage && (!el.color || el.color === 'none')) {
+      style = {
+        stroke: 'black',
+        fill: 'white',
+        strokeWidth: 2,
+        fillOpacity: 0.35,
+      };
+    } else if (elementType === t.State && (!el.color || el.color === 'none')) {
       style = { stroke: 'black', fill: 'white', strokeWidth: 2.5 };
-    } 
-    else if (elementType === t.StartState && (!el.color || el.color==='none')) {
-      style = { stroke: 'black', fill: 'black', strokeWidth: 3};
-    } 
-    else if (elementType === t.EndState && (!el.color || el.color==='none')) {
+    } else if (
+      elementType === t.StartState &&
+      (!el.color || el.color === 'none')
+    ) {
+      style = { stroke: 'black', fill: 'black', strokeWidth: 3 };
+    } else if (
+      elementType === t.EndState &&
+      (!el.color || el.color === 'none')
+    ) {
       style = { stroke: 'black', fill: 'white', strokeWidth: 4 };
-    } 
-    else if ([t.API, t.DataSchema, t.HumanInLoop, t.LLM, t.PromptVariable, t.Scheduler, t.SqlQuery, t.Vector].includes(elementType) && (!el.color || el.color==='none')) {
+    } else if (
+      [
+        t.API,
+        t.DataSchema,
+        t.HumanInLoop,
+        t.LLM,
+        t.PromptVariable,
+        t.Scheduler,
+        t.SqlQuery,
+        t.Vector,
+      ].includes(elementType) &&
+      (!el.color || el.color === 'none')
+    ) {
       style = { stroke: 'black', fill: 'white', strokeWidth: 4 };
-    } 
-    else if (elementType === t.SubProcess && (!el.color || el.color==='none')) {
+    } else if (
+      elementType === t.SubProcess &&
+      (!el.color || el.color === 'none')
+    ) {
       style = { stroke: 'black', fill: 'white', strokeWidth: 2 };
-    } 
-    else if (elementType === t.Gateway && (!el.color || el.color==='none')) {
+    } else if (
+      elementType === t.Gateway &&
+      (!el.color || el.color === 'none')
+    ) {
       style = { stroke: 'black', fill: 'white', strokeWidth: 2 };
-    } 
-    else if (elementType === t.Association && (!el.color || el.color==='none')) {
-      style = { stroke: 'black', fill: 'none',  strokeDasharray: '0.5, 5', strokeLinecap: 'round', strokeLinejoin: 'round', };
-    } 
-    else if (def === EventDef.Timer && (!el.color || el.color==='none')) {
+    } else if (
+      elementType === t.Association &&
+      (!el.color || el.color === 'none')
+    ) {
+      style = {
+        stroke: 'black',
+        fill: 'none',
+        strokeDasharray: '0.5, 5',
+        strokeLinecap: 'round',
+        strokeLinejoin: 'round',
+      };
+    } else if (def === EventDef.Timer && (!el.color || el.color === 'none')) {
       style = { stroke: 'black', fill: 'white' };
-    } 
-    else if (def === EventDef.Notify && (!el.color || el.color==='none')) {
+    } else if (def === EventDef.Notify && (!el.color || el.color === 'none')) {
       style = { stroke: 'black', fill: 'white' };
-    } 
-    else if (def === EventDef.System && (!el.color || el.color==='none')) {
+    } else if (def === EventDef.System && (!el.color || el.color === 'none')) {
       style = { stroke: 'black', fill: 'white' };
-    } 
-    else {
+    } else {
       style = COLORS[elementType] as ElementStyle;
     }
   }
@@ -182,13 +218,15 @@ export const getElementStyle = (el: any): ElementStyle => {
     }
     style.stroke = INACTIVE_STROKE_COLOR;
   }
-  
-  if (el.color && el.color !== 'none') {
-  const style = getElementTypeStyle(elementType, el.color);
-  COLORS[def || elementType] = style;
-}
 
-// ...
+  if (el.color && el.color !== 'none') {
+    const customStyle = getElementTypeStyle(elementType, el.color);
+    COLORS[def || elementType] = customStyle;
+    return customStyle;
+  }
+
+  return style;
+};
 
 function getElementTypeStyle(elementType, color) {
   switch (elementType) {
@@ -199,13 +237,13 @@ function getElementTypeStyle(elementType, color) {
         fillOpacity: 1,
         strokeWidth: 4,
       };
-      case 'bpmn:Lane':
-          return {
-            stroke: color,
-           fill: color,
-           fillOpacity: 0.35,
-           strokeWidth: 2,
-          };
+    case 'bpmn:Lane':
+      return {
+        stroke: color,
+        fill: color,
+        fillOpacity: 0.35,
+        strokeWidth: 2,
+      };
     default:
       return {
         stroke: color,
@@ -215,12 +253,7 @@ function getElementTypeStyle(elementType, color) {
       };
   }
 }
- 
 
-  return style;
-
-
-};
 export const getEventDef = (el: DiagramEl) => {
   const defs = el.businessObject?.eventDefinitions;
   return defs && defs[0]?.$type;

@@ -45,14 +45,13 @@ export class BpmnService {
   >;
   private canvas: Canvas;
   private factory: ElementFactory;
-  private registry: ElementRegistry;
+  public registry: ElementRegistry;
   public eventBus: EventBus;
   public commandStack: any;
   private palette: any;
   private readonly labelEditing: any;
   constructor(private msg: MessageService) {
     this.bpmnJS = new CustomModeler({
-      // keyboard: {bindTo: document},
       textRenderer: {
         defaultStyle: {
           fontSize: '14px',
@@ -294,6 +293,75 @@ export class BpmnService {
     element.color = fillColor;
 
     this.eventBus.fire('element.changed', { element });
+  }
+
+  public applyFillColorOnly(element: DiagramEl, fillColor: string): void {
+    if (!element) return;
+
+    this.modeling.updateProperties(element, {
+      color: fillColor,
+    });
+
+    const bo = element.businessObject;
+
+    if (bo) {
+      bo.color = fillColor;
+    }
+
+    element.color = fillColor;
+
+    this.updateElementFillColor(element, fillColor);
+
+    this.eventBus.fire('element.changed', { element });
+  }
+
+  private updateElementFillColor(element: DiagramEl, fillColor: string): void {
+    const gfx = this.registry.getGraphics(element.id);
+    if (!gfx) {
+      console.log('No graphics found for element:', element.id);
+      return;
+    }
+
+    const rectElements = gfx.querySelectorAll('rect');
+    for (let i = 0; i < rectElements.length; i++) {
+      const rectEl = rectElements[i];
+      rectEl.setAttribute('fill', fillColor);
+    }
+
+    const pathElements = gfx.querySelectorAll('path');
+    for (let i = 0; i < pathElements.length; i++) {
+      const pathEl = pathElements[i];
+      const d = pathEl.getAttribute('d');
+      if (d && !d.includes('M') && !d.includes('L')) {
+        pathEl.setAttribute('fill', fillColor);
+      }
+    }
+
+    const circleElements = gfx.querySelectorAll('circle');
+    for (let i = 0; i < circleElements.length; i++) {
+      const circleEl = circleElements[i];
+      console.log(
+        'Updating circle element:',
+        circleEl,
+        'with fill:',
+        fillColor
+      );
+      circleEl.setAttribute('fill', fillColor);
+    }
+
+    const allElements = gfx.querySelectorAll('*');
+    for (let i = 0; i < allElements.length; i++) {
+      const el = allElements[i];
+      const tagName = el.tagName.toLowerCase();
+      if (['rect', 'circle', 'ellipse', 'path'].includes(tagName)) {
+        const currentFill = el.getAttribute('fill');
+        console.log(`Element ${tagName} current fill:`, currentFill);
+        if (currentFill !== 'none' && currentFill !== 'transparent') {
+          el.setAttribute('fill', fillColor);
+          console.log(`Updated ${tagName} fill to:`, fillColor);
+        }
+      }
+    }
   }
 
   private updateTextElements(
