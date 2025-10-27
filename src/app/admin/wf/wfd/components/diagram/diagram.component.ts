@@ -1559,6 +1559,7 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     const currentFontBold = this.getCurrentFontBold(element);
     const currentFontItalic = this.getCurrentFontItalic(element);
     const currentFontUnderline = this.getCurrentFontUnderline(element);
+    const currentFillColor = this.getCurrentFillColor(element);
 
     const bo = element.businessObject;
     const boFontFamily = bo?.fontFamily;
@@ -1567,6 +1568,7 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     const boFontBold = bo?.fontBold;
     const boFontItalic = bo?.fontItalic;
     const boFontUnderline = bo?.fontUnderline;
+    const boFillColor = bo?.color;
 
     this.selectedFontFamily = this.processFontFamily(
       boFontFamily ||
@@ -1618,6 +1620,14 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
         : element.props && element.props.fontUnderline !== undefined
         ? element.props.fontUnderline
         : currentFontUnderline || false;
+
+    this.selectedFillColor = this.processFillColor(
+      boFillColor ||
+        element.color ||
+        (element.props && element.props.color) ||
+        currentFillColor ||
+        '#ffffff'
+    );
 
     console.log(
       'Processed values:',
@@ -1722,28 +1732,16 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
 
     // If it's an rgb/rgba color, try to convert it
     if (fontColor.startsWith('rgb')) {
-      return this.rgbToHex(fontColor);
-    }
-
-    // Default fallback
-    return '#000000';
-  }
-
-  private rgbToHex(rgb: string): string {
-    try {
-      // Extract numbers from rgb(r, g, b) or rgba(r, g, b, a)
-      const matches = rgb.match(/\d+/g);
+      const matches = fontColor.match(/\d+/g);
       if (matches && matches.length >= 3) {
         const r = parseInt(matches[0]);
         const g = parseInt(matches[1]);
         const b = parseInt(matches[2]);
-        return `#${((1 << 24) + (r << 16) + (g << 8) + b)
-          .toString(16)
-          .slice(1)}`;
+        return this.rgbToHex(r, g, b);
       }
-    } catch (error) {
-      console.warn('Error converting RGB to hex:', error);
     }
+
+    // Default fallback
     return '#000000';
   }
 
@@ -1913,16 +1911,67 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     return false;
   }
 
-  public applyFontFamily(): void {
-    if (!this.selectedState) {
-      this.toastr.warning('Please select a state first');
-      return;
-    }
+  private getCurrentFillColor(element: any): string | null {
+    try {
+      const gfx = this.service.getGraphics(element);
+      if (gfx) {
+        const rectElements = gfx.querySelectorAll('rect');
+        for (let i = 0; i < rectElements.length; i++) {
+          const rectEl = rectElements[i];
+          const fill = rectEl.getAttribute('fill');
+          if (fill && fill !== 'none' && fill !== 'transparent') {
+            return fill;
+          }
+        }
 
-    this.applyAllElementProperties();
+        const pathElements = gfx.querySelectorAll('path');
+        for (let i = 0; i < pathElements.length; i++) {
+          const pathEl = pathElements[i];
+          const fill = pathEl.getAttribute('fill');
+          if (fill && fill !== 'none' && fill !== 'transparent') {
+            return fill;
+          }
+        }
+      }
+    } catch (error) {
+      console.warn('Error getting fill color:', error);
+    }
+    return null;
   }
 
-  public applyFontSize(): void {
+  private processFillColor(fillColor: string): string {
+    if (!fillColor) return '#ffffff';
+
+    if (fillColor.startsWith('#')) {
+      return fillColor;
+    }
+
+    if (fillColor.startsWith('rgb')) {
+      const matches = fillColor.match(/\d+/g);
+      if (matches && matches.length >= 3) {
+        const r = parseInt(matches[0]);
+        const g = parseInt(matches[1]);
+        const b = parseInt(matches[2]);
+        return this.rgbToHex(r, g, b);
+      }
+    }
+
+    return '#ffffff';
+  }
+
+  private rgbToHex(r: number, g: number, b: number): string {
+    return (
+      '#' +
+      [r, g, b]
+        .map((x) => {
+          const hex = x.toString(16);
+          return hex.length === 1 ? '0' + hex : hex;
+        })
+        .join('')
+    );
+  }
+
+  public applyFontFamily(): void {
     if (!this.selectedState) {
       this.toastr.warning('Please select a state first');
       return;
@@ -1941,6 +1990,15 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
   }
 
   public applyFillColor(): void {
+    if (!this.selectedState) {
+      this.toastr.warning('Please select a state first');
+      return;
+    }
+
+    this.applyAllElementProperties();
+  }
+
+  public applyFontSize(): void {
     if (!this.selectedState) {
       this.toastr.warning('Please select a state first');
       return;
