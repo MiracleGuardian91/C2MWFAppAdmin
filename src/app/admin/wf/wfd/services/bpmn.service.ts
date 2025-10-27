@@ -258,8 +258,7 @@ export class BpmnService {
     fontBold: boolean = false,
     fontItalic: boolean = false,
     fontUnderline: boolean = false,
-    alignment: string = 'center',
-    verticalAlignment: string = 'middle'
+    fillColor: string = '#ffffff'
   ): void {
     if (!element) return;
 
@@ -270,11 +269,11 @@ export class BpmnService {
       fontBold: fontBold,
       fontItalic: fontItalic,
       fontUnderline: fontUnderline,
-      alignment: alignment,
-      verticalAlignment: verticalAlignment,
+      color: fillColor,
     });
 
     const bo = element.businessObject;
+
     if (bo) {
       bo.fontFamily = fontFamily;
       bo.fontSize = fontSize;
@@ -282,8 +281,7 @@ export class BpmnService {
       bo.fontBold = fontBold;
       bo.fontItalic = fontItalic;
       bo.fontUnderline = fontUnderline;
-      bo.alignment = alignment;
-      bo.verticalAlignment = verticalAlignment;
+      bo.color = fillColor;
     }
 
     element.fontFamily = fontFamily;
@@ -292,8 +290,7 @@ export class BpmnService {
     element.fontBold = fontBold;
     element.fontItalic = fontItalic;
     element.fontUnderline = fontUnderline;
-    element.alignment = alignment;
-    element.verticalAlignment = verticalAlignment;
+    element.color = fillColor;
 
     this.eventBus.fire('element.changed', { element });
   }

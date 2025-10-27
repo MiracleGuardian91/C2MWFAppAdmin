@@ -58,7 +58,8 @@ export class ElementPropertiesCommand extends CommandInterceptor {
       properties.fontColor !== undefined ||
       properties.fontBold !== undefined ||
       properties.fontItalic !== undefined ||
-      properties.fontUnderline !== undefined
+      properties.fontUnderline !== undefined ||
+      properties.color !== undefined
     );
   }
 
@@ -71,6 +72,7 @@ export class ElementPropertiesCommand extends CommandInterceptor {
       fontBold: bo?.fontBold || element.fontBold || false,
       fontItalic: bo?.fontItalic || element.fontItalic || false,
       fontUnderline: bo?.fontUnderline || element.fontUnderline || false,
+      color: bo?.color || element.color || '#ffffff',
     };
   }
 
@@ -87,6 +89,7 @@ export class ElementPropertiesCommand extends CommandInterceptor {
         bo.fontItalic = properties.fontItalic;
       if (properties.fontUnderline !== undefined)
         bo.fontUnderline = properties.fontUnderline;
+      if (properties.color !== undefined) bo.color = properties.color;
     }
 
     if (properties.fontFamily !== undefined)
@@ -101,6 +104,7 @@ export class ElementPropertiesCommand extends CommandInterceptor {
       element.fontItalic = properties.fontItalic;
     if (properties.fontUnderline !== undefined)
       element.fontUnderline = properties.fontUnderline;
+    if (properties.color !== undefined) element.color = properties.color;
 
     this.updateTextElements(element, properties);
   }
@@ -109,6 +113,7 @@ export class ElementPropertiesCommand extends CommandInterceptor {
     const gfx = this.elementRegistry.getGraphics(element.id);
     if (!gfx) return;
 
+    // Update text elements
     const textElements = gfx.querySelectorAll('text');
     textElements.forEach((textEl: SVGTextElement) => {
       if (properties.fontFamily !== undefined) {
@@ -140,6 +145,7 @@ export class ElementPropertiesCommand extends CommandInterceptor {
       }
     });
 
+    // Update tspan elements
     const tspanElements = gfx.querySelectorAll('tspan');
     tspanElements.forEach((tspanEl: SVGTSpanElement) => {
       if (properties.fontFamily !== undefined) {
@@ -170,6 +176,18 @@ export class ElementPropertiesCommand extends CommandInterceptor {
         );
       }
     });
+
+    if (properties.color !== undefined) {
+      const rectElements = gfx.querySelectorAll('rect');
+      rectElements.forEach((rectEl: SVGRectElement) => {
+        rectEl.setAttribute('fill', properties.color);
+      });
+
+      const pathElements = gfx.querySelectorAll('path');
+      pathElements.forEach((pathEl: SVGPathElement) => {
+        pathEl.setAttribute('fill', properties.color);
+      });
+    }
   }
 
   static $inject = ['eventBus', 'modeling', 'elementRegistry'];

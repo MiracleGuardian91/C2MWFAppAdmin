@@ -146,6 +146,7 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
   public selectedFontBold: boolean = false;
   public selectedFontItalic: boolean = false;
   public selectedFontUnderline: boolean = false;
+  public selectedFillColor: string = '#ffffff';
   constructor(
     private dialog: MatDialog,
     public service: DiagramService,
@@ -1939,6 +1940,15 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     this.applyAllElementProperties();
   }
 
+  public applyFillColor(): void {
+    if (!this.selectedState) {
+      this.toastr.warning('Please select a state first');
+      return;
+    }
+
+    this.applyAllElementProperties();
+  }
+
   public toggleFontBold(): void {
     if (!this.selectedState) {
       this.toastr.warning('Please select a state first');
@@ -1979,6 +1989,7 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       fontBold: this.selectedFontBold,
       fontItalic: this.selectedFontItalic,
       fontUnderline: this.selectedFontUnderline,
+      fillColor: this.selectedFillColor,
     });
 
     this.service.applyAllElementProperties(
@@ -1988,7 +1999,8 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       this.selectedFontColor,
       this.selectedFontBold,
       this.selectedFontItalic,
-      this.selectedFontUnderline
+      this.selectedFontUnderline,
+      this.selectedFillColor
     );
   }
 
@@ -2021,6 +2033,8 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
           bo.fontItalic || this.selectedState.fontItalic || false;
         this.selectedFontUnderline =
           bo.fontUnderline || this.selectedState.fontUnderline || false;
+        this.selectedFillColor =
+          bo.color || this.selectedState.color || '#ffffff';
       } else {
         this.selectedFontFamily = this.selectedState.fontFamily || 'Arial';
         this.selectedFontSize = this.selectedState.fontSize || '14px';
@@ -2028,6 +2042,7 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
         this.selectedFontBold = this.selectedState.fontBold || false;
         this.selectedFontItalic = this.selectedState.fontItalic || false;
         this.selectedFontUnderline = this.selectedState.fontUnderline || false;
+        this.selectedFillColor = this.selectedState.color || '#ffffff';
       }
 
       this.cdr.detectChanges();

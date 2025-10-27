@@ -1205,8 +1205,7 @@ export class DiagramService implements OnDestroy {
     fontBold: boolean = false,
     fontItalic: boolean = false,
     fontUnderline: boolean = false,
-    alignment: string = 'center',
-    verticalAlignment: string = 'middle'
+    fillColor: string = '#ffffff'
   ): void {
     if (!element) return;
 
@@ -1218,8 +1217,7 @@ export class DiagramService implements OnDestroy {
       fontBold,
       fontItalic,
       fontUnderline,
-      alignment,
-      verticalAlignment
+      fillColor
     );
   }
 

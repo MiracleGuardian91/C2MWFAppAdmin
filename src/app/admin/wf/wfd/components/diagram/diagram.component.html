@@ -258,6 +258,24 @@
             </div>
           </div>
 
+          <!-- Fill Color Picker -->
+          <div
+            *ngIf="service.paletteIsOpen"
+            style="display: flex; align-items: center"
+          >
+            <div class="font-control-group">
+              <label class="font-control-label">Fill Color:</label>
+              <input
+                type="color"
+                class="font-control-color"
+                [disabled]="!selectedState"
+                [(ngModel)]="selectedFillColor"
+                (input)="applyFillColor()"
+                title="Select fill color"
+              />
+            </div>
+          </div>
+
           <!-- Font Style Buttons -->
           <div
             *ngIf="service.paletteIsOpen"
