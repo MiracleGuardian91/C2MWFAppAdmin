@@ -9,7 +9,7 @@ import {
   WorkflowDetailComponent,
   getTriggerType,
   require_guid
-} from "./chunk-ZYWLZ2OQ.js";
+} from "./chunk-I4JDELKK.js";
 import {
   NAME_VALIDATORS
 } from "./chunk-IZC66MGR.js";
@@ -3227,7 +3227,7 @@ var DiagramComponent = class _DiagramComponent {
     this.trgConditionDetail = false;
     this.undoredoactive = false;
     this.selectedState = null;
-    this.selectedFontFamily = "Arial";
+    this.selectedFontFamily = "Museo Sans";
     this.selectedFontSize = "14px";
     this.selectedFontColor = "#000000";
     this.selectedFontBold = false;
@@ -4238,8 +4238,8 @@ var DiagramComponent = class _DiagramComponent {
     const boFontItalic = bo?.fontItalic;
     const boFontUnderline = bo?.fontUnderline;
     const boFillColor = bo?.color;
-    this.selectedFontFamily = this.processFontFamily(boFontFamily || element.fontFamily || element.props && element.props.fontFamily || currentFontFamily || "Arial");
-    this.selectedFontSize = this.processFontSize(boFontSize || element.fontSize || element.props && element.props.fontSize || currentFontSize || "14px");
+    this.selectedFontFamily = this.processFontFamily(boFontFamily || element.fontFamily || element.props && element.props.fontFamily || currentFontFamily || "Museo Sans");
+    this.selectedFontSize = this.processFontSize(boFontSize || element.fontSize || element.props && element.props.fontSize || currentFontSize || "13px");
     this.selectedFontColor = this.processFontColor(boFontColor || element.fontColor || element.props && element.props.fontColor || currentFontColor || "#000000");
     this.selectedFontBold = boFontBold !== void 0 ? boFontBold : element.fontBold !== void 0 ? element.fontBold : element.props && element.props.fontBold !== void 0 ? element.props.fontBold : currentFontBold || false;
     this.selectedFontItalic = boFontItalic !== void 0 ? boFontItalic : element.fontItalic !== void 0 ? element.fontItalic : element.props && element.props.fontItalic !== void 0 ? element.props.fontItalic : currentFontItalic || false;
@@ -4254,7 +4254,7 @@ var DiagramComponent = class _DiagramComponent {
   }
   processFontFamily(fontFamily) {
     if (!fontFamily)
-      return "Arial";
+      return "Museo Sans";
     const cleaned = fontFamily.replace(/['"]/g, "").trim();
     const fontMap = {
       "Museo Sans": "Museo Sans",
@@ -4268,11 +4268,11 @@ var DiagramComponent = class _DiagramComponent {
       Impact: "Impact",
       "Trebuchet MS": "Trebuchet MS"
     };
-    return fontMap[cleaned] || cleaned || "Arial";
+    return fontMap[cleaned] || cleaned || "Museo Sans";
   }
   processFontSize(fontSize) {
     if (!fontSize)
-      return "14px";
+      return "13px";
     const cleaned = fontSize.trim();
     const sizeMap = {
       "8px": "8px",
@@ -4287,7 +4287,7 @@ var DiagramComponent = class _DiagramComponent {
       "28px": "28px",
       "32px": "32px"
     };
-    return sizeMap[cleaned] || cleaned || "14px";
+    return sizeMap[cleaned] || cleaned || "13px";
   }
   processFontColor(fontColor) {
     if (!fontColor)
@@ -4569,16 +4569,16 @@ var DiagramComponent = class _DiagramComponent {
     if (this.selectedState) {
       const bo = this.selectedState.businessObject;
       if (bo) {
-        this.selectedFontFamily = bo.fontFamily || this.selectedState.fontFamily || "Arial";
-        this.selectedFontSize = bo.fontSize || this.selectedState.fontSize || "14px";
+        this.selectedFontFamily = bo.fontFamily || this.selectedState.fontFamily || "Museo Sans";
+        this.selectedFontSize = bo.fontSize || this.selectedState.fontSize || "13px";
         this.selectedFontColor = bo.fontColor || this.selectedState.fontColor || "#000000";
         this.selectedFontBold = bo.fontBold || this.selectedState.fontBold || false;
         this.selectedFontItalic = bo.fontItalic || this.selectedState.fontItalic || false;
         this.selectedFontUnderline = bo.fontUnderline || this.selectedState.fontUnderline || false;
         this.selectedFillColor = bo.color || this.selectedState.color || "#ffffff";
       } else {
-        this.selectedFontFamily = this.selectedState.fontFamily || "Arial";
-        this.selectedFontSize = this.selectedState.fontSize || "14px";
+        this.selectedFontFamily = this.selectedState.fontFamily || "Museo Sans";
+        this.selectedFontSize = this.selectedState.fontSize || "13px";
         this.selectedFontColor = this.selectedState.fontColor || "#000000";
         this.selectedFontBold = this.selectedState.fontBold || false;
         this.selectedFontItalic = this.selectedState.fontItalic || false;
@@ -4843,4 +4843,4 @@ var WfdModule = class _WfdModule {
 export {
   WfdModule
 };
-//# sourceMappingURL=chunk-VNAE7C7V.js.map
+//# sourceMappingURL=chunk-2ETRWXVE.js.map

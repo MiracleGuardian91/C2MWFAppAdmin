@@ -1053,14 +1053,14 @@ export class CustomContextPad<
           },
         };
 
-        actions['color-picker'] = {
-          group: 'edit',
-          className: 'custom-paintbrush-icon',
-          title: 'Pick Color',
-          action: {
-            click: () => this.showColorPicker(element),
-          },
-        };
+        // actions['color-picker'] = {
+        //   group: 'edit',
+        //   className: 'custom-paintbrush-icon',
+        //   title: 'Pick Color',
+        //   action: {
+        //     click: () => this.showColorPicker(element),
+        //   },
+        // };
 
         if (type === t.SubProcess) {
           actions['redirect-to-SubProcess'] = {

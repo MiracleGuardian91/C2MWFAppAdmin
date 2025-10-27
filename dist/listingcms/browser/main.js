@@ -170,5 +170,5 @@ function processHostInfo(hostInfo, relBundlesPath = "./") {
 }
 
 // src/main.ts
-initFederation().catch((err) => console.error(err)).then((_) => import("./chunk-PCR326IT.js")).catch((err) => console.error(err));
+initFederation().catch((err) => console.error(err)).then((_) => import("./chunk-D6ZKQAOC.js")).catch((err) => console.error(err));
 //# sourceMappingURL=main.js.map

@@ -5769,7 +5769,7 @@ var routes = [
   },
   {
     path: "admin",
-    loadChildren: () => import("./chunk-UWA3SSVB.js").then((m) => m.AdminModule)
+    loadChildren: () => import("./chunk-HHYWZZ55.js").then((m) => m.AdminModule)
   },
   {
     path: "bmwfcompare",
@@ -5818,4 +5818,4 @@ bootstrapApplication(AppComponent, {
     provideRouter(routes)
   ]
 }).catch((err) => console.error(err));
-//# sourceMappingURL=chunk-PCR326IT.js.map
+//# sourceMappingURL=chunk-D6ZKQAOC.js.map

@@ -7844,14 +7844,19 @@ var ElementPropertiesCommand = class extends CommandInterceptor {
   }
   getCurrentElementProperties(element) {
     const bo = element.businessObject;
+    const currentFontColor = this.getCurrentFontColor(element);
+    const currentFillColor = this.getCurrentFillColor(element);
+    const currentFontBold = this.getCurrentFontBold(element);
+    const currentFontItalic = this.getCurrentFontItalic(element);
+    const currentFontUnderline = this.getCurrentFontUnderline(element);
     return {
-      fontFamily: bo?.fontFamily || element.fontFamily || "Arial",
-      fontSize: bo?.fontSize || element.fontSize || "14px",
-      fontColor: bo?.fontColor || element.fontColor || "#000000",
-      fontBold: bo?.fontBold || element.fontBold || false,
-      fontItalic: bo?.fontItalic || element.fontItalic || false,
-      fontUnderline: bo?.fontUnderline || element.fontUnderline || false,
-      color: bo?.color || element.color || "#ffffff"
+      fontFamily: bo?.fontFamily || element.fontFamily || "Museo Sans",
+      fontSize: bo?.fontSize || element.fontSize || "13px",
+      fontColor: currentFontColor || bo?.fontColor || element.fontColor || "#000000",
+      fontBold: currentFontBold !== null ? currentFontBold : bo?.fontBold || element.fontBold || false,
+      fontItalic: currentFontItalic !== null ? currentFontItalic : bo?.fontItalic || element.fontItalic || false,
+      fontUnderline: currentFontUnderline !== null ? currentFontUnderline : bo?.fontUnderline || element.fontUnderline || false,
+      color: currentFillColor || bo?.color || element.color || "#ffffff"
     };
   }
   applyElementPropertiesToElement(element, properties) {
@@ -7944,6 +7949,92 @@ var ElementPropertiesCommand = class extends CommandInterceptor {
         pathEl.setAttribute("fill", properties.color);
       });
     }
+  }
+  getCurrentFontColor(element) {
+    try {
+      const gfx = this.elementRegistry.getGraphics(element.id);
+      if (gfx) {
+        const textElement = gfx.querySelector("text");
+        if (textElement) {
+          const fontColor = textElement.getAttribute("fill") || textElement.style.fill || window.getComputedStyle(textElement).fill;
+          return fontColor && fontColor !== "inherit" && fontColor !== "currentColor" ? fontColor : null;
+        }
+      }
+    } catch (error4) {
+      console.warn("Error getting font color:", error4);
+    }
+    return null;
+  }
+  getCurrentFillColor(element) {
+    try {
+      const gfx = this.elementRegistry.getGraphics(element.id);
+      if (gfx) {
+        const rectElements = gfx.querySelectorAll("rect");
+        for (let i3 = 0; i3 < rectElements.length; i3++) {
+          const rectEl = rectElements[i3];
+          const fill = rectEl.getAttribute("fill");
+          if (fill && fill !== "none" && fill !== "transparent") {
+            return fill;
+          }
+        }
+        const pathElements = gfx.querySelectorAll("path");
+        for (let i3 = 0; i3 < pathElements.length; i3++) {
+          const pathEl = pathElements[i3];
+          const fill = pathEl.getAttribute("fill");
+          if (fill && fill !== "none" && fill !== "transparent") {
+            return fill;
+          }
+        }
+      }
+    } catch (error4) {
+      console.warn("Error getting fill color:", error4);
+    }
+    return null;
+  }
+  getCurrentFontBold(element) {
+    try {
+      const gfx = this.elementRegistry.getGraphics(element.id);
+      if (gfx) {
+        const textElement = gfx.querySelector("text");
+        if (textElement) {
+          const fontWeight = textElement.getAttribute("font-weight") || textElement.style.fontWeight || window.getComputedStyle(textElement).fontWeight;
+          return fontWeight === "bold" || fontWeight === "700" || fontWeight === "800" || fontWeight === "900";
+        }
+      }
+    } catch (error4) {
+      console.warn("Error getting font bold:", error4);
+    }
+    return null;
+  }
+  getCurrentFontItalic(element) {
+    try {
+      const gfx = this.elementRegistry.getGraphics(element.id);
+      if (gfx) {
+        const textElement = gfx.querySelector("text");
+        if (textElement) {
+          const fontStyle = textElement.getAttribute("font-style") || textElement.style.fontStyle || window.getComputedStyle(textElement).fontStyle;
+          return fontStyle === "italic";
+        }
+      }
+    } catch (error4) {
+      console.warn("Error getting font italic:", error4);
+    }
+    return null;
+  }
+  getCurrentFontUnderline(element) {
+    try {
+      const gfx = this.elementRegistry.getGraphics(element.id);
+      if (gfx) {
+        const textElement = gfx.querySelector("text");
+        if (textElement) {
+          const textDecoration = textElement.getAttribute("text-decoration") || textElement.style.textDecoration || window.getComputedStyle(textElement).textDecoration;
+          return textDecoration.includes("underline");
+        }
+      }
+    } catch (error4) {
+      console.warn("Error getting font underline:", error4);
+    }
+    return null;
   }
   static {
     this.$inject = ["eventBus", "modeling", "elementRegistry"];
@@ -40988,8 +41079,8 @@ var BpmnService = class _BpmnService {
   }
   getCurrentFontProperties(element) {
     const bo = element.businessObject;
-    const currentFontFamily = bo?.fontFamily || element.fontFamily || "Arial";
-    const currentFontSize = bo?.fontSize || element.fontSize || "14px";
+    const currentFontFamily = bo?.fontFamily || element.fontFamily || "Museo Sans";
+    const currentFontSize = bo?.fontSize || element.fontSize || "13px";
     const currentFontColor = bo?.fontColor || element.fontColor || "#000000";
     return {
       fontFamily: currentFontFamily,
@@ -41976,4 +42067,4 @@ export {
   BpmnService,
   DiagramService
 };
-//# sourceMappingURL=chunk-ZYWLZ2OQ.js.map
+//# sourceMappingURL=chunk-I4JDELKK.js.map

@@ -8,7 +8,7 @@ import {
   WorkflowDetailComponent,
   getTriggerType,
   require_guid
-} from "./chunk-ZYWLZ2OQ.js";
+} from "./chunk-I4JDELKK.js";
 import "./chunk-IZC66MGR.js";
 import {
   AdditionalPermissionComponent,
@@ -4797,4 +4797,4 @@ var routes = [
 export {
   routes
 };
-//# sourceMappingURL=chunk-YYQQSLRI.js.map
+//# sourceMappingURL=chunk-2JONSAPG.js.map

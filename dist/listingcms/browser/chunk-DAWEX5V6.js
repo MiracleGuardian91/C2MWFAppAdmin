@@ -1591,7 +1591,7 @@ var routes = [
   { path: "", component: WfComponent },
   {
     path: "wfd",
-    loadChildren: () => import("./chunk-VNAE7C7V.js").then((m) => m.WfdModule)
+    loadChildren: () => import("./chunk-2ETRWXVE.js").then((m) => m.WfdModule)
   },
   {
     path: "wfcondition",
@@ -3138,4 +3138,4 @@ var WfModule = class _WfModule {
 export {
   WfModule
 };
-//# sourceMappingURL=chunk-F6TIFWRP.js.map
+//# sourceMappingURL=chunk-DAWEX5V6.js.map
