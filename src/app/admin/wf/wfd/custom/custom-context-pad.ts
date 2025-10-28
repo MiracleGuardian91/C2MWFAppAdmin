@@ -915,14 +915,15 @@ export class CustomContextPad<
         },
       };
 
-      actions['color-picker'] = {
-        group: 'edit',
-        className: 'custom-paintbrush-icon',
-        title: 'Pick Color',
-        action: {
-          click: () => this.showColorPicker(element),
-        },
-      };
+      // Removed color-picker from Stage - color picker should not be available for any elements
+      // actions['color-picker'] = {
+      //   group: 'edit',
+      //   className: 'custom-paintbrush-icon',
+      //   title: 'Pick Color',
+      //   action: {
+      //     click: () => this.showColorPicker(element),
+      //   },
+      // };
     }
     if (type === t.Pool) {
       actions['lane-insert-above'] = {
@@ -944,14 +945,15 @@ export class CustomContextPad<
       };
     }
     if (type === t.TriggerExtension) {
-      actions['color-picker'] = {
-        group: 'edit',
-        className: 'custom-paintbrush-icon',
-        title: 'Pick Color',
-        action: {
-          click: () => this.showColorPicker(element),
-        },
-      };
+      // Removed color-picker from timer trigger - color picker should only be available for states
+      // actions['color-picker'] = {
+      //   group: 'edit',
+      //   className: 'custom-paintbrush-icon',
+      //   title: 'Pick Color',
+      //   action: {
+      //     click: () => this.showColorPicker(element),
+      //   },
+      // };
     }
 
     let deleteAllowed = this._rules.allowed(Rule.DeleteElements, {
@@ -1124,6 +1126,18 @@ export class CustomContextPad<
         };
       }
     }
+
+    // Removed color picker from State types (StartState, EndState, State) - color picker should not be available for any elements
+    // if ([t.StartState, t.EndState, t.State].includes(type)) {
+    //   actions['color-picker'] = {
+    //     group: 'edit',
+    //     className: 'custom-paintbrush-icon',
+    //     title: 'Pick Color',
+    //     action: {
+    //       click: () => this.showColorPicker(element),
+    //     },
+    //   };
+    // }
 
     if ([t.State].includes(type) && this._isAiFlow) {
       actions.dottedConnection = {
