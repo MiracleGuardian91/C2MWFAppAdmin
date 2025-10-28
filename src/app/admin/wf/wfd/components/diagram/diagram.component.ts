@@ -140,6 +140,7 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
 
   // Element properties
   public selectedState: any = null;
+  public selectedTimerTrigger: any = null;
   public selectedFontFamily: string = 'Museo Sans';
   public selectedFontSize: string = '14px';
   public selectedFontColor: string = '#000000';
@@ -1512,6 +1513,13 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       if (selectedElement.type === 'bpmn:Lane') {
         this.selectedSwimlane = selectedElement;
         this.selectedState = null;
+        this.selectedTimerTrigger = null;
+      } else if (selectedElement.type === 'bpmn:IntermediateCatchEvent') {
+        // Timer triggers - only enable fill color
+        this.selectedTimerTrigger = selectedElement;
+        this.selectedState = null;
+        this.selectedSwimlane = null;
+        this.loadTimerTriggerProperties(selectedElement);
       } else if (
         [
           'bpmn:Task',
@@ -1522,14 +1530,17 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       ) {
         this.selectedState = selectedElement;
         this.selectedSwimlane = null;
+        this.selectedTimerTrigger = null;
         this.loadStateFontProperties(selectedElement);
       } else {
         this.selectedSwimlane = null;
         this.selectedState = null;
+        this.selectedTimerTrigger = null;
       }
     } else {
       this.selectedSwimlane = null;
       this.selectedState = null;
+      this.selectedTimerTrigger = null;
     }
   }
 
@@ -1552,6 +1563,24 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     const alignmentText =
       alignment.charAt(0).toUpperCase() + alignment.slice(1);
     this.toastr.success(`States aligned to ${alignmentText}`);
+  }
+
+  private loadTimerTriggerProperties(element: any): void {
+    // Only load fill color for timer triggers
+    const currentFillColor = this.getCurrentFillColor(element);
+    const bo = element.businessObject;
+    const boFillColor = bo?.color;
+
+    this.selectedFillColor = this.processFillColor(
+      boFillColor ||
+        element.color ||
+        (element.props && element.props.color) ||
+        currentFillColor ||
+        '#ffffff'
+    );
+
+    console.log('Loaded timer trigger fill color:', this.selectedFillColor);
+    this.cdr.detectChanges();
   }
 
   private loadStateFontProperties(element: any): void {
@@ -1992,12 +2021,38 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
   }
 
   public applyFillColor(): void {
-    if (!this.selectedState) {
-      this.toastr.warning('Please select a state first');
+    if (!this.selectedState && !this.selectedTimerTrigger) {
+      this.toastr.warning('Please select a state or timer trigger first');
       return;
     }
 
-    this.applyAllElementProperties();
+    if (this.selectedTimerTrigger) {
+      // Apply fill color only to timer trigger
+      this.applyTimerTriggerFillColor();
+    } else {
+      // Apply all properties to state
+      this.applyAllElementProperties();
+    }
+  }
+
+  private applyTimerTriggerFillColor(): void {
+    if (!this.selectedTimerTrigger) return;
+
+    console.log(
+      'Applying fill color to timer trigger:',
+      this.selectedFillColor
+    );
+
+    this.service.applyAllElementProperties(
+      this.selectedTimerTrigger,
+      'Museo Sans', // Default font family
+      '13px', // Default font size
+      '#000000', // Default font color
+      false, // Default font bold
+      false, // Default font italic
+      false, // Default font underline
+      this.selectedFillColor // Only the fill color changes
+    );
   }
 
   public applyElementsColor(): void {
