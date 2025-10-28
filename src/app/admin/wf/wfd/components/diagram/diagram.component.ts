@@ -1515,7 +1515,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
         this.selectedState = null;
         this.selectedTimerTrigger = null;
       } else if (selectedElement.type === 'bpmn:IntermediateCatchEvent') {
-        // Timer triggers - only enable fill color
         this.selectedTimerTrigger = selectedElement;
         this.selectedState = null;
         this.selectedSwimlane = null;
