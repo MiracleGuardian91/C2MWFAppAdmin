@@ -64,7 +64,7 @@ export class CustomContextPad<
       }
 
       if (event.newSelection.length > 1 || firsChild?.type === 'bpmn:Lane') {
-        this.addLassoToolColorPicker(event.newSelection);
+        // this.addLassoToolColorPicker(event.newSelection); // Removed Elements Color button
         this.removeLassoToolAlignment('align-elements');
       }
     });
@@ -699,7 +699,7 @@ export class CustomContextPad<
             });
           }
           this.selectedPad = null;
-          this.addLassoToolColorPicker(element);
+          // this.addLassoToolColorPicker(element); // Removed Elements Color button
           this.removeLassoToolAlignment('align-elements');
           this.closeExistingColorPicker();
 
@@ -818,17 +818,8 @@ export class CustomContextPad<
       this.currentColorInput = null;
     }
     if (this.previousElement) {
-      this.addLassoToolColorPicker(this.previousElement);
+      // this.addLassoToolColorPicker(this.previousElement); // Removed Elements Color button
     }
-  }
-
-  private updateAllElementColor(element, color) {
-    element.children.forEach((iliment) => {
-      iliment.color = color;
-      this._modeling.updateProperties(iliment, {
-        style: { fill: color },
-      });
-    });
   }
 
   private updateElementColor(element: any, color: string) {
