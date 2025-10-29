@@ -276,6 +276,24 @@
             </div>
           </div>
 
+          <!-- Line Color Picker -->
+          <div
+            *ngIf="service.paletteIsOpen"
+            style="display: flex; align-items: center"
+          >
+            <div class="font-control-group">
+              <label class="font-control-label">Line Color:</label>
+              <input
+                type="color"
+                class="font-control-color"
+                [disabled]="!selectedTrigger"
+                [(ngModel)]="selectedLineColor"
+                (input)="applyLineColor()"
+                title="Select line color for trigger"
+              />
+            </div>
+          </div>
+
           <!-- Elements Color Picker -->
           <div
             *ngIf="service.paletteIsOpen"
