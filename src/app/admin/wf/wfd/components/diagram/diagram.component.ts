@@ -2165,6 +2165,10 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     console.log('Applying line color to trigger:', this.selectedLineColor);
 
     this.service.applyLineColor(this.selectedTrigger, this.selectedLineColor);
+
+    this.hasUnsavedChanges = true;
+
+    setTimeout(() => this.updateUndoRedoState(), 100);
   }
 
   public applyElementsColor(): void {
@@ -2311,6 +2315,35 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
         this.selectedFontItalic = this.selectedState.fontItalic || false;
         this.selectedFontUnderline = this.selectedState.fontUnderline || false;
         this.selectedFillColor = this.selectedState.color || '#ffffff';
+      }
+
+      this.cdr.detectChanges();
+    } else if (this.selectedTimerTrigger) {
+      // Update timer trigger properties
+      const bo = this.selectedTimerTrigger.businessObject;
+      if (bo) {
+        this.selectedFillColor =
+          bo.color || this.selectedTimerTrigger.color || '#ffffff';
+      } else {
+        this.selectedFillColor = this.selectedTimerTrigger.color || '#ffffff';
+      }
+
+      this.cdr.detectChanges();
+    } else if (this.selectedTrigger) {
+      // Update trigger line color properties
+      const bo = this.selectedTrigger.businessObject;
+      if (bo) {
+        this.selectedLineColor =
+          bo.lineColor ||
+          bo.stroke ||
+          this.selectedTrigger.lineColor ||
+          this.selectedTrigger.stroke ||
+          '#000000';
+      } else {
+        this.selectedLineColor =
+          this.selectedTrigger.lineColor ||
+          this.selectedTrigger.stroke ||
+          '#000000';
       }
 
       this.cdr.detectChanges();

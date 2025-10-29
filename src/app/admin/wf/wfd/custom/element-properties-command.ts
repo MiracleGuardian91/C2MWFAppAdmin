@@ -59,7 +59,9 @@ export class ElementPropertiesCommand extends CommandInterceptor {
       properties.fontBold !== undefined ||
       properties.fontItalic !== undefined ||
       properties.fontUnderline !== undefined ||
-      properties.color !== undefined
+      properties.color !== undefined ||
+      properties.lineColor !== undefined ||
+      properties.stroke !== undefined
     );
   }
 
@@ -71,6 +73,7 @@ export class ElementPropertiesCommand extends CommandInterceptor {
     const currentFontBold = this.getCurrentFontBold(element);
     const currentFontItalic = this.getCurrentFontItalic(element);
     const currentFontUnderline = this.getCurrentFontUnderline(element);
+    const currentLineColor = this.getCurrentLineColor(element);
 
     return {
       fontFamily: bo?.fontFamily || element.fontFamily || 'Museo Sans',
@@ -90,6 +93,9 @@ export class ElementPropertiesCommand extends CommandInterceptor {
           ? currentFontUnderline
           : bo?.fontUnderline || element.fontUnderline || false,
       color: currentFillColor || bo?.color || element.color || '#ffffff',
+      lineColor:
+        currentLineColor || bo?.lineColor || element.lineColor || '#000000',
+      stroke: currentLineColor || bo?.stroke || element.stroke || '#000000',
     };
   }
 
@@ -107,6 +113,9 @@ export class ElementPropertiesCommand extends CommandInterceptor {
       if (properties.fontUnderline !== undefined)
         bo.fontUnderline = properties.fontUnderline;
       if (properties.color !== undefined) bo.color = properties.color;
+      if (properties.lineColor !== undefined)
+        bo.lineColor = properties.lineColor;
+      if (properties.stroke !== undefined) bo.stroke = properties.stroke;
     }
 
     if (properties.fontFamily !== undefined)
@@ -122,8 +131,12 @@ export class ElementPropertiesCommand extends CommandInterceptor {
     if (properties.fontUnderline !== undefined)
       element.fontUnderline = properties.fontUnderline;
     if (properties.color !== undefined) element.color = properties.color;
+    if (properties.lineColor !== undefined)
+      element.lineColor = properties.lineColor;
+    if (properties.stroke !== undefined) element.stroke = properties.stroke;
 
     this.updateTextElements(element, properties);
+    this.updateLineElements(element, properties);
 
     const labelShape = element && (element as any).label;
     if (labelShape) {
@@ -209,6 +222,34 @@ export class ElementPropertiesCommand extends CommandInterceptor {
       const pathElements = gfx.querySelectorAll('path');
       pathElements.forEach((pathEl: SVGPathElement) => {
         pathEl.setAttribute('fill', properties.color);
+      });
+    }
+  }
+
+  private updateLineElements(element: any, properties: any): void {
+    const gfx = this.elementRegistry.getGraphics(element.id);
+    if (!gfx) return;
+
+    if (properties.lineColor !== undefined || properties.stroke !== undefined) {
+      const lineColor = properties.lineColor || properties.stroke;
+
+      // Update path elements (triggers are typically paths)
+      const pathElements = gfx.querySelectorAll('path');
+      pathElements.forEach((pathEl: SVGPathElement) => {
+        pathEl.setAttribute('stroke', lineColor);
+      });
+
+      // Update line elements
+      const lineElements = gfx.querySelectorAll('line');
+      lineElements.forEach((lineEl: SVGLineElement) => {
+        lineEl.setAttribute('stroke', lineColor);
+      });
+
+      // Update marker elements (arrow heads)
+      const markerElements = gfx.querySelectorAll('marker path');
+      markerElements.forEach((markerEl: SVGPathElement) => {
+        markerEl.setAttribute('stroke', lineColor);
+        markerEl.setAttribute('fill', lineColor);
       });
     }
   }
@@ -341,6 +382,36 @@ export class ElementPropertiesCommand extends CommandInterceptor {
       }
     } catch (error) {
       console.warn('Error getting font underline:', error);
+    }
+    return null;
+  }
+
+  private getCurrentLineColor(element: any): string | null {
+    try {
+      const gfx = this.elementRegistry.getGraphics(element.id);
+      if (gfx) {
+        // Check path elements for stroke color (triggers are typically paths)
+        const pathElements = gfx.querySelectorAll('path');
+        for (let i = 0; i < pathElements.length; i++) {
+          const pathEl = pathElements[i];
+          const stroke = pathEl.getAttribute('stroke');
+          if (stroke && stroke !== 'none' && stroke !== 'transparent') {
+            return stroke;
+          }
+        }
+
+        // Check line elements for stroke color
+        const lineElements = gfx.querySelectorAll('line');
+        for (let i = 0; i < lineElements.length; i++) {
+          const lineEl = lineElements[i];
+          const stroke = lineEl.getAttribute('stroke');
+          if (stroke && stroke !== 'none' && stroke !== 'transparent') {
+            return stroke;
+          }
+        }
+      }
+    } catch (error) {
+      console.warn('Error getting line color:', error);
     }
     return null;
   }
