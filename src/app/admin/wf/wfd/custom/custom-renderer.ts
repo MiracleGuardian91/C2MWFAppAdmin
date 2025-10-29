@@ -127,9 +127,13 @@ export default class CustomRenderer extends BaseRenderer {
 
   public drawCustomConnection = (parentGfx, connection) => {
     const { fill, stroke } = getElementStyle(connection);
+
+    const lineColor =
+      connection.lineColor || connection.stroke || stroke || 'black';
+
     const attrs = this.computeStyle({
-      stroke: 'black',
-      markerEnd: this.marker('sequenceflow-end', fill, stroke),
+      stroke: lineColor,
+      markerEnd: this.marker('sequenceflow-end', fill, lineColor),
       strokeWidth: 2,
     });
 

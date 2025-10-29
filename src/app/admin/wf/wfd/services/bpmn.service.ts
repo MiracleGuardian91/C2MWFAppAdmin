@@ -299,6 +299,59 @@ export class BpmnService {
     this.eventBus.fire('element.changed', { element });
   }
 
+  public applyLineColor(element: DiagramEl, lineColor: string): void {
+    if (!element) return;
+
+    this.modeling.updateProperties(element, {
+      lineColor: lineColor,
+      stroke: lineColor,
+    });
+
+    const bo = element.businessObject;
+
+    if (bo) {
+      bo.lineColor = lineColor;
+      bo.stroke = lineColor;
+    }
+
+    element.lineColor = lineColor;
+    element.stroke = lineColor;
+
+    this.updateElementLineColor(element, lineColor);
+
+    this.eventBus.fire('element.changed', { element });
+  }
+
+  private updateElementLineColor(element: DiagramEl, lineColor: string): void {
+    const gfx = this.registry.getGraphics(element.id);
+    if (!gfx) {
+      console.log('No graphics found for element:', element.id);
+      return;
+    }
+
+    // Update path elements (triggers are typically paths)
+    const pathElements = gfx.querySelectorAll('path');
+    for (let i = 0; i < pathElements.length; i++) {
+      const pathEl = pathElements[i];
+      pathEl.setAttribute('stroke', lineColor);
+    }
+
+    // Update line elements
+    const lineElements = gfx.querySelectorAll('line');
+    for (let i = 0; i < lineElements.length; i++) {
+      const lineEl = lineElements[i];
+      lineEl.setAttribute('stroke', lineColor);
+    }
+
+    // Update marker elements (arrow heads)
+    const markerElements = gfx.querySelectorAll('marker path');
+    for (let i = 0; i < markerElements.length; i++) {
+      const markerEl = markerElements[i];
+      markerEl.setAttribute('stroke', lineColor);
+      markerEl.setAttribute('fill', lineColor);
+    }
+  }
+
   private updateElementFillColor(element: DiagramEl, fillColor: string): void {
     const gfx = this.registry.getGraphics(element.id);
     if (!gfx) {

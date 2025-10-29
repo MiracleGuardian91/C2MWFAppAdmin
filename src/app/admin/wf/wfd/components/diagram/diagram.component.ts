@@ -141,6 +141,7 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
   // Element properties
   public selectedState: any = null;
   public selectedTimerTrigger: any = null;
+  public selectedTrigger: any = null;
   public selectedFontFamily: string = 'Museo Sans';
   public selectedFontSize: string = '14px';
   public selectedFontColor: string = '#000000';
@@ -148,6 +149,7 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
   public selectedFontItalic: boolean = false;
   public selectedFontUnderline: boolean = false;
   public selectedFillColor: string = '#ffffff';
+  public selectedLineColor: string = '#000000';
   public selectedElementsColor: string = '#ffffff';
 
   constructor(
@@ -1514,10 +1516,12 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
         this.selectedSwimlane = selectedElement;
         this.selectedState = null;
         this.selectedTimerTrigger = null;
+        this.selectedTrigger = null;
       } else if (selectedElement.type === 'bpmn:IntermediateCatchEvent') {
         this.selectedTimerTrigger = selectedElement;
         this.selectedState = null;
         this.selectedSwimlane = null;
+        this.selectedTrigger = null;
         this.loadTimerTriggerProperties(selectedElement);
       } else if (
         [
@@ -1530,16 +1534,28 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
         this.selectedState = selectedElement;
         this.selectedSwimlane = null;
         this.selectedTimerTrigger = null;
+        this.selectedTrigger = null;
         this.loadStateFontProperties(selectedElement);
+      } else if (
+        selectedElement.type === 'bpmn:SequenceFlow' ||
+        selectedElement.type === 'custom:Trigger'
+      ) {
+        this.selectedTrigger = selectedElement;
+        this.selectedSwimlane = null;
+        this.selectedState = null;
+        this.selectedTimerTrigger = null;
+        this.loadTriggerProperties(selectedElement);
       } else {
         this.selectedSwimlane = null;
         this.selectedState = null;
         this.selectedTimerTrigger = null;
+        this.selectedTrigger = null;
       }
     } else {
       this.selectedSwimlane = null;
       this.selectedState = null;
       this.selectedTimerTrigger = null;
+      this.selectedTrigger = null;
     }
   }
 
@@ -1579,6 +1595,24 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     );
 
     console.log('Loaded timer trigger fill color:', this.selectedFillColor);
+    this.cdr.detectChanges();
+  }
+
+  private loadTriggerProperties(element: any): void {
+    const currentLineColor = this.getCurrentLineColor(element);
+    const bo = element.businessObject;
+    const boLineColor = bo?.lineColor || bo?.stroke;
+
+    this.selectedLineColor = this.processLineColor(
+      boLineColor ||
+        element.lineColor ||
+        element.stroke ||
+        (element.props && element.props.lineColor) ||
+        currentLineColor ||
+        '#000000'
+    );
+
+    console.log('Loaded trigger line color:', this.selectedLineColor);
     this.cdr.detectChanges();
   }
 
@@ -2019,6 +2053,56 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     );
   }
 
+  private getCurrentLineColor(element: any): string | null {
+    try {
+      const gfx = this.service.getGraphics(element);
+      if (gfx) {
+        // Check path elements for stroke color (triggers are typically paths)
+        const pathElements = gfx.querySelectorAll('path');
+        for (let i = 0; i < pathElements.length; i++) {
+          const pathEl = pathElements[i];
+          const stroke = pathEl.getAttribute('stroke');
+          if (stroke && stroke !== 'none' && stroke !== 'transparent') {
+            return stroke;
+          }
+        }
+
+        // Check line elements for stroke color
+        const lineElements = gfx.querySelectorAll('line');
+        for (let i = 0; i < lineElements.length; i++) {
+          const lineEl = lineElements[i];
+          const stroke = lineEl.getAttribute('stroke');
+          if (stroke && stroke !== 'none' && stroke !== 'transparent') {
+            return stroke;
+          }
+        }
+      }
+    } catch (error) {
+      console.warn('Error getting line color:', error);
+    }
+    return null;
+  }
+
+  private processLineColor(lineColor: string): string {
+    if (!lineColor) return '#000000';
+
+    if (lineColor.startsWith('#')) {
+      return lineColor;
+    }
+
+    if (lineColor.startsWith('rgb')) {
+      const matches = lineColor.match(/\d+/g);
+      if (matches && matches.length >= 3) {
+        const r = parseInt(matches[0]);
+        const g = parseInt(matches[1]);
+        const b = parseInt(matches[2]);
+        return this.rgbToHex(r, g, b);
+      }
+    }
+
+    return '#000000';
+  }
+
   public applyFontFamily(): void {
     if (!this.selectedState) {
       this.toastr.warning('Please select a state first');
@@ -2070,6 +2154,21 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       false, // Default font underline
       this.selectedFillColor // Only the fill color changes
     );
+  }
+
+  public applyLineColor(): void {
+    if (!this.selectedTrigger) {
+      this.toastr.warning('Please select a trigger first');
+      return;
+    }
+
+    console.log('Applying line color to trigger:', this.selectedLineColor);
+
+    this.service.applyLineColor(this.selectedTrigger, this.selectedLineColor);
+
+    this.hasUnsavedChanges = true;
+
+    setTimeout(() => this.updateUndoRedoState(), 100);
   }
 
   public applyElementsColor(): void {
@@ -2216,6 +2315,35 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
         this.selectedFontItalic = this.selectedState.fontItalic || false;
         this.selectedFontUnderline = this.selectedState.fontUnderline || false;
         this.selectedFillColor = this.selectedState.color || '#ffffff';
+      }
+
+      this.cdr.detectChanges();
+    } else if (this.selectedTimerTrigger) {
+      // Update timer trigger properties
+      const bo = this.selectedTimerTrigger.businessObject;
+      if (bo) {
+        this.selectedFillColor =
+          bo.color || this.selectedTimerTrigger.color || '#ffffff';
+      } else {
+        this.selectedFillColor = this.selectedTimerTrigger.color || '#ffffff';
+      }
+
+      this.cdr.detectChanges();
+    } else if (this.selectedTrigger) {
+      // Update trigger line color properties
+      const bo = this.selectedTrigger.businessObject;
+      if (bo) {
+        this.selectedLineColor =
+          bo.lineColor ||
+          bo.stroke ||
+          this.selectedTrigger.lineColor ||
+          this.selectedTrigger.stroke ||
+          '#000000';
+      } else {
+        this.selectedLineColor =
+          this.selectedTrigger.lineColor ||
+          this.selectedTrigger.stroke ||
+          '#000000';
       }
 
       this.cdr.detectChanges();
