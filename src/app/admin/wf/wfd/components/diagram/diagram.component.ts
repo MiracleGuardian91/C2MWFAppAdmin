@@ -141,6 +141,7 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
   // Element properties
   public selectedState: any = null;
   public selectedTimerTrigger: any = null;
+  public selectedTriggerConnection: any = null;
   public selectedFontFamily: string = 'Museo Sans';
   public selectedFontSize: string = '14px';
   public selectedFontColor: string = '#000000';
@@ -149,6 +150,7 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
   public selectedFontUnderline: boolean = false;
   public selectedFillColor: string = '#ffffff';
   public selectedElementsColor: string = '#ffffff';
+  public selectedLineColor: string = '#000000';
 
   constructor(
     private dialog: MatDialog,
@@ -1514,11 +1516,22 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
         this.selectedSwimlane = selectedElement;
         this.selectedState = null;
         this.selectedTimerTrigger = null;
+        this.selectedTriggerConnection = null;
       } else if (selectedElement.type === 'bpmn:IntermediateCatchEvent') {
         this.selectedTimerTrigger = selectedElement;
         this.selectedState = null;
         this.selectedSwimlane = null;
         this.loadTimerTriggerProperties(selectedElement);
+        this.selectedTriggerConnection = null;
+      } else if (
+        selectedElement.type === 'bpmn:SequenceFlow' ||
+        selectedElement.type === 'custom:DottedFlow'
+      ) {
+        this.selectedTriggerConnection = selectedElement;
+        this.selectedState = null;
+        this.selectedTimerTrigger = null;
+        this.selectedSwimlane = null;
+        this.loadTriggerLineProperties(selectedElement);
       } else if (
         [
           'bpmn:Task',
@@ -1530,16 +1543,19 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
         this.selectedState = selectedElement;
         this.selectedSwimlane = null;
         this.selectedTimerTrigger = null;
+        this.selectedTriggerConnection = null;
         this.loadStateFontProperties(selectedElement);
       } else {
         this.selectedSwimlane = null;
         this.selectedState = null;
         this.selectedTimerTrigger = null;
+        this.selectedTriggerConnection = null;
       }
     } else {
       this.selectedSwimlane = null;
       this.selectedState = null;
       this.selectedTimerTrigger = null;
+      this.selectedTriggerConnection = null;
     }
   }
 
@@ -1959,6 +1975,37 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     return false;
   }
 
+  private getCurrentLineColor(element: any): string | null {
+    try {
+      // First check the element's color property
+      if (element.color && element.color !== 'none') {
+        return element.color;
+      }
+
+      // Then check the graphics
+      const gfx = this.service.getGraphics(element);
+      if (gfx) {
+        const path = gfx.querySelector('path');
+        if (path) {
+          const stroke =
+            path.getAttribute('stroke') ||
+            (path as any).style?.stroke ||
+            window.getComputedStyle(path as any).stroke;
+          if (stroke) return stroke;
+        }
+      }
+    } catch (e) {
+      console.warn('Error getting line color:', e);
+    }
+    return null;
+  }
+
+  private loadTriggerLineProperties(element: any): void {
+    const current = this.getCurrentLineColor(element) || '#000000';
+    this.selectedLineColor = this.processFontColor(current);
+    this.cdr.detectChanges();
+  }
+
   private getCurrentFillColor(element: any): string | null {
     try {
       const gfx = this.service.getGraphics(element);
@@ -2062,14 +2109,46 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
 
     this.service.applyAllElementProperties(
       this.selectedTimerTrigger,
-      'Museo Sans', // Default font family
-      '13px', // Default font size
-      '#000000', // Default font color
-      false, // Default font bold
-      false, // Default font italic
-      false, // Default font underline
-      this.selectedFillColor // Only the fill color changes
+      'Museo Sans',
+      '13px',
+      '#000000',
+      false,
+      false,
+      false,
+      this.selectedFillColor
     );
+  }
+
+  public applyLineColor(): void {
+    if (!this.selectedTriggerConnection) {
+      this.toastr.warning('Please select a trigger first');
+      return;
+    }
+
+    this.service.updateElementProperties(this.selectedTriggerConnection, {
+      color: this.selectedLineColor,
+    });
+
+    this.bpmnService.eventBus.fire('element.changed', {
+      element: this.selectedTriggerConnection,
+    });
+
+    this.bpmnService.eventBus.fire('commandStack.changed', {
+      command: 'element.updateProperties',
+    });
+
+    const gfx = this.service.getGraphics(this.selectedTriggerConnection);
+    if (gfx) {
+      const path = gfx.querySelector('path');
+      if (path) {
+        path.setAttribute('stroke', this.selectedLineColor);
+        (path as any).style.setProperty(
+          'stroke',
+          this.selectedLineColor,
+          'important'
+        );
+      }
+    }
   }
 
   public applyElementsColor(): void {

@@ -108,10 +108,6 @@
   letter-spacing: 0%;
 }
 
-::ng-deep .djs-element.djs-connection.selected .djs-visual path {
-  stroke: #214fb5 !important;
-}
-
 // Hide selection border for shapes
 ::ng-deep .djs-element.djs-shape.selected .djs-outline {
   display: none !important;

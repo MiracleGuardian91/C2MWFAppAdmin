@@ -1566,6 +1566,11 @@ export default class CustomRenderer extends BaseRenderer {
     };
 
     const path = this.drawPath(parentGfx, pathData, attrs);
+    try {
+      (path as any).style?.setProperty('stroke', stroke, 'important');
+      path.setAttribute('stroke', stroke);
+      (path as any).style.stroke = stroke;
+    } catch {}
 
     const sequenceFlow = getSemantic(element);
 
@@ -1574,7 +1579,6 @@ export default class CustomRenderer extends BaseRenderer {
     if (element.source) {
       source = element.source.businessObject;
 
-      // conditional flow marker
       if (
         sequenceFlow.conditionExpression &&
         source.$instanceOf('bpmn:Activity')
@@ -1616,6 +1620,13 @@ export default class CustomRenderer extends BaseRenderer {
     };
 
     const path = this.drawPath(parentGfx, pathData, attrs);
+    try {
+      (path as any).style?.setProperty('stroke', stroke, 'important');
+      // Also set it directly as an attribute with higher specificity
+      path.setAttribute('stroke', stroke);
+      // Force a style recalculation
+      (path as any).style.stroke = stroke;
+    } catch {}
 
     const sequenceFlow = getSemantic(element);
 

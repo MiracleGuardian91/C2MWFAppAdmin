@@ -204,11 +204,38 @@ export class ElementPropertiesCommand extends CommandInterceptor {
       const rectElements = gfx.querySelectorAll('rect');
       rectElements.forEach((rectEl: SVGRectElement) => {
         rectEl.setAttribute('fill', properties.color);
+        rectEl.setAttribute('stroke', properties.color);
       });
 
       const pathElements = gfx.querySelectorAll('path');
       pathElements.forEach((pathEl: SVGPathElement) => {
-        pathEl.setAttribute('fill', properties.color);
+        pathEl.setAttribute('stroke', properties.color);
+        try {
+          (pathEl as any).style?.setProperty(
+            'stroke',
+            properties.color,
+            'important'
+          );
+        } catch {}
+        if (
+          pathEl.getAttribute('fill') &&
+          pathEl.getAttribute('fill') !== 'none'
+        ) {
+          pathEl.setAttribute('fill', properties.color);
+        }
+      });
+
+      // Also handle polylines if present
+      const polylineElements = gfx.querySelectorAll('polyline');
+      polylineElements.forEach((polyEl: SVGPolylineElement) => {
+        polyEl.setAttribute('stroke', properties.color);
+        try {
+          (polyEl as any).style?.setProperty(
+            'stroke',
+            properties.color,
+            'important'
+          );
+        } catch {}
       });
     }
   }

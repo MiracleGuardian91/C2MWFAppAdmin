@@ -117,11 +117,19 @@ export const getElementStyle = (el: any): ElementStyle => {
     const parentType = el.businessObject.$type;
     style = COLORS[parentType] as ElementStyle;
   } else if (el.type === t.Trigger || el.type === t.DottedFlow) {
-    const index = el.source?.outgoing?.length;
-    const colors = COLORS[el.type] as ElementStyle[];
-    const len = colors.length;
-    const triggerColors = colors[index % len || 0];
-    style = { ...triggerColors };
+    if (el.color && el.color !== 'none') {
+      style = {
+        stroke: el.color,
+        fill: 'none',
+        strokeWidth: 2,
+      };
+    } else {
+      const index = el.source?.outgoing?.length;
+      const colors = COLORS[el.type] as ElementStyle[];
+      const len = colors.length;
+      const triggerColors = colors[index % len || 0];
+      style = { ...triggerColors };
+    }
   } else if (el?.def === EventDef.Timer && !el.color) {
     style = style = { stroke: 'black', fill: 'white' };
   } else if (el?.def === EventDef.Notify && !el.color) {

@@ -1231,8 +1231,14 @@ export class DiagramService implements OnDestroy {
     this.bpmn.clear();
   }
 
-  // Method to get graphics element for font property loading
   public getGraphics(element: any): SVGElement | null {
     return this.bpmn.getGraphics(element);
+  }
+
+  public setElementColor(
+    element: any,
+    color: { stroke?: string; fill?: string }
+  ) {
+    this.bpmn.setElementColor(element, color as any);
   }
 }
