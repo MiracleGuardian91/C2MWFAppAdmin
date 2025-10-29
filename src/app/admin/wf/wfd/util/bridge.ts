@@ -85,7 +85,7 @@ export const extractElementCoordinates = (element: any) => {
     height,
     width,
     name: bo?.text || bo?.name || '',
-    color
+    color,
   };
 };
 

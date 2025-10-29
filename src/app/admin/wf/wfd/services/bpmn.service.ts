@@ -272,27 +272,11 @@ export class BpmnService {
       color: fillColor,
     });
 
-    const bo = element.businessObject;
-
-    if (bo) {
-      bo.fontFamily = fontFamily;
-      bo.fontSize = fontSize;
-      bo.fontColor = fontColor;
-      bo.fontBold = fontBold;
-      bo.fontItalic = fontItalic;
-      bo.fontUnderline = fontUnderline;
-      bo.color = fillColor;
-    }
-
-    element.fontFamily = fontFamily;
-    element.fontSize = fontSize;
-    element.fontColor = fontColor;
-    element.fontBold = fontBold;
-    element.fontItalic = fontItalic;
-    element.fontUnderline = fontUnderline;
-    element.color = fillColor;
-
     this.eventBus.fire('element.changed', { element });
+    const labelShape: any = (element as any).label;
+    if (labelShape) {
+      this.eventBus.fire('element.changed', { element: labelShape });
+    }
   }
 
   public applyFillColorOnly(element: DiagramEl, fillColor: string): void {

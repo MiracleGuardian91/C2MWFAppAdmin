@@ -1857,20 +1857,38 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
 
   private getCurrentFontColor(element: any): string | null {
     try {
+      // Try text inside the element graphics first (embedded labels)
       const gfx = this.service.getGraphics(element);
       if (gfx) {
         const textElement = gfx.querySelector('text');
         if (textElement) {
-          // Try multiple ways to get font color
           const fontColor =
             textElement.getAttribute('fill') ||
-            textElement.style.fill ||
-            window.getComputedStyle(textElement).fill;
-          return fontColor &&
+            (textElement as any).style?.fill ||
+            window.getComputedStyle(textElement as any).fill;
+          if (
+            fontColor &&
             fontColor !== 'inherit' &&
             fontColor !== 'currentColor'
-            ? fontColor
-            : null;
+          ) {
+            return fontColor;
+          }
+        }
+      }
+
+      // If no embedded text, check external label graphics (e.g., Start/End events)
+      const label = (element as any).label;
+      if (label) {
+        const lgfx = this.service.getGraphics(label);
+        if (lgfx) {
+          const ltext = lgfx.querySelector('text');
+          if (ltext) {
+            const lColor =
+              ltext.getAttribute('fill') ||
+              (ltext as any).style?.fill ||
+              window.getComputedStyle(ltext as any).fill;
+            if (lColor) return lColor;
+          }
         }
       }
     } catch (error) {

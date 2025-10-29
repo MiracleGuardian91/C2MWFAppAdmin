@@ -124,6 +124,12 @@ export class ElementPropertiesCommand extends CommandInterceptor {
     if (properties.color !== undefined) element.color = properties.color;
 
     this.updateTextElements(element, properties);
+
+    const labelShape = element && (element as any).label;
+    if (labelShape) {
+      this.updateTextElements(labelShape, properties);
+      this.eventBus.fire('element.changed', { element: labelShape });
+    }
   }
 
   private updateTextElements(element: any, properties: any): void {
@@ -215,13 +221,30 @@ export class ElementPropertiesCommand extends CommandInterceptor {
         if (textElement) {
           const fontColor =
             textElement.getAttribute('fill') ||
-            textElement.style.fill ||
-            window.getComputedStyle(textElement).fill;
-          return fontColor &&
+            (textElement as any).style?.fill ||
+            window.getComputedStyle(textElement as any).fill;
+          if (
+            fontColor &&
             fontColor !== 'inherit' &&
             fontColor !== 'currentColor'
-            ? fontColor
-            : null;
+          ) {
+            return fontColor;
+          }
+        }
+      }
+
+      const label = element && (element as any).label;
+      if (label) {
+        const lgfx = this.elementRegistry.getGraphics(label.id);
+        if (lgfx) {
+          const ltext = lgfx.querySelector('text');
+          if (ltext) {
+            const lColor =
+              ltext.getAttribute('fill') ||
+              (ltext as any).style?.fill ||
+              window.getComputedStyle(ltext as any).fill;
+            if (lColor) return lColor;
+          }
         }
       }
     } catch (error) {

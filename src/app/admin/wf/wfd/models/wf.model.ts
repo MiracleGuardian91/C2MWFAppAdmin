@@ -114,6 +114,7 @@ export class UndoRedoActionGroup {
 export interface ElementCoordinates extends Point, Dimension {
   name?: string;
   color?: string;
+  fontColor?: string;
 }
 export interface TriggerCoordinates extends Dimension {
   wayPoints: Waypoint[];

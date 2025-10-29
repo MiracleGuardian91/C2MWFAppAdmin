@@ -518,14 +518,28 @@ export default class CustomRenderer extends BaseRenderer {
       y: element.height / 2 + element.y,
     };
 
+    const target = element.labelTarget || element;
+    const bo = target && target.businessObject ? target.businessObject : null;
+
+    const resolvedFontFamily = (bo && bo.fontFamily) || 'Museo Sans';
+    const resolvedFontSize = (bo && bo.fontSize) || '13px';
+    const resolvedFontWeight = bo && bo.fontBold ? 'bold' : '500';
+    const resolvedFontStyle = bo && bo.fontItalic ? 'italic' : 'normal';
+    const resolvedTextDecoration =
+      bo && bo.fontUnderline ? 'underline' : 'none';
+    const fallbackFill = getElementStyle(target).stroke;
+    const resolvedFill = (bo && bo.fontColor) || fallbackFill;
+
     return this.renderLabel(parentGfx, getLabel(element), {
       box: box,
       fitBox: true,
       style: assign({}, this.textRenderer.getExternalStyle(), {
-        fill: getElementStyle(element).stroke,
-        fontSize: '13px', // Increase the font size here (adjust the value as needed)
-        fontFamily: 'Museo Sans',
-        fontWeight: '500', // Set font weight to 500
+        fill: resolvedFill,
+        fontSize: resolvedFontSize,
+        fontFamily: resolvedFontFamily,
+        fontWeight: resolvedFontWeight,
+        fontStyle: resolvedFontStyle,
+        textDecoration: resolvedTextDecoration,
       }),
     });
   };
