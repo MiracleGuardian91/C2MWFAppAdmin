@@ -252,7 +252,10 @@
                 class="font-control-color"
                 [disabled]="!selectedState"
                 [(ngModel)]="selectedFontColor"
-                (input)="applyFontColor()"
+                (mousedown)="
+                  $event.preventDefault(); openCustomColor('font', $event)
+                "
+                (click)="$event.preventDefault()"
                 title="Select font color"
               />
             </div>
@@ -270,7 +273,10 @@
                 class="font-control-color"
                 [disabled]="!selectedState && !selectedTimerTrigger"
                 [(ngModel)]="selectedFillColor"
-                (input)="applyFillColor()"
+                (mousedown)="
+                  $event.preventDefault(); openCustomColor('fill', $event)
+                "
+                (click)="$event.preventDefault()"
                 title="Select fill color"
               />
             </div>
@@ -288,7 +294,10 @@
                 class="font-control-color"
                 [disabled]="!selectedTrigger"
                 [(ngModel)]="selectedLineColor"
-                (input)="applyLineColor()"
+                (mousedown)="
+                  $event.preventDefault(); openCustomColor('line', $event)
+                "
+                (click)="$event.preventDefault()"
                 title="Select line color for trigger"
               />
             </div>
@@ -306,7 +315,10 @@
                 class="font-control-color"
                 [disabled]="!selectedSwimlane"
                 [(ngModel)]="selectedElementsColor"
-                (input)="applyElementsColor()"
+                (mousedown)="
+                  $event.preventDefault(); openCustomColor('elements', $event)
+                "
+                (click)="$event.preventDefault()"
                 title="Select color for all state boxes in the selected stage"
               />
             </div>
