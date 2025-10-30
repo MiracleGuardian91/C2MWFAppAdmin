@@ -252,7 +252,10 @@
                 class="font-control-color"
                 [disabled]="!selectedState"
                 [(ngModel)]="selectedFontColor"
-                (input)="applyFontColor()"
+                (mousedown)="
+                  $event.preventDefault(); openCustomColor('font', $event)
+                "
+                (click)="$event.preventDefault()"
                 title="Select font color"
               />
             </div>
@@ -270,7 +273,10 @@
                 class="font-control-color"
                 [disabled]="!selectedState && !selectedTimerTrigger"
                 [(ngModel)]="selectedFillColor"
-                (input)="applyFillColor()"
+                (mousedown)="
+                  $event.preventDefault(); openCustomColor('fill', $event)
+                "
+                (click)="$event.preventDefault()"
                 title="Select fill color"
               />
             </div>
@@ -288,9 +294,37 @@
                 class="font-control-color"
                 [disabled]="!selectedTrigger"
                 [(ngModel)]="selectedLineColor"
-                (input)="applyLineColor()"
+                (mousedown)="
+                  $event.preventDefault(); openCustomColor('line', $event)
+                "
+                (click)="$event.preventDefault()"
                 title="Select line color for trigger"
               />
+            </div>
+            <div
+              class="font-control-group"
+              style="
+                margin-left: 8px;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+              "
+            >
+              <label class="font-control-label">Line Width:</label>
+              <select
+                class="font-control-select"
+                [disabled]="!selectedTrigger"
+                [(ngModel)]="selectedLineWidth"
+                (change)="applyLineWidth()"
+                title="Select line width"
+                style="width: 70px"
+              >
+                <option [ngValue]="1">1</option>
+                <option [ngValue]="2">2</option>
+                <option [ngValue]="3">3</option>
+                <option [ngValue]="4">4</option>
+                <option [ngValue]="6">6</option>
+              </select>
             </div>
           </div>
 
@@ -306,7 +340,10 @@
                 class="font-control-color"
                 [disabled]="!selectedSwimlane"
                 [(ngModel)]="selectedElementsColor"
-                (input)="applyElementsColor()"
+                (mousedown)="
+                  $event.preventDefault(); openCustomColor('elements', $event)
+                "
+                (click)="$event.preventDefault()"
                 title="Select color for all state boxes in the selected stage"
               />
             </div>

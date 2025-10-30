@@ -150,7 +150,13 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
   public selectedFontUnderline: boolean = false;
   public selectedFillColor: string = '#ffffff';
   public selectedLineColor: string = '#000000';
+  public selectedLineWidth: number = 2;
   public selectedElementsColor: string = '#ffffff';
+
+  private currentHeaderColorPickerContainer: HTMLDivElement | null = null;
+  private currentHeaderColorInput: HTMLInputElement | null = null;
+  private headerOutsideClickHandler: ((event: MouseEvent) => void) | null =
+    null;
 
   constructor(
     private dialog: MatDialog,
@@ -332,6 +338,347 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     //     }, 50);
     //   }
     // });
+  }
+
+  // ===== Custom Color Picker for Header Controls =====
+  public openCustomColor(
+    kind: 'font' | 'fill' | 'line' | 'elements',
+    ev: MouseEvent
+  ): void {
+    if (
+      (kind === 'font' && !this.selectedState) ||
+      (kind === 'fill' && !this.selectedState && !this.selectedTimerTrigger) ||
+      (kind === 'line' && !this.selectedTrigger) ||
+      (kind === 'elements' && !this.selectedSwimlane)
+    ) {
+      return;
+    }
+
+    ev.stopPropagation();
+
+    this.closeHeaderColorPicker();
+
+    const container = this.createHeaderColorPickerContainer();
+    this.currentHeaderColorPickerContainer = container;
+
+    const header = this.createHeaderPickerHeader(() =>
+      this.closeHeaderColorPicker()
+    );
+    container.appendChild(header);
+
+    const hexInput = this.createHeaderHexInputSection(kind, container);
+    this.currentHeaderColorInput = hexInput;
+
+    const palette = this.createHeaderColorPalette(kind, hexInput);
+    container.appendChild(palette);
+
+    this.positionHeaderColorPicker(container, ev);
+
+    this.setupHeaderOutsideClick(container);
+
+    document.body.appendChild(container);
+  }
+
+  private createHeaderColorPickerContainer(): HTMLDivElement {
+    const container = document.createElement('div');
+    container.style.position = 'absolute';
+    container.style.backgroundColor = '#ffffff';
+    container.style.border = '1px solid #cccccc';
+    container.style.borderRadius = '4px';
+    container.style.padding = '8px';
+    container.style.boxShadow = '0 3px 10px rgba(0, 0, 0, 0.2)';
+    container.style.zIndex = '9999';
+    container.style.width = '235px';
+    container.style.fontFamily = 'Museo Sans, Arial, sans-serif';
+    container.style.maxHeight = '62vh';
+    container.style.overflowX = 'auto';
+    container.style.overflowY = 'auto';
+    return container;
+  }
+
+  private createHeaderPickerHeader(onClose: () => void): HTMLDivElement {
+    const headerContainer = document.createElement('div');
+    headerContainer.style.display = 'flex';
+    headerContainer.style.justifyContent = 'space-between';
+    headerContainer.style.alignItems = 'center';
+    headerContainer.style.marginBottom = '10px';
+
+    const title = document.createElement('span');
+    title.innerText = 'Pick Color';
+    title.style.fontFamily = 'Museo Sans';
+    title.style.fontWeight = 'bold';
+    title.style.marginBottom = '10px';
+    title.style.paddingTop = '5px';
+    title.style.fontSize = '14px';
+    headerContainer.appendChild(title);
+
+    const closeButton = document.createElement('span');
+    closeButton.classList.add('fas', 'fa-times-circle', 'fa-fw');
+    closeButton.style.cursor = 'pointer';
+    closeButton.addEventListener('click', onClose);
+    headerContainer.appendChild(closeButton);
+
+    return headerContainer;
+  }
+
+  private createHeaderHexInputSection(
+    kind: 'font' | 'fill' | 'line' | 'elements',
+    container: HTMLDivElement
+  ): HTMLInputElement {
+    const hexContainer = document.createElement('div');
+    hexContainer.style.marginBottom = '12px';
+    hexContainer.style.alignItems = 'center';
+    hexContainer.style.display = 'flex';
+
+    const hexLabel = document.createElement('div');
+    hexLabel.innerText = 'Hex:';
+    hexLabel.style.fontSize = '12px';
+    hexLabel.style.marginRight = '5px';
+    hexLabel.style.fontFamily = 'Museo Sans';
+    hexLabel.style.fontWeight = '500';
+    hexLabel.style.minWidth = '35px';
+    hexContainer.appendChild(hexLabel);
+
+    const hexInput = document.createElement('input');
+    hexInput.type = 'text';
+    const initial =
+      kind === 'font'
+        ? this.selectedFontColor
+        : kind === 'fill'
+        ? this.selectedFillColor
+        : kind === 'line'
+        ? this.selectedLineColor
+        : this.selectedElementsColor;
+    hexInput.value = initial || '';
+    hexInput.style.width = '80px';
+    hexInput.style.padding = '5px 7px';
+    hexInput.style.border = '1px solid #ccc';
+    hexInput.style.borderRadius = '3px';
+    hexInput.style.fontFamily = 'Museo Sans';
+    hexInput.style.fontSize = '12px';
+    hexInput.placeholder = '#RRGGBB';
+    hexContainer.appendChild(hexInput);
+
+    // EyeDropper button
+    const dropperButton = document.createElement('button');
+    dropperButton.title = 'Pick color from screen';
+    dropperButton.classList.add('fas', 'fa-eye');
+    dropperButton.style.marginLeft = '5px';
+    dropperButton.style.padding = '5px 8px';
+    dropperButton.style.border = '1px solid #ccc';
+    dropperButton.style.borderRadius = '3px';
+    dropperButton.style.backgroundColor = '#f0f0f0';
+    dropperButton.style.cursor = 'pointer';
+    dropperButton.style.fontSize = '12px';
+    const eyeDropperSupported = 'EyeDropper' in window;
+    if (!eyeDropperSupported) {
+      dropperButton.style.opacity = '0.5';
+      dropperButton.title = 'Color picking not supported in this browser';
+    }
+    dropperButton.addEventListener('click', async () => {
+      if (!eyeDropperSupported) return;
+      try {
+        if (this.currentHeaderColorPickerContainer) {
+          this.currentHeaderColorPickerContainer.style.display = 'none';
+        }
+        // @ts-ignore
+        const ed = new window.EyeDropper();
+        const result = await ed.open();
+        if (this.currentHeaderColorPickerContainer) {
+          this.currentHeaderColorPickerContainer.style.display = 'block';
+        }
+        hexInput.value = result.sRGBHex;
+        this.applyHeaderPickedColor(kind, hexInput.value);
+      } catch (_) {
+        if (this.currentHeaderColorPickerContainer) {
+          this.currentHeaderColorPickerContainer.style.display = 'block';
+        }
+      }
+    });
+    hexContainer.appendChild(dropperButton);
+
+    // Apply button
+    const applyButton = document.createElement('button');
+    applyButton.innerText = 'Apply';
+    applyButton.style.fontFamily = 'Museo Sans';
+    applyButton.style.marginLeft = '5px';
+    applyButton.style.padding = '5px 10px';
+    applyButton.style.border = '1px solid #ccc';
+    applyButton.style.borderRadius = '3px';
+    applyButton.style.backgroundColor = '#f0f0f0';
+    applyButton.style.cursor = 'pointer';
+    applyButton.style.fontSize = '12px';
+    applyButton.addEventListener('click', () => {
+      let colorValue = hexInput.value || '';
+      if (colorValue && !colorValue.startsWith('#')) {
+        colorValue = '#' + colorValue;
+      }
+      if (/^#([0-9A-F]{3}){1,2}$/i.test(colorValue)) {
+        this.applyHeaderPickedColor(kind, colorValue);
+      } else {
+        hexInput.style.border = '1px solid red';
+        setTimeout(() => (hexInput.style.border = '1px solid #ccc'), 800);
+      }
+    });
+    hexInput.addEventListener('keyup', (e) => {
+      if ((e as KeyboardEvent).key === 'Enter') applyButton.click();
+    });
+    hexContainer.appendChild(applyButton);
+
+    container.appendChild(hexContainer);
+    return hexInput;
+  }
+
+  private createHeaderColorPalette(
+    kind: 'font' | 'fill' | 'line' | 'elements',
+    hexInput: HTMLInputElement
+  ): HTMLElement {
+    const colors: string[] = [
+      '#FF6B6B',
+      '#FF4040',
+      '#CC0000',
+      '#990000',
+      '#660000',
+      '#FFAB76',
+      '#FF8000',
+      '#CC6600',
+      '#994C00',
+      '#663300',
+      '#FFDA83',
+      '#FFCC00',
+      '#CCCC00',
+      '#999900',
+      '#666600',
+      '#CAFFBF',
+      '#80FF40',
+      '#40CC00',
+      '#339900',
+      '#1A6600',
+      '#9BF6FF',
+      '#33CCCC',
+      '#009999',
+      '#006666',
+      '#003333',
+      '#A0C4FF',
+      '#3399FF',
+      '#0066CC',
+      '#003399',
+      '#000066',
+      '#BDB2FF',
+      '#9966FF',
+      '#7733CC',
+      '#4C0099',
+      '#330066',
+      '#FFD6FF',
+      '#FF99CC',
+      '#FF3399',
+      '#CC0066',
+      '#990033',
+      '#FFFFFF',
+      '#CCCCCC',
+      '#999999',
+      '#666666',
+      '#333333',
+    ];
+    const palette = document.createElement('div');
+    palette.style.display = 'grid';
+    palette.style.gridTemplateColumns = 'repeat(5, 1fr)';
+    palette.style.gap = '5px';
+    palette.style.marginBottom = '15px';
+
+    colors.forEach((c) => {
+      const swatch = document.createElement('div');
+      swatch.style.backgroundColor = c;
+      swatch.style.width = '100%';
+      swatch.style.height = '20px';
+      swatch.style.cursor = 'pointer';
+      swatch.style.borderRadius = '2px';
+      swatch.style.border = '1px solid #ddd';
+      swatch.title = c;
+      swatch.addEventListener('click', () => {
+        hexInput.value = c;
+        this.applyHeaderPickedColor(kind, c);
+      });
+      palette.appendChild(swatch);
+    });
+
+    return palette;
+  }
+
+  private positionHeaderColorPicker(
+    container: HTMLDivElement,
+    ev: MouseEvent
+  ): void {
+    const rect = (ev.target as HTMLElement).getBoundingClientRect();
+    const estimatedHeight = 400;
+    const estimatedWidth = 250;
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+
+    let top = rect.bottom + window.scrollY + 8;
+    let left = rect.left + window.scrollX;
+    const spaceBelow = viewportHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    if (spaceBelow < estimatedHeight && spaceAbove > estimatedHeight) {
+      top = rect.top + window.scrollY - estimatedHeight - 8;
+    }
+    top = Math.max(10, Math.min(top, viewportHeight - estimatedHeight - 10));
+    left = Math.max(10, Math.min(left, viewportWidth - estimatedWidth - 10));
+    container.style.top = `${top}px`;
+    container.style.left = `${left}px`;
+  }
+
+  private setupHeaderOutsideClick(container: HTMLDivElement): void {
+    this.removeHeaderOutsideClick();
+    this.headerOutsideClickHandler = (event: MouseEvent) => {
+      if (!container.contains(event.target as Node)) {
+        this.closeHeaderColorPicker();
+        this.removeHeaderOutsideClick();
+      }
+    };
+    document.addEventListener('pointerdown', this.headerOutsideClickHandler);
+  }
+
+  private removeHeaderOutsideClick(): void {
+    if (this.headerOutsideClickHandler) {
+      document.removeEventListener(
+        'pointerdown',
+        this.headerOutsideClickHandler
+      );
+      this.headerOutsideClickHandler = null;
+    }
+  }
+
+  private closeHeaderColorPicker(): void {
+    if (
+      this.currentHeaderColorPickerContainer &&
+      document.body.contains(this.currentHeaderColorPickerContainer)
+    ) {
+      document.body.removeChild(this.currentHeaderColorPickerContainer);
+    }
+    this.currentHeaderColorPickerContainer = null;
+    this.currentHeaderColorInput = null;
+  }
+
+  private applyHeaderPickedColor(
+    kind: 'font' | 'fill' | 'line' | 'elements',
+    color: string
+  ): void {
+    const val = color;
+    if (kind === 'font') {
+      this.selectedFontColor = val;
+      this.applyFontColor();
+    } else if (kind === 'fill') {
+      this.selectedFillColor = val;
+      this.applyFillColor();
+    } else if (kind === 'line') {
+      this.selectedLineColor = val;
+      this.applyLineColor();
+    } else {
+      this.selectedElementsColor = val;
+      this.applyElementsColor();
+    }
+    this.closeHeaderColorPicker();
   }
 
   changeUndoRedo(id: string, type: string, Action: string) {
@@ -1600,8 +1947,10 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
 
   private loadTriggerProperties(element: any): void {
     const currentLineColor = this.getCurrentLineColor(element);
+    const currentLineWidth = this.getCurrentLineWidth(element);
     const bo = element.businessObject;
     const boLineColor = bo?.lineColor || bo?.stroke;
+    const boLineWidth = bo?.lineWidth || bo?.strokeWidth || element.strokeWidth;
 
     this.selectedLineColor = this.processLineColor(
       boLineColor ||
@@ -1611,6 +1960,13 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
         currentLineColor ||
         '#000000'
     );
+
+    this.selectedLineWidth =
+      (typeof boLineWidth === 'number' && boLineWidth) ||
+      (typeof element.lineWidth === 'number' && element.lineWidth) ||
+      (typeof element.strokeWidth === 'number' && element.strokeWidth) ||
+      (typeof currentLineWidth === 'number' && currentLineWidth) ||
+      2;
 
     console.log('Loaded trigger line color:', this.selectedLineColor);
     this.cdr.detectChanges();
@@ -2083,6 +2439,29 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     return null;
   }
 
+  private getCurrentLineWidth(element: any): number | null {
+    try {
+      const gfx = this.service.getGraphics(element);
+      if (gfx) {
+        const pathElements = gfx.querySelectorAll('path');
+        for (let i = 0; i < pathElements.length; i++) {
+          const pathEl = pathElements[i];
+          const sw = pathEl.getAttribute('stroke-width');
+          if (sw) return Number(sw);
+        }
+        const lineElements = gfx.querySelectorAll('line');
+        for (let i = 0; i < lineElements.length; i++) {
+          const lineEl = lineElements[i];
+          const sw = lineEl.getAttribute('stroke-width');
+          if (sw) return Number(sw);
+        }
+      }
+    } catch (error) {
+      console.warn('Error getting line width:', error);
+    }
+    return null;
+  }
+
   private processLineColor(lineColor: string): string {
     if (!lineColor) return '#000000';
 
@@ -2168,6 +2547,20 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
 
     this.hasUnsavedChanges = true;
 
+    setTimeout(() => this.updateUndoRedoState(), 100);
+  }
+
+  public applyLineWidth(): void {
+    if (!this.selectedTrigger) {
+      this.toastr.warning('Please select a trigger first');
+      return;
+    }
+    const width = Number(this.selectedLineWidth);
+    if (!width || width < 1) {
+      this.selectedLineWidth = 1;
+    }
+    this.service.applyLineWidth(this.selectedTrigger, this.selectedLineWidth);
+    this.hasUnsavedChanges = true;
     setTimeout(() => this.updateUndoRedoState(), 100);
   }
 
@@ -2339,11 +2732,21 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
           this.selectedTrigger.lineColor ||
           this.selectedTrigger.stroke ||
           '#000000';
+        this.selectedLineWidth =
+          bo.lineWidth ||
+          bo.strokeWidth ||
+          this.selectedTrigger.lineWidth ||
+          this.selectedTrigger.strokeWidth ||
+          2;
       } else {
         this.selectedLineColor =
           this.selectedTrigger.lineColor ||
           this.selectedTrigger.stroke ||
           '#000000';
+        this.selectedLineWidth =
+          this.selectedTrigger.lineWidth ||
+          this.selectedTrigger.strokeWidth ||
+          2;
       }
 
       this.cdr.detectChanges();

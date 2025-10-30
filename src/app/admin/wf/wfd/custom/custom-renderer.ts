@@ -130,11 +130,18 @@ export default class CustomRenderer extends BaseRenderer {
 
     const lineColor =
       connection.lineColor || connection.stroke || stroke || 'black';
+    const lineWidth =
+      connection.lineWidth ||
+      connection.strokeWidth ||
+      (connection.businessObject &&
+        (connection.businessObject.lineWidth ||
+          connection.businessObject.strokeWidth)) ||
+      2;
 
     const attrs = this.computeStyle({
       stroke: lineColor,
       markerEnd: this.marker('sequenceflow-end', fill, lineColor),
-      strokeWidth: 2,
+      strokeWidth: lineWidth,
     });
 
     if (connection.type === t.DottedFlow) {
