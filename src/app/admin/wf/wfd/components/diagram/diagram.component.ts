@@ -150,6 +150,7 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
   public selectedFontUnderline: boolean = false;
   public selectedFillColor: string = '#ffffff';
   public selectedLineColor: string = '#000000';
+  public selectedLineWidth: number = 2;
   public selectedElementsColor: string = '#ffffff';
 
   private currentHeaderColorPickerContainer: HTMLDivElement | null = null;
@@ -1946,8 +1947,10 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
 
   private loadTriggerProperties(element: any): void {
     const currentLineColor = this.getCurrentLineColor(element);
+    const currentLineWidth = this.getCurrentLineWidth(element);
     const bo = element.businessObject;
     const boLineColor = bo?.lineColor || bo?.stroke;
+    const boLineWidth = bo?.lineWidth || bo?.strokeWidth || element.strokeWidth;
 
     this.selectedLineColor = this.processLineColor(
       boLineColor ||
@@ -1957,6 +1960,13 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
         currentLineColor ||
         '#000000'
     );
+
+    this.selectedLineWidth =
+      (typeof boLineWidth === 'number' && boLineWidth) ||
+      (typeof element.lineWidth === 'number' && element.lineWidth) ||
+      (typeof element.strokeWidth === 'number' && element.strokeWidth) ||
+      (typeof currentLineWidth === 'number' && currentLineWidth) ||
+      2;
 
     console.log('Loaded trigger line color:', this.selectedLineColor);
     this.cdr.detectChanges();
@@ -2429,6 +2439,29 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     return null;
   }
 
+  private getCurrentLineWidth(element: any): number | null {
+    try {
+      const gfx = this.service.getGraphics(element);
+      if (gfx) {
+        const pathElements = gfx.querySelectorAll('path');
+        for (let i = 0; i < pathElements.length; i++) {
+          const pathEl = pathElements[i];
+          const sw = pathEl.getAttribute('stroke-width');
+          if (sw) return Number(sw);
+        }
+        const lineElements = gfx.querySelectorAll('line');
+        for (let i = 0; i < lineElements.length; i++) {
+          const lineEl = lineElements[i];
+          const sw = lineEl.getAttribute('stroke-width');
+          if (sw) return Number(sw);
+        }
+      }
+    } catch (error) {
+      console.warn('Error getting line width:', error);
+    }
+    return null;
+  }
+
   private processLineColor(lineColor: string): string {
     if (!lineColor) return '#000000';
 
@@ -2514,6 +2547,20 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
 
     this.hasUnsavedChanges = true;
 
+    setTimeout(() => this.updateUndoRedoState(), 100);
+  }
+
+  public applyLineWidth(): void {
+    if (!this.selectedTrigger) {
+      this.toastr.warning('Please select a trigger first');
+      return;
+    }
+    const width = Number(this.selectedLineWidth);
+    if (!width || width < 1) {
+      this.selectedLineWidth = 1;
+    }
+    this.service.applyLineWidth(this.selectedTrigger, this.selectedLineWidth);
+    this.hasUnsavedChanges = true;
     setTimeout(() => this.updateUndoRedoState(), 100);
   }
 
@@ -2685,11 +2732,21 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
           this.selectedTrigger.lineColor ||
           this.selectedTrigger.stroke ||
           '#000000';
+        this.selectedLineWidth =
+          bo.lineWidth ||
+          bo.strokeWidth ||
+          this.selectedTrigger.lineWidth ||
+          this.selectedTrigger.strokeWidth ||
+          2;
       } else {
         this.selectedLineColor =
           this.selectedTrigger.lineColor ||
           this.selectedTrigger.stroke ||
           '#000000';
+        this.selectedLineWidth =
+          this.selectedTrigger.lineWidth ||
+          this.selectedTrigger.strokeWidth ||
+          2;
       }
 
       this.cdr.detectChanges();

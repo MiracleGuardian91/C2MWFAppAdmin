@@ -322,6 +322,46 @@ export class BpmnService {
     this.eventBus.fire('element.changed', { element });
   }
 
+  public applyLineWidth(element: DiagramEl, lineWidth: number): void {
+    if (!element) return;
+
+    const width = Number(lineWidth) || 2;
+
+    this.modeling.updateProperties(element, {
+      lineWidth: width,
+      strokeWidth: width,
+    });
+
+    const bo = element.businessObject as any;
+    if (bo) {
+      bo.lineWidth = width;
+      bo.strokeWidth = width;
+    }
+
+    (element as any).lineWidth = width;
+    (element as any).strokeWidth = width;
+
+    this.updateElementLineWidth(element, width);
+    this.eventBus.fire('element.changed', { element });
+  }
+
+  private updateElementLineWidth(element: DiagramEl, lineWidth: number): void {
+    const gfx = this.registry.getGraphics(element.id);
+    if (!gfx) return;
+
+    const pathElements = gfx.querySelectorAll('path');
+    for (let i = 0; i < pathElements.length; i++) {
+      const pathEl = pathElements[i];
+      pathEl.setAttribute('stroke-width', String(lineWidth));
+    }
+
+    const lineElements = gfx.querySelectorAll('line');
+    for (let i = 0; i < lineElements.length; i++) {
+      const lineEl = lineElements[i];
+      lineEl.setAttribute('stroke-width', String(lineWidth));
+    }
+  }
+
   private updateElementLineColor(element: DiagramEl, lineColor: string): void {
     const gfx = this.registry.getGraphics(element.id);
     if (!gfx) {

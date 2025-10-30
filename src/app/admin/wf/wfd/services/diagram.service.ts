@@ -1233,6 +1233,12 @@ export class DiagramService implements OnDestroy {
     this.bpmn.applyLineColor(element, lineColor);
   }
 
+  public applyLineWidth(element: any, lineWidth: number): void {
+    if (!element) return;
+
+    this.bpmn.applyLineWidth(element, lineWidth);
+  }
+
   public clear() {
     this.bpmn.clear();
   }

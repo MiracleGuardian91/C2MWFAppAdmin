@@ -301,6 +301,31 @@
                 title="Select line color for trigger"
               />
             </div>
+            <div
+              class="font-control-group"
+              style="
+                margin-left: 8px;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+              "
+            >
+              <label class="font-control-label">Line Width:</label>
+              <select
+                class="font-control-select"
+                [disabled]="!selectedTrigger"
+                [(ngModel)]="selectedLineWidth"
+                (change)="applyLineWidth()"
+                title="Select line width"
+                style="width: 70px"
+              >
+                <option [ngValue]="1">1</option>
+                <option [ngValue]="2">2</option>
+                <option [ngValue]="3">3</option>
+                <option [ngValue]="4">4</option>
+                <option [ngValue]="6">6</option>
+              </select>
+            </div>
           </div>
 
           <!-- Elements Color Picker -->
