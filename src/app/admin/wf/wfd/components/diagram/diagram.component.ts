@@ -73,7 +73,7 @@ import {
   NgbDropdownMenu,
   NgbDropdownItem,
 } from '@ng-bootstrap/ng-bootstrap';
-import { NgIf, NgFor } from '@angular/common';
+import { NgIf, NgFor, TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 const t = ElementType;
@@ -95,6 +95,7 @@ interface WfosIdToWfoIdMap {
     NgFor,
     NgbDropdownItem,
     FormsModule,
+    TitleCasePipe,
   ],
 })
 export class DiagramComponent implements AfterContentInit, OnDestroy {
@@ -151,11 +152,16 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
   public selectedFillColor: string = '#ffffff';
   public selectedLineColor: string = '#000000';
   public selectedLineWidth: number = 2;
+  public selectedLineType: 'straight' | 'curved' | 'elbow' = 'straight';
   public selectedElementsColor: string = '#ffffff';
 
   private currentHeaderColorPickerContainer: HTMLDivElement | null = null;
   private currentHeaderColorInput: HTMLInputElement | null = null;
   private headerOutsideClickHandler: ((event: MouseEvent) => void) | null =
+    null;
+
+  private currentLineTypePickerContainer: HTMLDivElement | null = null;
+  private lineTypeOutsideClickHandler: ((event: MouseEvent) => void) | null =
     null;
 
   constructor(
@@ -658,6 +664,96 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     }
     this.currentHeaderColorPickerContainer = null;
     this.currentHeaderColorInput = null;
+  }
+
+  // ===== Line Type Picker (UI only) =====
+  public openLineTypePicker(ev: MouseEvent): void {
+    if (!this.selectedTrigger) return;
+    ev.stopPropagation();
+
+    this.closeLineTypePicker();
+
+    const container = document.createElement('div');
+    container.style.position = 'absolute';
+    container.style.backgroundColor = '#ffffff';
+    container.style.border = '1px solid #cccccc';
+    container.style.borderRadius = '6px';
+    container.style.padding = '8px';
+    container.style.boxShadow = '0 3px 10px rgba(0, 0, 0, 0.2)';
+    container.style.zIndex = '9999';
+    container.style.display = 'flex';
+    container.style.gap = '6px';
+
+    const makeBtn = (
+      type: 'straight' | 'curved' | 'elbow',
+      title: string,
+      svg: string
+    ) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.title = title;
+      btn.style.border = '1px solid #ddd';
+      btn.style.borderRadius = '4px';
+      btn.style.padding = '6px';
+      btn.style.background =
+        this.selectedLineType === type ? '#EEF0FF' : '#ffffff';
+      btn.style.cursor = 'pointer';
+      btn.style.width = '34px';
+      btn.style.height = '34px';
+      btn.innerHTML = svg;
+      btn.addEventListener('click', () => {
+        this.setLineType(type);
+        this.closeLineTypePicker();
+      });
+      return btn;
+    };
+
+    const straightSvg =
+      '<svg width="18" height="18" viewBox="0 0 20 20"><path d="M2 18 L18 2" stroke="currentColor" stroke-width="2" fill="none"/></svg>';
+    const curvedSvg =
+      '<svg width="18" height="18" viewBox="0 0 20 20"><path d="M2 16 C8 2, 12 18, 18 4" stroke="currentColor" stroke-width="2" fill="none"/></svg>';
+    const elbowSvg =
+      '<svg width="18" height="18" viewBox="0 0 20 20"><path d="M2 18 L2 6 L18 6" stroke="currentColor" stroke-width="2" fill="none"/></svg>';
+
+    container.appendChild(makeBtn('straight', 'Straight Line', straightSvg));
+    container.appendChild(makeBtn('curved', 'Curved Line', curvedSvg));
+    container.appendChild(makeBtn('elbow', 'Elbow Line', elbowSvg));
+
+    this.positionHeaderColorPicker(container, ev);
+    document.body.appendChild(container);
+    this.currentLineTypePickerContainer = container;
+    this.setupLineTypeOutsideClick(container);
+  }
+
+  private setupLineTypeOutsideClick(container: HTMLDivElement): void {
+    this.removeLineTypeOutsideClick();
+    this.lineTypeOutsideClickHandler = (event: MouseEvent) => {
+      if (!container.contains(event.target as Node)) {
+        this.closeLineTypePicker();
+        this.removeLineTypeOutsideClick();
+      }
+    };
+    document.addEventListener('pointerdown', this.lineTypeOutsideClickHandler);
+  }
+
+  private removeLineTypeOutsideClick(): void {
+    if (this.lineTypeOutsideClickHandler) {
+      document.removeEventListener(
+        'pointerdown',
+        this.lineTypeOutsideClickHandler
+      );
+      this.lineTypeOutsideClickHandler = null;
+    }
+  }
+
+  private closeLineTypePicker(): void {
+    if (
+      this.currentLineTypePickerContainer &&
+      document.body.contains(this.currentLineTypePickerContainer)
+    ) {
+      document.body.removeChild(this.currentLineTypePickerContainer);
+    }
+    this.currentLineTypePickerContainer = null;
   }
 
   private applyHeaderPickedColor(
@@ -2751,5 +2847,10 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
 
       this.cdr.detectChanges();
     }
+  }
+
+  // UI-only: update selected line option label/icon in header
+  public setLineType(type: 'straight' | 'curved' | 'elbow'): void {
+    this.selectedLineType = type;
   }
 }
