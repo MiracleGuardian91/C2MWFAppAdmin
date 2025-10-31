@@ -189,13 +189,12 @@
             style="display: flex; align-items: center"
           >
             <div class="font-control-group">
-              <label class="font-control-label">Font Family:</label>
               <select
                 class="font-control-select"
                 [disabled]="!selectedState"
                 [(ngModel)]="selectedFontFamily"
                 (change)="applyFontFamily()"
-                title="Select font family"
+                title="Font Family"
               >
                 <option value="Arial">Arial</option>
                 <option value="Museo Sans">Museo Sans</option>
@@ -217,13 +216,12 @@
             style="display: flex; align-items: center"
           >
             <div class="font-control-group">
-              <label class="font-control-label">Font Size:</label>
               <select
                 class="font-control-select"
                 [disabled]="!selectedState"
                 [(ngModel)]="selectedFontSize"
                 (change)="applyFontSize()"
-                title="Select font size"
+                title="Font Size"
               >
                 <option value="8px">8px</option>
                 <option value="10px">10px</option>
@@ -246,7 +244,6 @@
             style="display: flex; align-items: center"
           >
             <div class="font-control-group">
-              <label class="font-control-label">Font Color:</label>
               <input
                 type="color"
                 class="font-control-color"
@@ -256,95 +253,7 @@
                   $event.preventDefault(); openCustomColor('font', $event)
                 "
                 (click)="$event.preventDefault()"
-                title="Select font color"
-              />
-            </div>
-          </div>
-
-          <!-- Fill Color Picker -->
-          <div
-            *ngIf="service.paletteIsOpen"
-            style="display: flex; align-items: center"
-          >
-            <div class="font-control-group">
-              <label class="font-control-label">Fill Color:</label>
-              <input
-                type="color"
-                class="font-control-color"
-                [disabled]="!selectedState && !selectedTimerTrigger"
-                [(ngModel)]="selectedFillColor"
-                (mousedown)="
-                  $event.preventDefault(); openCustomColor('fill', $event)
-                "
-                (click)="$event.preventDefault()"
-                title="Select fill color"
-              />
-            </div>
-          </div>
-
-          <!-- Line Color Picker -->
-          <div
-            *ngIf="service.paletteIsOpen"
-            style="display: flex; align-items: center"
-          >
-            <div class="font-control-group">
-              <label class="font-control-label">Line Color:</label>
-              <input
-                type="color"
-                class="font-control-color"
-                [disabled]="!selectedTrigger"
-                [(ngModel)]="selectedLineColor"
-                (mousedown)="
-                  $event.preventDefault(); openCustomColor('line', $event)
-                "
-                (click)="$event.preventDefault()"
-                title="Select line color for trigger"
-              />
-            </div>
-            <div
-              class="font-control-group"
-              style="
-                margin-left: 8px;
-                display: flex;
-                align-items: center;
-                gap: 6px;
-              "
-            >
-              <label class="font-control-label">Line Width:</label>
-              <select
-                class="font-control-select"
-                [disabled]="!selectedTrigger"
-                [(ngModel)]="selectedLineWidth"
-                (change)="applyLineWidth()"
-                title="Select line width"
-                style="width: 70px"
-              >
-                <option [ngValue]="1">1</option>
-                <option [ngValue]="2">2</option>
-                <option [ngValue]="3">3</option>
-                <option [ngValue]="4">4</option>
-                <option [ngValue]="6">6</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Elements Color Picker -->
-          <div
-            *ngIf="service.paletteIsOpen"
-            style="display: flex; align-items: center"
-          >
-            <div class="font-control-group">
-              <label class="font-control-label">Elements Color:</label>
-              <input
-                type="color"
-                class="font-control-color"
-                [disabled]="!selectedSwimlane"
-                [(ngModel)]="selectedElementsColor"
-                (mousedown)="
-                  $event.preventDefault(); openCustomColor('elements', $event)
-                "
-                (click)="$event.preventDefault()"
-                title="Select color for all state boxes in the selected stage"
+                title="Font Color"
               />
             </div>
           </div>
@@ -387,6 +296,147 @@
                   <u>U</u>
                 </button>
               </div>
+            </div>
+          </div>
+
+          <!-- Fill Color Picker -->
+          <div
+            *ngIf="service.paletteIsOpen"
+            style="display: flex; align-items: center"
+          >
+            <div class="font-control-group">
+              <input
+                type="color"
+                class="font-control-color"
+                [disabled]="!selectedState && !selectedTimerTrigger"
+                [(ngModel)]="selectedFillColor"
+                (mousedown)="
+                  $event.preventDefault(); openCustomColor('fill', $event)
+                "
+                (click)="$event.preventDefault()"
+                title="Fill Color"
+              />
+            </div>
+          </div>
+
+          <!-- Line Color Picker -->
+          <div
+            *ngIf="service.paletteIsOpen"
+            style="display: flex; align-items: center"
+          >
+            <div class="font-control-group">
+              <input
+                type="color"
+                class="font-control-color"
+                [disabled]="!selectedTrigger"
+                [(ngModel)]="selectedLineColor"
+                (mousedown)="
+                  $event.preventDefault(); openCustomColor('line', $event)
+                "
+                (click)="$event.preventDefault()"
+                title="Line Color"
+              />
+            </div>
+            <div
+              class="font-control-group"
+              style="
+                margin-left: 8px;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+              "
+            >
+              <select
+                class="font-control-select"
+                [disabled]="!selectedTrigger"
+                [(ngModel)]="selectedLineWidth"
+                (change)="applyLineWidth()"
+                title="Select line width"
+                style="width: 70px"
+              >
+                <option [ngValue]="1">1</option>
+                <option [ngValue]="2">2</option>
+                <option [ngValue]="3">3</option>
+                <option [ngValue]="4">4</option>
+                <option [ngValue]="5">5</option>
+                <option [ngValue]="6">6</option>
+              </select>
+            </div>
+            <div class="font-control-group" style="margin-left: 8px">
+              <button
+                type="button"
+                [disabled]="!selectedTrigger"
+                (mousedown)="
+                  $event.preventDefault(); openLineTypePicker($event)
+                "
+                (click)="$event.preventDefault()"
+                title="Line Option"
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+                  width: 30px;
+                  height: 24px;
+                  background: white;
+                  border: 1px solid #ccc;
+                  border-radius: 3px;
+                  padding-bottom: 3px;
+                "
+              >
+                <span
+                  *ngIf="selectedLineType === 'straight'"
+                  title="Straight Line"
+                >
+                  <svg width="18" height="18" viewBox="0 0 20 20">
+                    <path
+                      d="M2 18 L18 2"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      fill="none"
+                    />
+                  </svg>
+                </span>
+                <span *ngIf="selectedLineType === 'curved'" title="Curved Line">
+                  <svg width="18" height="18" viewBox="0 0 20 20">
+                    <path
+                      d="M2 16 C8 2, 12 18, 18 4"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      fill="none"
+                    />
+                  </svg>
+                </span>
+                <span *ngIf="selectedLineType === 'elbow'" title="Elbow Line">
+                  <svg width="18" height="18" viewBox="0 0 20 20">
+                    <path
+                      d="M2 18 L2 6 L18 6"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      fill="none"
+                    />
+                  </svg>
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Elements Color Picker -->
+          <div
+            *ngIf="service.paletteIsOpen"
+            style="display: flex; align-items: center"
+          >
+            <div class="font-control-group">
+              <input
+                type="color"
+                class="font-control-color"
+                [disabled]="!selectedSwimlane"
+                [(ngModel)]="selectedElementsColor"
+                (mousedown)="
+                  $event.preventDefault(); openCustomColor('elements', $event)
+                "
+                (click)="$event.preventDefault()"
+                title="Elements Color"
+              />
             </div>
           </div>
 
