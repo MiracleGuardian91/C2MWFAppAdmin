@@ -181,6 +181,52 @@
               </svg>
               <span class="newBtnDesin">Bottom</span>
             </button>
+            <button
+              [disabled]="!selectedSwimlane || !canMoveLaneUp"
+              style="border-right: 1px solid #e0e0e0; cursor: pointer"
+              (click)="moveSelectedLaneUp()"
+              title="Move selected lane up"
+            >
+              <svg
+                width="20"
+                height="14"
+                viewBox="0 0 20 18"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2 16H18"
+                  stroke="#555555"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                />
+                <path d="M10 4L6 8H9V12H11V8H14L10 4Z" fill="#555555" />
+              </svg>
+              <span class="newBtnDesin">Move Up</span>
+            </button>
+            <button
+              [disabled]="!selectedSwimlane || !canMoveLaneDown"
+              style="cursor: pointer"
+              (click)="moveSelectedLaneDown()"
+              title="Move selected lane down"
+            >
+              <svg
+                width="20"
+                height="14"
+                viewBox="0 0 20 18"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2 2H18"
+                  stroke="#555555"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                />
+                <path d="M10 14L14 10H11V6H9V10H6L10 14Z" fill="#555555" />
+              </svg>
+              <span class="newBtnDesin">Move Down</span>
+            </button>
           </div>
 
           <!-- Font Family Dropdown -->

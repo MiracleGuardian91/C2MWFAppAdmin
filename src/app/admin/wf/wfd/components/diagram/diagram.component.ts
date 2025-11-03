@@ -136,6 +136,8 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
 
   // Alignment properties
   public selectedSwimlane: any = null;
+  public canMoveLaneUp: boolean = false;
+  public canMoveLaneDown: boolean = false;
   trgConditionDetail: boolean = false;
   undoredoactive = false;
 
@@ -1960,6 +1962,7 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
         this.selectedState = null;
         this.selectedTimerTrigger = null;
         this.selectedTrigger = null;
+        this.updateLaneMoveButtonsState();
       } else if (selectedElement.type === 'bpmn:IntermediateCatchEvent') {
         this.selectedTimerTrigger = selectedElement;
         this.selectedState = null;
@@ -1993,13 +1996,43 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
         this.selectedState = null;
         this.selectedTimerTrigger = null;
         this.selectedTrigger = null;
+        this.canMoveLaneUp = false;
+        this.canMoveLaneDown = false;
       }
     } else {
       this.selectedSwimlane = null;
       this.selectedState = null;
       this.selectedTimerTrigger = null;
       this.selectedTrigger = null;
+      this.canMoveLaneUp = false;
+      this.canMoveLaneDown = false;
     }
+  }
+
+  private updateLaneMoveButtonsState(): void {
+    if (!this.selectedSwimlane || !this.selectedSwimlane.parent) {
+      this.canMoveLaneUp = false;
+      this.canMoveLaneDown = false;
+      return;
+    }
+
+    const lanes = (this.selectedSwimlane.parent.children || []).filter(
+      (c: any) => c.type === 'bpmn:Lane'
+    );
+
+    if (lanes.length <= 1) {
+      this.canMoveLaneUp = false;
+      this.canMoveLaneDown = false;
+      return;
+    }
+
+    const sorted = [...lanes].sort((a: any, b: any) => a.y - b.y);
+    const idx = sorted.findIndex((l: any) => l.id === this.selectedSwimlane.id);
+
+    // Can move up if not at the top (index > 0)
+    this.canMoveLaneUp = idx > 0;
+    // Can move down if not at the bottom (index < length - 1)
+    this.canMoveLaneDown = idx >= 0 && idx < sorted.length - 1;
   }
 
   public alignStatesInSwimlane(alignment: 'top' | 'middle' | 'bottom'): void {
@@ -2021,6 +2054,30 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     const alignmentText =
       alignment.charAt(0).toUpperCase() + alignment.slice(1);
     this.toastr.success(`States aligned to ${alignmentText}`);
+  }
+
+  public moveSelectedLaneUp(): void {
+    if (!this.selectedSwimlane) {
+      this.toastr.warning('Please select a swimlane first');
+      return;
+    }
+    this.service.moveLaneUp(this.selectedSwimlane);
+    // Update button states after move completes
+    setTimeout(() => {
+      this.updateLaneMoveButtonsState();
+    }, 50);
+  }
+
+  public moveSelectedLaneDown(): void {
+    if (!this.selectedSwimlane) {
+      this.toastr.warning('Please select a swimlane first');
+      return;
+    }
+    this.service.moveLaneDown(this.selectedSwimlane);
+    // Update button states after move completes
+    setTimeout(() => {
+      this.updateLaneMoveButtonsState();
+    }, 50);
   }
 
   private loadTimerTriggerProperties(element: any): void {
