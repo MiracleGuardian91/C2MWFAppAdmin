@@ -652,7 +652,7 @@ export default class CustomRenderer extends BaseRenderer {
 
   private createSmoothPathFromWaypoints = (
     waypoints,
-    smoothing: number = 0.2
+    smoothing: number = 0.3
   ) => {
     if (!waypoints || waypoints.length === 0) return '';
     if (waypoints.length === 1) {
@@ -662,31 +662,40 @@ export default class CustomRenderer extends BaseRenderer {
 
     const pts = waypoints.map((p) => ({ x: p.x, y: p.y }));
 
-    const line = (pA, pB) => {
-      const length = Math.hypot(pB.x - pA.x, pB.y - pA.y) || 1;
-      const angle = Math.atan2(pB.y - pA.y, pB.x - pA.x);
-      return { length, angle };
+    const distance = (a, b) => Math.hypot(b.x - a.x, b.y - a.y) || 1;
+    const normalize = (v) => {
+      const len = Math.hypot(v.x, v.y) || 1;
+      return { x: v.x / len, y: v.y / len };
     };
 
-    const controlPoint = (current, previous, next, reverse = false) => {
-      const p = previous || current;
-      const n = next || current;
-      const props = line(p, n);
-      const scale = Math.min(80, props.length) * smoothing;
-      const angle = props.angle + (reverse ? Math.PI : 0);
-      return {
-        x: current.x + Math.cos(angle) * scale,
-        y: current.y + Math.sin(angle) * scale,
-      };
-    };
+    const tangents = pts.map((_, i) => {
+      if (i === 0) {
+        return normalize({ x: pts[1].x - pts[0].x, y: pts[1].y - pts[0].y });
+      } else if (i === pts.length - 1) {
+        return normalize({
+          x: pts[i].x - pts[i - 1].x,
+          y: pts[i].y - pts[i - 1].y,
+        });
+      } else {
+        return normalize({
+          x: (pts[i + 1].x - pts[i - 1].x) / 2,
+          y: (pts[i + 1].y - pts[i - 1].y) / 2,
+        });
+      }
+    });
 
     let d = `M ${pts[0].x} ${pts[0].y}`;
     for (let i = 0; i < pts.length - 1; i++) {
-      const current = pts[i];
-      const next = pts[i + 1];
-      const cp1 = controlPoint(current, pts[i - 1], next, false);
-      const cp2 = controlPoint(next, current, pts[i + 2], true);
-      d += ` C ${cp1.x} ${cp1.y}, ${cp2.x} ${cp2.y}, ${next.x} ${next.y}`;
+      const p0 = pts[i];
+      const p1 = pts[i + 1];
+      const segLen = distance(p0, p1);
+      const k = Math.min(80, segLen) * smoothing; // per-segment handle length
+      const cp1 = { x: p0.x + tangents[i].x * k, y: p0.y + tangents[i].y * k };
+      const cp2 = {
+        x: p1.x - tangents[i + 1].x * k,
+        y: p1.y - tangents[i + 1].y * k,
+      };
+      d += ` C ${cp1.x} ${cp1.y}, ${cp2.x} ${cp2.y}, ${p1.x} ${p1.y}`;
     }
     return d;
   };
