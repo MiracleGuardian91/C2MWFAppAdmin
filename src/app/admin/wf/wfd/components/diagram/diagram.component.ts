@@ -2899,6 +2899,10 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
         this.service.applyElbowLine(this.selectedTrigger);
         this.hasUnsavedChanges = true;
         setTimeout(() => this.updateUndoRedoState(), 100);
+      } else if (type === 'curved') {
+        this.service.applyCurvedLine(this.selectedTrigger);
+        this.hasUnsavedChanges = true;
+        setTimeout(() => this.updateUndoRedoState(), 100);
       }
     }
   }

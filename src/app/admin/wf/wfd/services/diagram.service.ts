@@ -1319,6 +1319,57 @@ export class DiagramService implements OnDestroy {
     (element as any).lineType = 'elbow';
   }
 
+  public applyCurvedLine(element: any): void {
+    if (!element || !element.source || !element.target) return;
+
+    const wps = Array.isArray(element.waypoints) ? element.waypoints : [];
+    const start = wps[0]
+      ? ({ x: wps[0].x, y: wps[0].y } as Point)
+      : ({ x: element.source.x, y: element.source.y } as Point);
+    const end = wps[wps.length - 1]
+      ? ({ x: wps[wps.length - 1].x, y: wps[wps.length - 1].y } as Point)
+      : ({ x: element.target.x, y: element.target.y } as Point);
+
+    let middle = wps.length > 2 ? wps.slice(1, wps.length - 1) : [];
+
+    if (middle.length < 2) {
+      const dx = end.x - start.x;
+      const dy = end.y - start.y;
+      const len = Math.max(1, Math.hypot(dx, dy));
+      const off = 40;
+      const nx = (-dy / len) * off;
+      const ny = (dx / len) * off;
+
+      const m1 = {
+        x: start.x + dx * 0.33 + nx,
+        y: start.y + dy * 0.33 + ny,
+      } as Point;
+      const m2 = {
+        x: start.x + dx * 0.66 - nx,
+        y: start.y + dy * 0.66 - ny,
+      } as Point;
+
+      if (middle.length === 1) {
+        const existing = middle[0];
+        const dist = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
+        const candidate = dist(existing, m1) > dist(existing, m2) ? m1 : m2;
+        middle = [existing, candidate];
+      } else if (middle.length === 0) {
+        middle = [m1, m2];
+      }
+    }
+
+    this.bpmn.updateElementProperties(element, {
+      waypoints: [start, ...middle, end],
+      lineType: 'curved',
+    });
+
+    if (element.businessObject) {
+      (element.businessObject as any).lineType = 'curved';
+    }
+    (element as any).lineType = 'curved';
+  }
+
   public clear() {
     this.bpmn.clear();
   }
