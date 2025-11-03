@@ -1332,7 +1332,7 @@ export class DiagramService implements OnDestroy {
 
     let middle = wps.length > 2 ? wps.slice(1, wps.length - 1) : [];
 
-    if (middle.length < 2) {
+    if (middle.length === 0) {
       const dx = end.x - start.x;
       const dy = end.y - start.y;
       const len = Math.max(1, Math.hypot(dx, dy));
@@ -1340,23 +1340,11 @@ export class DiagramService implements OnDestroy {
       const nx = (-dy / len) * off;
       const ny = (dx / len) * off;
 
-      const m1 = {
-        x: start.x + dx * 0.33 + nx,
-        y: start.y + dy * 0.33 + ny,
+      const mid = {
+        x: start.x + dx * 0.5 + nx,
+        y: start.y + dy * 0.5 + ny,
       } as Point;
-      const m2 = {
-        x: start.x + dx * 0.66 - nx,
-        y: start.y + dy * 0.66 - ny,
-      } as Point;
-
-      if (middle.length === 1) {
-        const existing = middle[0];
-        const dist = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
-        const candidate = dist(existing, m1) > dist(existing, m2) ? m1 : m2;
-        middle = [existing, candidate];
-      } else if (middle.length === 0) {
-        middle = [m1, m2];
-      }
+      middle = [mid];
     }
 
     this.bpmn.updateElementProperties(element, {
