@@ -147,10 +147,25 @@ export default class CustomRenderer extends BaseRenderer {
     if (connection.type === t.DottedFlow) {
       attrs.strokeDasharray = 5.5;
     }
-    const lineType =
+    let lineType =
       (connection as any).lineType ||
       (connection.businessObject &&
         (connection.businessObject as any).lineType);
+
+    // Infer line type for preview connections lacking custom props
+    if (!lineType) {
+      const wps = connection.waypoints || [];
+      if (Array.isArray(wps) && wps.length > 2) {
+        const isOrthogonal = wps.every((p, i) => {
+          if (i === 0) return true;
+          const prev = wps[i - 1];
+          return Math.abs(p.x - prev.x) < 0.5 || Math.abs(p.y - prev.y) < 0.5;
+        });
+        lineType = isOrthogonal ? 'elbow' : 'curved';
+      } else if (Array.isArray(wps) && wps.length === 2) {
+        lineType = 'straight';
+      }
+    }
 
     if (lineType === 'curved') {
       const pathData = this.createSmoothPathFromWaypoints(
