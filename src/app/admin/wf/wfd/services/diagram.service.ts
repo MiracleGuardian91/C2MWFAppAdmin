@@ -1006,6 +1006,83 @@ export class DiagramService implements OnDestroy {
     this.alignElementsWithBPMN(stateBoxes, swimlane, alignment);
   }
 
+  public moveLaneUp(swimlane: any): void {
+    if (!swimlane || !swimlane.parent) return;
+    const lanes = (swimlane.parent.children || []).filter(
+      (c: any) => c.type === t.Stage
+    );
+    if (lanes.length <= 1) return;
+    const sorted = [...lanes].sort((a, b) => a.y - b.y);
+    const idx = sorted.findIndex((l) => l.id === swimlane.id);
+    if (idx <= 0) return;
+    const above = sorted[idx - 1];
+
+    const tempY = swimlane.y;
+    const newYSelected = above.y;
+    const newYAbove = tempY;
+
+    const deltaSel = newYSelected - swimlane.y;
+    const deltaAbove = newYAbove - above.y;
+
+    this.bpmn.moveElements([swimlane], { x: 0, y: deltaSel });
+    this.bpmn.moveElements([above], { x: 0, y: deltaAbove });
+
+    this.repositionLanesWithoutGaps(swimlane.parent);
+  }
+
+  public moveLaneDown(swimlane: any): void {
+    if (!swimlane || !swimlane.parent) return;
+    const lanes = (swimlane.parent.children || []).filter(
+      (c: any) => c.type === t.Stage
+    );
+    if (lanes.length <= 1) return;
+    const sorted = [...lanes].sort((a, b) => a.y - b.y);
+    const idx = sorted.findIndex((l) => l.id === swimlane.id);
+    if (idx === -1 || idx >= sorted.length - 1) return;
+    const below = sorted[idx + 1];
+
+    const tempY = swimlane.y;
+    const newYSelected = below.y;
+    const newYBelow = tempY;
+
+    const deltaSel = newYSelected - swimlane.y;
+    const deltaBelow = newYBelow - below.y;
+
+    this.bpmn.moveElements([swimlane], { x: 0, y: deltaSel });
+    this.bpmn.moveElements([below], { x: 0, y: deltaBelow });
+
+    this.repositionLanesWithoutGaps(swimlane.parent);
+  }
+
+  private repositionLanesWithoutGaps(pool: any): void {
+    if (!pool || !pool.children) return;
+
+    const lanes = pool.children.filter((c: any) => c.type === t.Stage);
+    if (lanes.length === 0) return;
+
+    // Use setTimeout to ensure previous moves are complete before repositioning
+    setTimeout(() => {
+      // Get fresh references and sort by current Y position
+      const currentLanes = pool.children.filter((c: any) => c.type === t.Stage);
+      const sorted = [...currentLanes].sort((a, b) => a.y - b.y);
+
+      if (sorted.length === 0) return;
+
+      // Reposition lanes so they're adjacent with no gaps
+      let currentY = sorted[0].y;
+
+      sorted.forEach((lane) => {
+        if (Math.abs(lane.y - currentY) > 1) {
+          // Allow 1px tolerance for rounding
+          const deltaY = currentY - lane.y;
+          this.bpmn.moveElements([lane], { x: 0, y: deltaY });
+        }
+        // Update currentY to the bottom of this lane (whether moved or not)
+        currentY = currentY + lane.height;
+      });
+    }, 10);
+  }
+
   private alignElementsWithBPMN(
     elements: any[],
     swimlane: any,
