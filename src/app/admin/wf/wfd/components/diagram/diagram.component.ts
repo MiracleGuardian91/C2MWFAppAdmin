@@ -2044,9 +2044,11 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
   private loadTriggerProperties(element: any): void {
     const currentLineColor = this.getCurrentLineColor(element);
     const currentLineWidth = this.getCurrentLineWidth(element);
+    const currentLineType = this.getCurrentLineType(element);
     const bo = element.businessObject;
     const boLineColor = bo?.lineColor || bo?.stroke;
     const boLineWidth = bo?.lineWidth || bo?.strokeWidth || element.strokeWidth;
+    const boLineType = (bo as any)?.lineType || (element as any)?.lineType;
 
     this.selectedLineColor = this.processLineColor(
       boLineColor ||
@@ -2064,8 +2066,45 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
       (typeof currentLineWidth === 'number' && currentLineWidth) ||
       2;
 
+    this.selectedLineType =
+      (boLineType as any) || (currentLineType as any) || 'straight';
+
     console.log('Loaded trigger line color:', this.selectedLineColor);
     this.cdr.detectChanges();
+  }
+
+  private getCurrentLineType(
+    element: any
+  ): 'straight' | 'curved' | 'elbow' | null {
+    try {
+      const waypoints: any[] =
+        (element && (element as any).waypoints) ||
+        (element && (element as any).businessObject?.di?.waypoint) ||
+        [];
+      if (Array.isArray(waypoints) && waypoints.length >= 3) {
+        return 'elbow';
+      }
+
+      const gfx = this.service.getGraphics(element);
+      if (!gfx) return null;
+      const path = gfx.querySelector('path');
+      if (!path) return null;
+      const d = path.getAttribute('d') || '';
+      if (!d) return null;
+
+      if (/[cCqQsS]/.test(d)) {
+        return 'curved';
+      }
+
+      const lMatches = (d.match(/[lLhHvV]/g) || []).length;
+      if (lMatches > 1) {
+        return 'elbow';
+      }
+
+      return 'straight';
+    } catch (e) {
+      return null;
+    }
   }
 
   private loadStateFontProperties(element: any): void {
@@ -2849,8 +2888,22 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     }
   }
 
-  // UI-only: update selected line option label/icon in header
   public setLineType(type: 'straight' | 'curved' | 'elbow'): void {
     this.selectedLineType = type;
+    if (this.selectedTrigger) {
+      if (type === 'straight') {
+        this.service.applyStraightLine(this.selectedTrigger);
+        this.hasUnsavedChanges = true;
+        setTimeout(() => this.updateUndoRedoState(), 100);
+      } else if (type === 'elbow') {
+        this.service.applyElbowLine(this.selectedTrigger);
+        this.hasUnsavedChanges = true;
+        setTimeout(() => this.updateUndoRedoState(), 100);
+      } else if (type === 'curved') {
+        this.service.applyCurvedLine(this.selectedTrigger);
+        this.hasUnsavedChanges = true;
+        setTimeout(() => this.updateUndoRedoState(), 100);
+      }
+    }
   }
 }

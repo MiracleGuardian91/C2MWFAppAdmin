@@ -1239,11 +1239,141 @@ export class DiagramService implements OnDestroy {
     this.bpmn.applyLineWidth(element, lineWidth);
   }
 
+  public applyStraightLine(element: any): void {
+    if (!element || !element.source || !element.target) return;
+    const wps = Array.isArray(element.waypoints) ? element.waypoints : [];
+    const start = wps[0]
+      ? ({ x: wps[0].x, y: wps[0].y } as Point)
+      : ({ x: element.source.x, y: element.source.y } as Point);
+    const end = wps[wps.length - 1]
+      ? ({ x: wps[wps.length - 1].x, y: wps[wps.length - 1].y } as Point)
+      : ({ x: element.target.x, y: element.target.y } as Point);
+
+    this.bpmn.updateElementProperties(element, {
+      waypoints: [start, end],
+      lineType: 'straight',
+    });
+
+    if (element.businessObject) {
+      (element.businessObject as any).lineType = 'straight';
+    }
+    (element as any).lineType = 'straight';
+  }
+
+  public applyElbowLine(element: any): void {
+    if (!element || !element.source || !element.target) return;
+
+    const wps = Array.isArray(element.waypoints) ? element.waypoints : [];
+    const start = wps[0]
+      ? ({ x: wps[0].x, y: wps[0].y } as Point)
+      : ({ x: element.source.x, y: element.source.y } as Point);
+    const end = wps[wps.length - 1]
+      ? ({ x: wps[wps.length - 1].x, y: wps[wps.length - 1].y } as Point)
+      : ({ x: element.target.x, y: element.target.y } as Point);
+
+    const OFFSET = 30;
+    const src = element.source;
+    const tgt = element.target;
+
+    const outFrom = (p: Point, shape: any): Point => {
+      const left = Math.abs(p.x - shape.x) <= 2;
+      const right = Math.abs(p.x - (shape.x + shape.width)) <= 2;
+      const top = Math.abs(p.y - shape.y) <= 2;
+      const bottom = Math.abs(p.y - (shape.y + shape.height)) <= 2;
+      if (left) return { x: p.x - OFFSET, y: p.y } as Point;
+      if (right) return { x: p.x + OFFSET, y: p.y } as Point;
+      if (top) return { x: p.x, y: p.y - OFFSET } as Point;
+      if (bottom) return { x: p.x, y: p.y + OFFSET } as Point;
+      return { x: p.x + OFFSET, y: p.y } as Point;
+    };
+
+    const startOut = outFrom(start, src);
+    const endOut = outFrom(end, tgt);
+
+    const cross1: Point = { x: startOut.x, y: endOut.y } as Point;
+    const cross2: Point = { x: endOut.x, y: startOut.y } as Point;
+
+    const length = (a: Point, b: Point) =>
+      Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+    const total1 =
+      length(start, startOut) +
+      length(startOut, cross1) +
+      length(cross1, endOut) +
+      length(endOut, end);
+    const total2 =
+      length(start, startOut) +
+      length(startOut, cross2) +
+      length(cross2, endOut) +
+      length(endOut, end);
+
+    const cross: Point = total1 <= total2 ? cross1 : cross2;
+
+    this.bpmn.updateElementProperties(element, {
+      waypoints: [start, startOut, cross, endOut, end],
+      lineType: 'elbow',
+    });
+
+    if (element.businessObject) {
+      (element.businessObject as any).lineType = 'elbow';
+    }
+    (element as any).lineType = 'elbow';
+  }
+
+  public applyCurvedLine(element: any): void {
+    if (!element || !element.source || !element.target) return;
+
+    const wps = Array.isArray(element.waypoints) ? element.waypoints : [];
+    const start = wps[0]
+      ? ({ x: wps[0].x, y: wps[0].y } as Point)
+      : ({ x: element.source.x, y: element.source.y } as Point);
+    const end = wps[wps.length - 1]
+      ? ({ x: wps[wps.length - 1].x, y: wps[wps.length - 1].y } as Point)
+      : ({ x: element.target.x, y: element.target.y } as Point);
+
+    let middle = wps.length > 2 ? wps.slice(1, wps.length - 1) : [];
+
+    if (middle.length < 2) {
+      const dx = end.x - start.x;
+      const dy = end.y - start.y;
+      const len = Math.max(1, Math.hypot(dx, dy));
+      const off = 40;
+      const nx = (-dy / len) * off;
+      const ny = (dx / len) * off;
+
+      const m1 = {
+        x: start.x + dx * 0.33 + nx,
+        y: start.y + dy * 0.33 + ny,
+      } as Point;
+      const m2 = {
+        x: start.x + dx * 0.66 - nx,
+        y: start.y + dy * 0.66 - ny,
+      } as Point;
+
+      if (middle.length === 1) {
+        const existing = middle[0];
+        const dist = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
+        const candidate = dist(existing, m1) > dist(existing, m2) ? m1 : m2;
+        middle = [existing, candidate];
+      } else if (middle.length === 0) {
+        middle = [m1, m2];
+      }
+    }
+
+    this.bpmn.updateElementProperties(element, {
+      waypoints: [start, ...middle, end],
+      lineType: 'curved',
+    });
+
+    if (element.businessObject) {
+      (element.businessObject as any).lineType = 'curved';
+    }
+    (element as any).lineType = 'curved';
+  }
+
   public clear() {
     this.bpmn.clear();
   }
 
-  // Method to get graphics element for font property loading
   public getGraphics(element: any): SVGElement | null {
     return this.bpmn.getGraphics(element);
   }

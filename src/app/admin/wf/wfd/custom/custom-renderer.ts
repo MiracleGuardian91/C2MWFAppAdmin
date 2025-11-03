@@ -147,6 +147,36 @@ export default class CustomRenderer extends BaseRenderer {
     if (connection.type === t.DottedFlow) {
       attrs.strokeDasharray = 5.5;
     }
+    let lineType =
+      (connection as any).lineType ||
+      (connection.businessObject &&
+        (connection.businessObject as any).lineType);
+
+    // Infer line type for preview connections lacking custom props
+    if (!lineType) {
+      const wps = connection.waypoints || [];
+      if (Array.isArray(wps) && wps.length > 2) {
+        const isOrthogonal = wps.every((p, i) => {
+          if (i === 0) return true;
+          const prev = wps[i - 1];
+          return Math.abs(p.x - prev.x) < 0.5 || Math.abs(p.y - prev.y) < 0.5;
+        });
+        lineType = isOrthogonal ? 'elbow' : 'curved';
+      } else if (Array.isArray(wps) && wps.length === 2) {
+        lineType = 'straight';
+      }
+    }
+
+    if (lineType === 'curved') {
+      const pathData = this.createSmoothPathFromWaypoints(
+        connection.waypoints,
+        0.2
+      );
+      const path = svgCreate('path');
+      svgAttr(path, assign({ d: pathData }, attrs));
+      return svgAppend(parentGfx, path);
+    }
+
     return svgAppend(parentGfx, createLine(connection.waypoints, attrs, 6));
   };
 
@@ -618,6 +648,47 @@ export default class CustomRenderer extends BaseRenderer {
     }
 
     return pathData;
+  };
+
+  private createSmoothPathFromWaypoints = (
+    waypoints,
+    smoothing: number = 0.2
+  ) => {
+    if (!waypoints || waypoints.length === 0) return '';
+    if (waypoints.length === 1) {
+      const p = waypoints[0];
+      return `M ${p.x} ${p.y}`;
+    }
+
+    const pts = waypoints.map((p) => ({ x: p.x, y: p.y }));
+
+    const line = (pA, pB) => {
+      const length = Math.hypot(pB.x - pA.x, pB.y - pA.y) || 1;
+      const angle = Math.atan2(pB.y - pA.y, pB.x - pA.x);
+      return { length, angle };
+    };
+
+    const controlPoint = (current, previous, next, reverse = false) => {
+      const p = previous || current;
+      const n = next || current;
+      const props = line(p, n);
+      const scale = Math.min(80, props.length) * smoothing;
+      const angle = props.angle + (reverse ? Math.PI : 0);
+      return {
+        x: current.x + Math.cos(angle) * scale,
+        y: current.y + Math.sin(angle) * scale,
+      };
+    };
+
+    let d = `M ${pts[0].x} ${pts[0].y}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const current = pts[i];
+      const next = pts[i + 1];
+      const cp1 = controlPoint(current, pts[i - 1], next, false);
+      const cp2 = controlPoint(next, current, pts[i + 2], true);
+      d += ` C ${cp1.x} ${cp1.y}, ${cp2.x} ${cp2.y}, ${next.x} ${next.y}`;
+    }
+    return d;
   };
 
   private drawEvent = (parentGfx, element, attrs) => {
