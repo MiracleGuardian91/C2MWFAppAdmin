@@ -561,6 +561,14 @@ export class BpmnService {
     this.modeling.moveElements(shapes, delta, target, hints);
   }
 
+  public layoutConnection(connection: any, layout?: any) {
+    this.modeling.layoutConnection(connection, layout || {});
+  }
+
+  public updateConnectionWaypoints(connection: any, waypoints: Waypoint[]) {
+    this.modeling.updateWaypoints(connection, waypoints);
+  }
+
   public destroy() {
     this.bpmnJS.destroy();
   }

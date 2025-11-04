@@ -1017,17 +1017,24 @@ export class DiagramService implements OnDestroy {
     if (idx <= 0) return;
     const above = sorted[idx - 1];
 
-    const tempY = swimlane.y;
-    const newYSelected = above.y;
-    const newYAbove = tempY;
+    // Capture complete state before any moves
+    const preMoveSnapshot = this.captureConnectionWaypoints();
+    const lanePositionsBefore = this.captureLanePositions(sorted);
 
-    const deltaSel = newYSelected - swimlane.y;
-    const deltaAbove = newYAbove - above.y;
+    // Swap the two lanes
+    const tempY = swimlane.y;
+    const deltaSel = above.y - swimlane.y;
+    const deltaAbove = tempY - above.y;
 
     this.bpmn.moveElements([swimlane], { x: 0, y: deltaSel });
     this.bpmn.moveElements([above], { x: 0, y: deltaAbove });
 
-    this.repositionLanesWithoutGaps(swimlane.parent);
+    // Reposition all lanes and then restore connections
+    this.repositionLanesWithoutGapsAndRestoreConnections(
+      swimlane.parent,
+      preMoveSnapshot,
+      lanePositionsBefore
+    );
   }
 
   public moveLaneDown(swimlane: any): void {
@@ -1041,17 +1048,21 @@ export class DiagramService implements OnDestroy {
     if (idx === -1 || idx >= sorted.length - 1) return;
     const below = sorted[idx + 1];
 
-    const tempY = swimlane.y;
-    const newYSelected = below.y;
-    const newYBelow = tempY;
+    const preMoveSnapshot = this.captureConnectionWaypoints();
+    const lanePositionsBefore = this.captureLanePositions(sorted);
 
-    const deltaSel = newYSelected - swimlane.y;
-    const deltaBelow = newYBelow - below.y;
+    const tempY = swimlane.y;
+    const deltaSel = below.y - swimlane.y;
+    const deltaBelow = tempY - below.y;
 
     this.bpmn.moveElements([swimlane], { x: 0, y: deltaSel });
     this.bpmn.moveElements([below], { x: 0, y: deltaBelow });
 
-    this.repositionLanesWithoutGaps(swimlane.parent);
+    this.repositionLanesWithoutGapsAndRestoreConnections(
+      swimlane.parent,
+      preMoveSnapshot,
+      lanePositionsBefore
+    );
   }
 
   private repositionLanesWithoutGaps(pool: any): void {
@@ -1060,27 +1071,157 @@ export class DiagramService implements OnDestroy {
     const lanes = pool.children.filter((c: any) => c.type === t.Stage);
     if (lanes.length === 0) return;
 
-    // Use setTimeout to ensure previous moves are complete before repositioning
     setTimeout(() => {
-      // Get fresh references and sort by current Y position
       const currentLanes = pool.children.filter((c: any) => c.type === t.Stage);
       const sorted = [...currentLanes].sort((a, b) => a.y - b.y);
 
       if (sorted.length === 0) return;
 
-      // Reposition lanes so they're adjacent with no gaps
       let currentY = sorted[0].y;
 
       sorted.forEach((lane) => {
         if (Math.abs(lane.y - currentY) > 1) {
-          // Allow 1px tolerance for rounding
           const deltaY = currentY - lane.y;
           this.bpmn.moveElements([lane], { x: 0, y: deltaY });
         }
-        // Update currentY to the bottom of this lane (whether moved or not)
         currentY = currentY + lane.height;
       });
     }, 10);
+  }
+
+  private rerouteConnectionsAfterLaneSwap(): void {
+    setTimeout(() => {
+      const all = this.bpmn.allElements;
+      const flows = all.filter(
+        (el: any) => el.type === t.Trigger || el.type === t.DottedFlow
+      );
+      flows.forEach((flow: any) => {
+        try {
+          this.bpmn.layoutConnection(flow);
+        } catch (_) {}
+      });
+
+      this.repositionAllStatesAtBottomOfConnections();
+    }, 30);
+  }
+
+  private captureConnectionWaypoints(): Array<{
+    c: any;
+    points: { x: number; y: number }[];
+  }> {
+    const all = this.bpmn.allElements;
+    const flows = all.filter(
+      (el: any) => el.type === t.Trigger || el.type === t.DottedFlow
+    );
+    return flows.map((c: any) => ({
+      c,
+      points: (c.waypoints || []).map((p: any) => ({ x: p.x, y: p.y })),
+    }));
+  }
+
+  private captureLanePositions(
+    lanes: any[]
+  ): Map<string, { y: number; height: number }> {
+    const positions = new Map<string, { y: number; height: number }>();
+    lanes.forEach((lane) => {
+      positions.set(lane.id, { y: lane.y, height: lane.height });
+    });
+    return positions;
+  }
+
+  private repositionLanesWithoutGapsAndRestoreConnections(
+    pool: any,
+    connectionSnapshot: Array<{ c: any; points: { x: number; y: number }[] }>,
+    lanePositionsBefore: Map<string, { y: number; height: number }>
+  ): void {
+    if (!pool || !pool.children) return;
+
+    const lanes = pool.children.filter((c: any) => c.type === t.Stage);
+    if (lanes.length === 0) return;
+
+    setTimeout(() => {
+      const currentLanes = pool.children.filter((c: any) => c.type === t.Stage);
+      const sorted = [...currentLanes].sort((a, b) => a.y - b.y);
+
+      if (sorted.length === 0) return;
+
+      const laneDeltas = new Map<string, number>();
+      let currentY = sorted[0].y;
+
+      sorted.forEach((lane) => {
+        const before = lanePositionsBefore.get(lane.id);
+        if (before) {
+          const finalY = currentY;
+          const totalDelta = finalY - before.y;
+          laneDeltas.set(lane.id, totalDelta);
+        }
+
+        if (Math.abs(lane.y - currentY) > 1) {
+          const deltaY = currentY - lane.y;
+          this.bpmn.moveElements([lane], { x: 0, y: deltaY });
+        }
+        currentY = currentY + lane.height;
+      });
+
+      setTimeout(() => {
+        connectionSnapshot.forEach(({ c, points }) => {
+          const newPoints = points.map((p) => {
+            let y = p.y;
+            let foundLane = false;
+
+            lanePositionsBefore.forEach((beforePos, laneId) => {
+              const delta = laneDeltas.get(laneId) || 0;
+              if (p.y >= beforePos.y && p.y < beforePos.y + beforePos.height) {
+                y = p.y + delta;
+                foundLane = true;
+              }
+            });
+
+            if (!foundLane) {
+              const sortedBefore = Array.from(
+                lanePositionsBefore.entries()
+              ).sort((a, b) => a[1].y - b[1].y);
+              for (let i = 0; i < sortedBefore.length; i++) {
+                const [laneId, beforePos] = sortedBefore[i];
+                const delta = laneDeltas.get(laneId) || 0;
+                if (i === 0 && p.y < beforePos.y) {
+                  y = p.y + delta;
+                  break;
+                } else if (
+                  i === sortedBefore.length - 1 &&
+                  p.y > beforePos.y + beforePos.height
+                ) {
+                  y = p.y + delta;
+                  break;
+                } else if (i < sortedBefore.length - 1) {
+                  const nextBefore = sortedBefore[i + 1][1];
+                  if (
+                    p.y > beforePos.y + beforePos.height &&
+                    p.y < nextBefore.y
+                  ) {
+                    const delta1 = laneDeltas.get(sortedBefore[i][0]) || 0;
+                    const delta2 = laneDeltas.get(sortedBefore[i + 1][0]) || 0;
+                    const ratio =
+                      (p.y - (beforePos.y + beforePos.height)) /
+                      (nextBefore.y - (beforePos.y + beforePos.height));
+                    y = p.y + delta1 + (delta2 - delta1) * ratio;
+                    break;
+                  }
+                }
+              }
+            }
+
+            return { x: p.x, y } as any;
+          });
+
+          try {
+            this.bpmn.updateConnectionWaypoints(c, newPoints as any);
+          } catch (_) {}
+        });
+
+        this.repositionAllStatesAtBottomOfConnections();
+      }, 50);
+    }, 20);
   }
 
   private alignElementsWithBPMN(
