@@ -939,7 +939,6 @@ export class DiagramService implements OnDestroy {
     this._isRepositioningInProgress = true;
 
     try {
-      // Get all states in the diagram
       const allElements = this.bpmn.allElements;
       const states = allElements.filter(
         (el) =>
@@ -949,7 +948,6 @@ export class DiagramService implements OnDestroy {
           el.type === t.SubProcess
       );
 
-      // For each state, find its incoming connections and reposition it
       states.forEach((state: StateShapeType) => {
         const incomingConnections = allElements.filter(
           (el) =>
@@ -959,7 +957,6 @@ export class DiagramService implements OnDestroy {
         );
 
         if (incomingConnections.length > 0) {
-          // Choose the connection with the most waypoints (most complex routing)
           const primaryConnection = incomingConnections.reduce(
             (prev, current) => {
               const prevWaypoints = prev.waypoints?.length || 0;
@@ -983,7 +980,6 @@ export class DiagramService implements OnDestroy {
       return;
     }
 
-    // Get all state boxes and timer triggers within the swimlane
     const stateBoxes = swimlane.children.filter(
       (child: any) =>
         child.type === t.State ||
@@ -991,11 +987,6 @@ export class DiagramService implements OnDestroy {
         child.type === t.EndState ||
         child.type === t.SubProcess ||
         child.type === t.TriggerExtension
-    );
-
-    console.log(
-      `Found ${stateBoxes.length} state boxes and timer triggers in swimlane:`,
-      stateBoxes.map((s) => s.id)
     );
 
     if (stateBoxes.length < 2) {
@@ -1017,11 +1008,9 @@ export class DiagramService implements OnDestroy {
     if (idx <= 0) return;
     const above = sorted[idx - 1];
 
-    // Capture complete state before any moves
     const preMoveSnapshot = this.captureConnectionWaypoints();
     const lanePositionsBefore = this.captureLanePositions(sorted);
 
-    // Swap the two lanes
     const tempY = swimlane.y;
     const deltaSel = above.y - swimlane.y;
     const deltaAbove = tempY - above.y;
@@ -1029,7 +1018,6 @@ export class DiagramService implements OnDestroy {
     this.bpmn.moveElements([swimlane], { x: 0, y: deltaSel });
     this.bpmn.moveElements([above], { x: 0, y: deltaAbove });
 
-    // Reposition all lanes and then restore connections
     this.repositionLanesWithoutGapsAndRestoreConnections(
       swimlane.parent,
       preMoveSnapshot,
@@ -1220,6 +1208,7 @@ export class DiagramService implements OnDestroy {
         });
 
         this.repositionAllStatesAtBottomOfConnections();
+        this.rerouteConnectionsAfterLaneSwap();
       }, 50);
     }, 20);
   }

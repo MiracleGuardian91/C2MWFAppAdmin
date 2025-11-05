@@ -16,8 +16,10 @@ import {
   remove
 } from "./chunk-W6KNEPAJ.js";
 import {
-  BaseRenderer
-} from "./chunk-P2P5AXCL.js";
+  rotate,
+  transform as transform2,
+  translate
+} from "./chunk-CE5VFLYH.js";
 import {
   getOriginal,
   hasPrimaryModifier,
@@ -29,28 +31,21 @@ import {
   toPoint
 } from "./chunk-O2RUVXQP.js";
 import {
-  rotate,
-  transform as transform2,
-  translate
-} from "./chunk-CE5VFLYH.js";
-import {
-  createCategory,
-  createCategoryValue,
-  linkCategoryValue,
-  unlinkCategory,
-  unlinkCategoryValue
-} from "./chunk-QBESYOBR.js";
-import {
-  add,
-  indexOf,
-  remove as remove3
-} from "./chunk-UPPIJ347.js";
-import {
-  RuleProvider
-} from "./chunk-4X2IYSHR.js";
+  BaseRenderer
+} from "./chunk-P2P5AXCL.js";
 import {
   AutoResize
-} from "./chunk-PDHFGGQH.js";
+} from "./chunk-2LKSNQAQ.js";
+import {
+  eachElement,
+  getBBox,
+  getClosure,
+  getEnclosedElements,
+  getParents,
+  getType,
+  isFrameElement,
+  selfAndAllChildren
+} from "./chunk-A3Q7264O.js";
 import {
   asBounds,
   asTRBL,
@@ -68,15 +63,8 @@ import {
   roundPoint
 } from "./chunk-4OHDVAG5.js";
 import {
-  eachElement,
-  getBBox,
-  getClosure,
-  getEnclosedElements,
-  getParents,
-  getType,
-  isFrameElement,
-  selfAndAllChildren
-} from "./chunk-A3Q7264O.js";
+  RuleProvider
+} from "./chunk-4X2IYSHR.js";
 import {
   CommandInterceptor
 } from "./chunk-JI54U5I4.js";
@@ -113,6 +101,18 @@ import {
   remove as remove2,
   transform
 } from "./chunk-VKE2OUF7.js";
+import {
+  createCategory,
+  createCategoryValue,
+  linkCategoryValue,
+  unlinkCategory,
+  unlinkCategoryValue
+} from "./chunk-QBESYOBR.js";
+import {
+  add,
+  indexOf,
+  remove as remove3
+} from "./chunk-UPPIJ347.js";
 import {
   ElementFactory,
   ElementFactory2,
