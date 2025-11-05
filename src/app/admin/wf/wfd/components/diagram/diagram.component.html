@@ -65,7 +65,6 @@
                   stroke-linejoin="round"
                 />
               </svg>
-              <span class="newBtnDesin">Undo</span>
             </button>
           </div>
           <div
@@ -93,7 +92,6 @@
                   stroke-linejoin="round"
                 />
               </svg>
-              <span class="newBtnDesin">Redo</span>
             </button>
           </div>
 
@@ -123,7 +121,6 @@
                 />
                 <path d="M8 2L12 2L12 6L8 6L8 2Z" fill="#555555" />
               </svg>
-              <span class="newBtnDesin">Top</span>
             </button>
           </div>
           <div
@@ -132,7 +129,7 @@
           >
             <button
               [disabled]="!selectedSwimlane"
-              style="border-left: 1px solid #e0e0e0; cursor: pointer"
+              style="cursor: pointer"
               (click)="alignStatesInSwimlane('middle')"
               title="Align states to middle"
             >
@@ -151,7 +148,6 @@
                 />
                 <path d="M8 6L12 6L12 10L8 10L8 6Z" fill="#555555" />
               </svg>
-              <span class="newBtnDesin">Middle</span>
             </button>
           </div>
           <div
@@ -179,7 +175,6 @@
                 />
                 <path d="M8 10L12 10L12 14L8 14L8 10Z" fill="#555555" />
               </svg>
-              <span class="newBtnDesin">Bottom</span>
             </button>
             <button
               [disabled]="!selectedSwimlane || !canMoveLaneUp"
@@ -202,7 +197,6 @@
                 />
                 <path d="M10 4L6 8H9V12H11V8H14L10 4Z" fill="#555555" />
               </svg>
-              <span class="newBtnDesin">Move Up</span>
             </button>
             <button
               [disabled]="!selectedSwimlane || !canMoveLaneDown"
@@ -225,7 +219,6 @@
                 />
                 <path d="M10 14L14 10H11V6H9V10H6L10 14Z" fill="#555555" />
               </svg>
-              <span class="newBtnDesin">Move Down</span>
             </button>
           </div>
 

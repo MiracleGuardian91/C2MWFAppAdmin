@@ -1053,30 +1053,6 @@ export class DiagramService implements OnDestroy {
     );
   }
 
-  private repositionLanesWithoutGaps(pool: any): void {
-    if (!pool || !pool.children) return;
-
-    const lanes = pool.children.filter((c: any) => c.type === t.Stage);
-    if (lanes.length === 0) return;
-
-    setTimeout(() => {
-      const currentLanes = pool.children.filter((c: any) => c.type === t.Stage);
-      const sorted = [...currentLanes].sort((a, b) => a.y - b.y);
-
-      if (sorted.length === 0) return;
-
-      let currentY = sorted[0].y;
-
-      sorted.forEach((lane) => {
-        if (Math.abs(lane.y - currentY) > 1) {
-          const deltaY = currentY - lane.y;
-          this.bpmn.moveElements([lane], { x: 0, y: deltaY });
-        }
-        currentY = currentY + lane.height;
-      });
-    }, 10);
-  }
-
   private rerouteConnectionsAfterLaneSwap(): void {
     setTimeout(() => {
       const all = this.bpmn.allElements;
