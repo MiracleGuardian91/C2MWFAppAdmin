@@ -7,11 +7,6 @@ import {
   TemplatePortal
 } from "./chunk-DJXBA42B.js";
 import {
-  MAT_RIPPLE_GLOBAL_OPTIONS,
-  MatCommonModule,
-  MatRipple
-} from "./chunk-J46YL22A.js";
-import {
   animate,
   state,
   style,
@@ -21,7 +16,13 @@ import {
 import {
   CdkScrollable,
   ViewportRuler
-} from "./chunk-OBQ4JLXT.js";
+} from "./chunk-HVMGBFIA.js";
+import "./chunk-QHBAYEQZ.js";
+import {
+  MAT_RIPPLE_GLOBAL_OPTIONS,
+  MatCommonModule,
+  MatRipple
+} from "./chunk-J46YL22A.js";
 import {
   CdkMonitorFocus,
   CdkObserveContent,
@@ -36,7 +37,6 @@ import {
   hasModifierKey,
   normalizePassiveListenerOptions
 } from "./chunk-UC23J2IQ.js";
-import "./chunk-QHBAYEQZ.js";
 import {
   DOCUMENT
 } from "./chunk-5YOS2YTK.js";
