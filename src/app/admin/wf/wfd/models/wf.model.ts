@@ -113,9 +113,23 @@ export class UndoRedoActionGroup {
 
 export interface ElementCoordinates extends Point, Dimension {
   name?: string;
-  color?: string;
-  fontColor?: string;
+  font_family?: string;
+  font_size?: string;
+  font_color?: string;
+  font_bold?: boolean;
+  font_italic?: boolean;
+  font_underline?: boolean;
+  fill_color?: string;
+  object_guid?: string;
+  object_type?: string;
+  parent_object_guid?: string;
 }
 export interface TriggerCoordinates extends Dimension {
   wayPoints: Waypoint[];
+  line_color?: string;
+  line_width?: number;
+  line_type?: 'straight' | 'elbow' | 'curved' | string;
+  object_guid?: string;
+  object_type?: string;
+  parent_object_guid?: string;
 }

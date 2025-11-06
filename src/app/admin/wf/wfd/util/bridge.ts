@@ -12,7 +12,12 @@ import {
   WorkflowShape,
 } from '../models/bpmn';
 import { ElementsIds } from '../models/elements-ids.model';
-import { isConnection, isStateType } from './bpmn';
+import {
+  getEventDef,
+  isConditionType,
+  isConnection,
+  isStateType,
+} from './bpmn';
 import { COLORS } from './bpmn';
 
 const t = ElementType;
@@ -69,24 +74,146 @@ export const getEventDefinition = (triggerType: TriggerType) => {
   return def;
 };
 
+const determineLineTypeFromWaypoints = (
+  waypoints: any[]
+): 'straight' | 'elbow' | 'curved' => {
+  if (!Array.isArray(waypoints) || waypoints.length === 0) {
+    return 'straight';
+  }
+
+  if (waypoints.length === 2) {
+    return 'straight';
+  }
+
+  if (waypoints.length > 2) {
+    let isOrthogonal = true;
+    for (let i = 1; i < waypoints.length; i++) {
+      const prev = waypoints[i - 1];
+      const curr = waypoints[i];
+      const dx = Math.abs(curr.x - prev.x);
+      const dy = Math.abs(curr.y - prev.y);
+
+      const isHorizontal = dy < 0.5;
+      const isVertical = dx < 0.5;
+
+      if (!isHorizontal && !isVertical) {
+        isOrthogonal = false;
+        break;
+      }
+    }
+
+    return isOrthogonal ? 'elbow' : 'curved';
+  }
+
+  return 'straight';
+};
+
 export const extractElementCoordinates = (element: any) => {
   const coordinates: any = {};
   const { height, width } = element;
-  if (isConnection(element)) {
+  const bo = element.businessObject;
+  const props = element.props || {};
+
+  const isConn = isConnection(element);
+
+  if (isConn) {
     coordinates.waypoints = (element as ConnectionShape).waypoints;
   } else {
     coordinates.x = element.x;
     coordinates.y = element.y;
   }
-  const bo = element.businessObject;
-  const color = element.color || 'none';
-  return {
+
+  let objectGuid = '';
+  let objectType = '';
+  let parentObjectGuid = '';
+
+  if (element.type === t.Pool) {
+    objectGuid = props.WFID || '';
+    objectType = 'workflow';
+    parentObjectGuid = '';
+  } else if (element.type === t.Stage) {
+    objectGuid = props.WfoId || props.Guid || '';
+    objectType = 'stage';
+    parentObjectGuid = element.parent?.props?.WFID || '';
+  } else if (isStateType(element)) {
+    objectGuid = props.WfosId || props.Guid || '';
+    objectType = 'state';
+    parentObjectGuid = element.parent?.props?.WfoId || '';
+  } else if (isConn && element.type === t.Trigger) {
+    if (isConditionType(element as TriggerConditionConnection)) {
+      objectGuid = props.ConditionId || '';
+      objectType = 'triggercondition';
+      parentObjectGuid = props.TriggerId || '';
+    } else {
+      objectGuid = props.TriggerId || props.Guid || '';
+      objectType = 'trigger';
+      parentObjectGuid = (element.source?.props as any)?.WfosId || '';
+    }
+  }
+
+  const result: any = {
     ...coordinates,
     height,
     width,
     name: bo?.text || bo?.name || '',
-    color,
+    object_guid: objectGuid,
+    object_type: objectType,
+    parent_object_guid: parentObjectGuid,
   };
+
+  if (!isConn) {
+    const fontFamily =
+      (bo as any)?.fontFamily || element.fontFamily || 'Museo Sans';
+    const fontSize = (bo as any)?.fontSize || element.fontSize || '13px';
+    const fontColor = (bo as any)?.fontColor || element.fontColor || '#000000';
+    const fontBold = (bo as any)?.fontBold ?? element.fontBold ?? false;
+    const fontItalic = (bo as any)?.fontItalic ?? element.fontItalic ?? false;
+    const fontUnderline =
+      (bo as any)?.fontUnderline ?? element.fontUnderline ?? false;
+    const fillColor = element.color || (bo as any)?.color || 'none';
+
+    result.font_family = fontFamily;
+    result.font_size = fontSize;
+    result.font_color = fontColor;
+    result.font_bold = !!fontBold;
+    result.font_italic = !!fontItalic;
+    result.font_underline = !!fontUnderline;
+    result.fill_color = fillColor;
+  }
+
+  if (isConn) {
+    const lineColor =
+      (bo as any)?.lineColor ||
+      element.lineColor ||
+      (bo as any)?.stroke ||
+      element.stroke ||
+      '#000000';
+    const lineWidth = Number(
+      (bo as any)?.lineWidth ??
+        (bo as any)?.strokeWidth ??
+        element.lineWidth ??
+        element.strokeWidth ??
+        2
+    );
+
+    const waypoints = (element as ConnectionShape).waypoints || [];
+
+    let lineType = (element as any)?.lineType || (bo as any)?.lineType;
+
+    if (!lineType && waypoints.length > 0) {
+      lineType = determineLineTypeFromWaypoints(waypoints);
+    }
+
+    if (!lineType) {
+      lineType = 'straight';
+    }
+
+    result.line_color = lineColor;
+    result.line_width = lineWidth;
+    result.line_type = lineType;
+  }
+
+  return result;
 };
 
 export const extractElementIds = (elements: DiagramEl[] = []): ElementsIds => {
