@@ -765,18 +765,25 @@ export class DiagramService implements OnDestroy {
       type = t.SubProcess;
     }
     let coords = this._getElementCoordinates(state.Guid);
+    const defaultSize = getShapeSize(type);
     if (!coords) {
       coords = {
         x: index * 100 + STATE_SIZE * 2 + lane.x,
         y: lane.y + STATE_SIZE,
-        width: getShapeSize(type).width,
-        height: getShapeSize(type).height,
+        width: defaultSize.width,
+        height: defaultSize.height,
       };
     } else {
       coords = {
         ...coords,
-        width: getShapeSize(type).width,
-        height: getShapeSize(type).height,
+        width:
+          coords.width !== undefined && coords.width !== null
+            ? coords.width
+            : defaultSize.width,
+        height:
+          coords.height !== undefined && coords.height !== null
+            ? coords.height
+            : defaultSize.height,
       };
     }
 
