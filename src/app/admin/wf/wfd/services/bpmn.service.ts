@@ -462,10 +462,39 @@ export class BpmnService {
   }
 
   public updateElementProperties(el: any, updated: any) {
+    if (isConnection(el)) {
+      const existingLineType =
+        (el as any).lineType ||
+        (el.businessObject && (el.businessObject as any).lineType);
+
+      if (updated.line_type && !updated.lineType) {
+        updated.lineType = updated.line_type;
+        delete updated.line_type;
+      }
+
+      if (existingLineType && !updated.lineType) {
+        updated.lineType = existingLineType;
+      }
+    }
+
     this.modeling.updateProperties(el, updated);
+
+    if (isConnection(el)) {
+      const lineType = updated.lineType || (el as any).lineType;
+      if (lineType) {
+        (el as any).lineType = lineType;
+        if (el.businessObject) {
+          (el.businessObject as any).lineType = lineType;
+        }
+      }
+    }
+
     if (isConnection(el) && updated.waypoints) {
       const flow = el as ConnectionShape;
       const waypoints = updated.waypoints as Waypoint[];
+      const preservedLineType =
+        (flow as any).lineType ||
+        (flow.businessObject && (flow.businessObject as any).lineType);
 
       const connectionStart = getMid(flow.source);
       const connectionEnd = getMid(flow.target);
@@ -487,10 +516,38 @@ export class BpmnService {
         connectionEnd,
       ]);
 
+      if (preservedLineType) {
+        (flow as any).lineType = preservedLineType;
+        if (flow.businessObject) {
+          (flow.businessObject as any).lineType = preservedLineType;
+        }
+      }
+
       if (!isCustomConnection(el)) {
-        const layout =
-          middle.length === 0 ? {} : { connectionStart, connectionEnd };
-        this.modeling.layoutConnection(flow, layout);
+        const lineType =
+          preservedLineType ||
+          (flow as any).lineType ||
+          (flow.businessObject && (flow.businessObject as any).lineType);
+
+        if (lineType === 'elbow') {
+          if (preservedLineType) {
+            (flow as any).lineType = preservedLineType;
+            if (flow.businessObject) {
+              (flow.businessObject as any).lineType = preservedLineType;
+            }
+          }
+        } else {
+          const layout =
+            middle.length === 0 ? {} : { connectionStart, connectionEnd };
+          this.modeling.layoutConnection(flow, layout);
+
+          if (preservedLineType) {
+            (flow as any).lineType = preservedLineType;
+            if (flow.businessObject) {
+              (flow.businessObject as any).lineType = preservedLineType;
+            }
+          }
+        }
       }
     }
   }
