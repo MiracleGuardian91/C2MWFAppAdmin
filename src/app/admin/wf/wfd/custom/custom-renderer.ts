@@ -152,7 +152,6 @@ export default class CustomRenderer extends BaseRenderer {
       (connection.businessObject &&
         (connection.businessObject as any).lineType);
 
-    // Infer line type for preview connections lacking custom props
     if (!lineType) {
       const wps = connection.waypoints || [];
       if (Array.isArray(wps) && wps.length > 2) {
@@ -164,6 +163,13 @@ export default class CustomRenderer extends BaseRenderer {
         lineType = isOrthogonal ? 'elbow' : 'curved';
       } else if (Array.isArray(wps) && wps.length === 2) {
         lineType = 'straight';
+      }
+    }
+
+    if (lineType && (connection as any).lineType !== lineType) {
+      (connection as any).lineType = lineType;
+      if (connection.businessObject) {
+        (connection.businessObject as any).lineType = lineType;
       }
     }
 
