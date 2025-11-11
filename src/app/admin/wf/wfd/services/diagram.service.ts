@@ -1082,20 +1082,73 @@ export class DiagramService implements OnDestroy {
     }, 30);
   }
 
+  private isSmallElement(element: any): boolean {
+    return (
+      element &&
+      (element.type === t.StartState ||
+        element.type === t.EndState ||
+        element.type === t.TriggerExtension)
+    );
+  }
+
   private showAnchorsForElement(target: any): void {
-    if (!this.isStateType(target)) return;
+    if (!this.isStateType(target) && !this.isSmallElement(target)) return;
     const id = target.id;
     if (this._anchorNodesByElementId.has(id)) return; // already shown
 
     const gfx = this.bpmn.getGraphics(target) as unknown as SVGGraphicsElement;
     if (!gfx) return;
 
-    const positions = [
-      { x: target.width / 2, y: 0 }, // top
-      { x: target.width, y: target.height / 2 }, // right
-      { x: target.width / 2, y: target.height }, // bottom
-      { x: 0, y: target.height / 2 }, // left
-    ];
+    const isSmall = this.isSmallElement(target);
+    const positions: Array<{ x: number; y: number }> = [];
+
+    if (isSmall) {
+      // For smaller elements: 2 points per edge = 8 total points
+      // Divide each edge into 3 segments, place points at 1/3 and 2/3
+      const w = target.width;
+      const h = target.height;
+
+      // Top edge: 2 points
+      positions.push({ x: w / 3, y: 0 });
+      positions.push({ x: (2 * w) / 3, y: 0 });
+
+      // Right edge: 2 points
+      positions.push({ x: w, y: h / 3 });
+      positions.push({ x: w, y: (2 * h) / 3 });
+
+      // Bottom edge: 2 points
+      positions.push({ x: (2 * w) / 3, y: h });
+      positions.push({ x: w / 3, y: h });
+
+      // Left edge: 2 points
+      positions.push({ x: 0, y: (2 * h) / 3 });
+      positions.push({ x: 0, y: h / 3 });
+    } else {
+      // For state boxes: 3 points per edge = 12 total points
+      // Divide each edge into 4 segments, place points at 1/4, 2/4, 3/4
+      const w = target.width;
+      const h = target.height;
+
+      // Top edge: 3 points
+      positions.push({ x: w / 4, y: 0 });
+      positions.push({ x: w / 2, y: 0 });
+      positions.push({ x: (3 * w) / 4, y: 0 });
+
+      // Right edge: 3 points
+      positions.push({ x: w, y: h / 4 });
+      positions.push({ x: w, y: h / 2 });
+      positions.push({ x: w, y: (3 * h) / 4 });
+
+      // Bottom edge: 3 points
+      positions.push({ x: (3 * w) / 4, y: h });
+      positions.push({ x: w / 2, y: h });
+      positions.push({ x: w / 4, y: h });
+
+      // Left edge: 3 points
+      positions.push({ x: 0, y: (3 * h) / 4 });
+      positions.push({ x: 0, y: h / 2 });
+      positions.push({ x: 0, y: h / 4 });
+    }
 
     const svgNs = 'http://www.w3.org/2000/svg';
     const created: SVGCircleElement[] = [];
@@ -1150,7 +1203,9 @@ export class DiagramService implements OnDestroy {
 
     const nearestStateWithin = (x: number, y: number, maxDist: number) => {
       const all = this.bpmn.allElements as any[];
-      const states = all.filter((el) => this.isStateType(el));
+      const states = all.filter(
+        (el) => this.isStateType(el) || this.isSmallElement(el)
+      );
       let best: any = null;
       let bestD = Number.MAX_SAFE_INTEGER;
       for (const s of states) {
@@ -1171,7 +1226,7 @@ export class DiagramService implements OnDestroy {
     eb.on('connect.move', (e: any) => {
       const hover = e?.hover;
       // If actually hovering the shape, show anchors
-      if (hover && this.isStateType(hover)) {
+      if (hover && (this.isStateType(hover) || this.isSmallElement(hover))) {
         this.showAnchorsForElement(hover);
         return;
       }
@@ -1186,7 +1241,7 @@ export class DiagramService implements OnDestroy {
 
     eb.on('connect.hover', (e: any) => {
       const hover = e?.hover;
-      if (hover && this.isStateType(hover)) {
+      if (hover && (this.isStateType(hover) || this.isSmallElement(hover))) {
         this.showAnchorsForElement(hover);
       }
     });
