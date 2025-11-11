@@ -68,6 +68,9 @@ export class DiagramService implements OnDestroy {
   private _initComplete = false;
   private _states: State[] = [];
   private _isRepositioningInProgress = false;
+  // Visual connection anchor handling
+  private _anchorsVisible = false;
+  private _anchorNodesByElementId: Map<string, SVGCircleElement[]> = new Map();
   private hoverOnElement$ = this.bpmn.listenTo(EventType.HoverOnElement).pipe(
     map(({ element }: { element: DiagramEl }) => element),
     filter(
@@ -91,6 +94,8 @@ export class DiagramService implements OnDestroy {
       // before allowing modal popups again
       this._dragEndTimeout = setTimeout(() => {
         this._isDragOperationInProgress = false;
+        // Clean up any anchors that might be left
+        this.hideAllAnchors();
       }, 100);
     });
 
@@ -169,6 +174,9 @@ export class DiagramService implements OnDestroy {
         }
       }
     });
+
+    // Register connection hover visuals
+    this.registerConnectionHoverHandlers();
   }
 
   ngOnDestroy() {
@@ -1074,6 +1082,152 @@ export class DiagramService implements OnDestroy {
 
       this.repositionAllStatesAtBottomOfConnections();
     }, 30);
+  }
+
+  /**
+   * Show four anchor points (top, right, bottom, left) on a state-like shape
+   * during connection hover to guide users where a connection will attach.
+   */
+  private showAnchorsForElement(target: any): void {
+    if (!this.isStateType(target)) return;
+    const id = target.id;
+    if (this._anchorNodesByElementId.has(id)) return; // already shown
+
+    const gfx = this.bpmn.getGraphics(target) as unknown as SVGGraphicsElement;
+    if (!gfx) return;
+
+    // registry.getGraphics returns the <g class="djs-element"> group which is already
+    // translated to element.x/element.y. So use LOCAL coordinates inside this group.
+    const positions = [
+      { x: target.width / 2, y: 0 }, // top
+      { x: target.width, y: target.height / 2 }, // right
+      { x: target.width / 2, y: target.height }, // bottom
+      { x: 0, y: target.height / 2 }, // left
+    ];
+
+    const svgNs = 'http://www.w3.org/2000/svg';
+    const created: SVGCircleElement[] = [];
+
+    positions.forEach((p) => {
+      const c = document.createElementNS(svgNs, 'circle');
+      c.setAttribute('cx', String(p.x));
+      c.setAttribute('cy', String(p.y));
+      c.setAttribute('r', '4');
+      c.setAttribute('fill', '#ffffff');
+      c.setAttribute('stroke', '#3f4752');
+      c.setAttribute('stroke-width', '1.5');
+      c.setAttribute('opacity', '0.9');
+      c.style.pointerEvents = 'none';
+
+      // Append to the element graphics group so it follows zoom/pan/move
+      gfx.appendChild(c);
+      created.push(c);
+    });
+
+    this._anchorNodesByElementId.set(id, created);
+    this._anchorsVisible = true;
+  }
+
+  private hideAnchorsForElement(target: any): void {
+    if (!target) return;
+    const id = target.id;
+    const anchors = this._anchorNodesByElementId.get(id);
+    if (!anchors) return;
+    anchors.forEach((n) => n.remove());
+    this._anchorNodesByElementId.delete(id);
+    if (this._anchorNodesByElementId.size === 0) {
+      this._anchorsVisible = false;
+    }
+  }
+
+  private hideAllAnchors(): void {
+    if (!this._anchorsVisible) return;
+    this._anchorNodesByElementId.forEach((nodes) =>
+      nodes.forEach((n) => n.remove())
+    );
+    this._anchorNodesByElementId.clear();
+    this._anchorsVisible = false;
+  }
+
+  /**
+   * Wire up event bus listeners for connect.* lifecycle to show/hide anchors
+   */
+  private registerConnectionHoverHandlers(): void {
+    const eb = this.bpmn.eventBus;
+    const PROXIMITY_PX = 48;
+
+    const nearestStateWithin = (x: number, y: number, maxDist: number) => {
+      const all = this.bpmn.allElements as any[];
+      const states = all.filter((el) => this.isStateType(el));
+      let best: any = null;
+      let bestD = Number.MAX_SAFE_INTEGER;
+      for (const s of states) {
+        const d = this.distancePointToRect(x, y, s.x, s.y, s.width, s.height);
+        if (d < bestD) {
+          bestD = d;
+          best = s;
+        }
+      }
+      if (best && bestD <= maxDist) return best;
+      return null;
+    };
+
+    eb.on('connect.start', () => {
+      this.hideAllAnchors();
+    });
+
+    eb.on('connect.move', (e: any) => {
+      const hover = e?.hover;
+      // If actually hovering the shape, show anchors
+      if (hover && this.isStateType(hover)) {
+        this.showAnchorsForElement(hover);
+        return;
+      }
+      // Otherwise, show anchors for the nearest state if within proximity
+      const near = nearestStateWithin(e?.x, e?.y, PROXIMITY_PX);
+      if (near) {
+        this.showAnchorsForElement(near);
+      } else {
+        this.hideAllAnchors();
+      }
+    });
+
+    eb.on('connect.hover', (e: any) => {
+      const hover = e?.hover;
+      if (hover && this.isStateType(hover)) {
+        this.showAnchorsForElement(hover);
+      }
+    });
+
+    eb.on('connect.out', (e: any) => {
+      const hover = e?.hover;
+      if (hover) {
+        this.hideAnchorsForElement(hover);
+      }
+    });
+
+    eb.on('connect.end', () => {
+      this.hideAllAnchors();
+    });
+
+    eb.on('drag.end', () => {
+      this.hideAllAnchors();
+    });
+  }
+
+  private distancePointToRect(
+    px: number,
+    py: number,
+    rx: number,
+    ry: number,
+    rw: number,
+    rh: number
+  ): number {
+    // dx is 0 if inside horizontally else distance to nearest vertical edge
+    const dx = px < rx ? rx - px : px > rx + rw ? px - (rx + rw) : 0;
+    const dy = py < ry ? ry - py : py > ry + rh ? py - (ry + rh) : 0;
+    if (dx === 0 && dy === 0) return 0;
+    return Math.hypot(dx, dy);
   }
 
   private captureConnectionWaypoints(): Array<{
