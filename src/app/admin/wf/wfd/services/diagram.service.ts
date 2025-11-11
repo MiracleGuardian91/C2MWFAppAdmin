@@ -594,8 +594,6 @@ export class DiagramService implements OnDestroy {
     });
     flow.friendlyName = props.FriendlyName;
 
-    // Position the target state at the bottom of the connection
-    // This creates the effect where state boxes appear below the connecting line
     if (toEvent && flow && flow.waypoints) {
       this.positionStateAtBottomOfConnection(
         toEvent as StateShapeType,
@@ -1084,10 +1082,6 @@ export class DiagramService implements OnDestroy {
     }, 30);
   }
 
-  /**
-   * Show four anchor points (top, right, bottom, left) on a state-like shape
-   * during connection hover to guide users where a connection will attach.
-   */
   private showAnchorsForElement(target: any): void {
     if (!this.isStateType(target)) return;
     const id = target.id;
@@ -1096,8 +1090,6 @@ export class DiagramService implements OnDestroy {
     const gfx = this.bpmn.getGraphics(target) as unknown as SVGGraphicsElement;
     if (!gfx) return;
 
-    // registry.getGraphics returns the <g class="djs-element"> group which is already
-    // translated to element.x/element.y. So use LOCAL coordinates inside this group.
     const positions = [
       { x: target.width / 2, y: 0 }, // top
       { x: target.width, y: target.height / 2 }, // right
@@ -1210,6 +1202,16 @@ export class DiagramService implements OnDestroy {
       this.hideAllAnchors();
     });
 
+    // Handle connection cancellation (e.g., ESC key or clicking outside)
+    eb.on('connect.cancel', () => {
+      this.hideAllAnchors();
+    });
+
+    // Also handle when connection is cleaned up/aborted
+    eb.on('connect.cleanup', () => {
+      this.hideAllAnchors();
+    });
+
     eb.on('drag.end', () => {
       this.hideAllAnchors();
     });
@@ -1223,7 +1225,6 @@ export class DiagramService implements OnDestroy {
     rw: number,
     rh: number
   ): number {
-    // dx is 0 if inside horizontally else distance to nearest vertical edge
     const dx = px < rx ? rx - px : px > rx + rw ? px - (rx + rw) : 0;
     const dy = py < ry ? ry - py : py > ry + rh ? py - (ry + rh) : 0;
     if (dx === 0 && dy === 0) return 0;
@@ -1380,7 +1381,6 @@ export class DiagramService implements OnDestroy {
         targetY = swimlaneTop + verticalPadding + 30;
     }
 
-    // Calculate horizontal distribution
     const elementWidth = 120;
     const spacing = 40;
     const totalWidth =
@@ -1391,20 +1391,16 @@ export class DiagramService implements OnDestroy {
       `Aligning to ${alignment}: targetY=${targetY}, startX=${startX}`
     );
 
-    // Move each element to its new position using BPMN service
     elements.forEach((element: any, index: number) => {
       const newX = startX + index * (elementWidth + spacing);
 
-      // Calculate Y position to center-align the element
-      // targetY represents the center line, so we need to offset by half the element height
-      const elementHeight = element.height || 60; // Default height if not available
+      const elementHeight = element.height || 60;
       const newY = targetY - elementHeight / 2;
 
       console.log(
         `Moving element ${index}: ${element.id} to (${newX}, ${newY}) - center at Y=${targetY}`
       );
 
-      // Calculate delta from current position
       const deltaX = newX - element.x;
       const deltaY = newY - element.y;
 
@@ -1448,7 +1444,7 @@ export class DiagramService implements OnDestroy {
           stagesCoords.push({ id: stage.Guid, ...coords, props: stage, type });
         }
       });
-      // Sort from top to bottom
+
       stagesCoords.sort((a, b) => a.y - b.y);
       stagesCoords.forEach((coords) => {
         const lane = this.toBPMNLane(pool, coords);
