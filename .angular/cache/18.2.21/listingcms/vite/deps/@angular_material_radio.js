@@ -1,10 +1,4 @@
 import {
-  NG_VALUE_ACCESSOR
-} from "./chunk-MV4OK5XK.js";
-import {
-  UniqueSelectionDispatcher
-} from "./chunk-QHBAYEQZ.js";
-import {
   MatCommonModule,
   MatRipple,
   MatRippleModule,
@@ -14,6 +8,12 @@ import {
   FocusMonitor
 } from "./chunk-MQPTQCIX.js";
 import "./chunk-UC23J2IQ.js";
+import {
+  UniqueSelectionDispatcher
+} from "./chunk-QHBAYEQZ.js";
+import {
+  NG_VALUE_ACCESSOR
+} from "./chunk-MV4OK5XK.js";
 import {
   CommonModule
 } from "./chunk-5YOS2YTK.js";

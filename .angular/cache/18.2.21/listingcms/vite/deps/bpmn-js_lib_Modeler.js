@@ -34,18 +34,11 @@ import {
   BaseRenderer
 } from "./chunk-P2P5AXCL.js";
 import {
-  AutoResize
-} from "./chunk-2LKSNQAQ.js";
+  RuleProvider
+} from "./chunk-4X2IYSHR.js";
 import {
-  eachElement,
-  getBBox,
-  getClosure,
-  getEnclosedElements,
-  getParents,
-  getType,
-  isFrameElement,
-  selfAndAllChildren
-} from "./chunk-A3Q7264O.js";
+  AutoResize
+} from "./chunk-PDHFGGQH.js";
 import {
   asBounds,
   asTRBL,
@@ -63,8 +56,15 @@ import {
   roundPoint
 } from "./chunk-4OHDVAG5.js";
 import {
-  RuleProvider
-} from "./chunk-4X2IYSHR.js";
+  eachElement,
+  getBBox,
+  getClosure,
+  getEnclosedElements,
+  getParents,
+  getType,
+  isFrameElement,
+  selfAndAllChildren
+} from "./chunk-A3Q7264O.js";
 import {
   CommandInterceptor
 } from "./chunk-JI54U5I4.js";
@@ -102,18 +102,6 @@ import {
   transform
 } from "./chunk-VKE2OUF7.js";
 import {
-  createCategory,
-  createCategoryValue,
-  linkCategoryValue,
-  unlinkCategory,
-  unlinkCategoryValue
-} from "./chunk-QBESYOBR.js";
-import {
-  add,
-  indexOf,
-  remove as remove3
-} from "./chunk-UPPIJ347.js";
-import {
   ElementFactory,
   ElementFactory2,
   ensureCompatDiRef,
@@ -134,6 +122,18 @@ import {
   isConnection,
   isLabel
 } from "./chunk-EYYVFZR2.js";
+import {
+  createCategory,
+  createCategoryValue,
+  linkCategoryValue,
+  unlinkCategory,
+  unlinkCategoryValue
+} from "./chunk-QBESYOBR.js";
+import {
+  add,
+  indexOf,
+  remove as remove3
+} from "./chunk-UPPIJ347.js";
 import {
   getParent,
   isDirectionHorizontal
