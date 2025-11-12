@@ -147,12 +147,18 @@ export default class CustomRenderer extends BaseRenderer {
     if (connection.type === t.DottedFlow) {
       attrs.strokeDasharray = 5.5;
     }
+
+    const isPreview = !connection.target;
     let lineType =
       (connection as any).lineType ||
       (connection.businessObject &&
         (connection.businessObject as any).lineType);
 
-    if (!lineType) {
+    console.log('Preview flag: ', isPreview);
+
+    if (isPreview) {
+      lineType = 'straight';
+    } else if (!lineType) {
       const wps = connection.waypoints || [];
       if (Array.isArray(wps) && wps.length > 2) {
         const isOrthogonal = wps.every((p, i) => {
@@ -166,7 +172,7 @@ export default class CustomRenderer extends BaseRenderer {
       }
     }
 
-    if (lineType && (connection as any).lineType !== lineType) {
+    if (lineType && (connection as any).lineType !== lineType && !isPreview) {
       (connection as any).lineType = lineType;
       if (connection.businessObject) {
         (connection.businessObject as any).lineType = lineType;
@@ -181,6 +187,14 @@ export default class CustomRenderer extends BaseRenderer {
       const path = svgCreate('path');
       svgAttr(path, assign({ d: pathData }, attrs));
       return svgAppend(parentGfx, path);
+    }
+
+    if (isPreview && connection.waypoints && connection.waypoints.length > 2) {
+      const wps = connection.waypoints;
+      const firstPoint = wps[0];
+      const lastPoint = wps[wps.length - 1];
+      const straightWaypoints = [firstPoint, lastPoint];
+      return svgAppend(parentGfx, createLine(straightWaypoints, attrs, 6));
     }
 
     return svgAppend(parentGfx, createLine(connection.waypoints, attrs, 6));
