@@ -1194,9 +1194,6 @@ export class DiagramService implements OnDestroy {
     this._anchorsVisible = false;
   }
 
-  /**
-   * Wire up event bus listeners for connect.* lifecycle to show/hide anchors
-   */
   private registerConnectionHoverHandlers(): void {
     const eb = this.bpmn.eventBus;
     const PROXIMITY_PX = 48;
@@ -1225,12 +1222,10 @@ export class DiagramService implements OnDestroy {
 
     eb.on('connect.move', (e: any) => {
       const hover = e?.hover;
-      // If actually hovering the shape, show anchors
       if (hover && (this.isStateType(hover) || this.isSmallElement(hover))) {
         this.showAnchorsForElement(hover);
         return;
       }
-      // Otherwise, show anchors for the nearest state if within proximity
       const near = nearestStateWithin(e?.x, e?.y, PROXIMITY_PX);
       if (near) {
         this.showAnchorsForElement(near);
@@ -1257,12 +1252,10 @@ export class DiagramService implements OnDestroy {
       this.hideAllAnchors();
     });
 
-    // Handle connection cancellation (e.g., ESC key or clicking outside)
     eb.on('connect.cancel', () => {
       this.hideAllAnchors();
     });
 
-    // Also handle when connection is cleaned up/aborted
     eb.on('connect.cleanup', () => {
       this.hideAllAnchors();
     });

@@ -154,8 +154,6 @@ export default class CustomRenderer extends BaseRenderer {
       (connection.businessObject &&
         (connection.businessObject as any).lineType);
 
-    console.log('Preview flag: ', isPreview);
-
     if (isPreview) {
       lineType = 'straight';
     } else if (!lineType) {

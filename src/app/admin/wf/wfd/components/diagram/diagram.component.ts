@@ -2126,7 +2126,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
     this.selectedLineType =
       (boLineType as any) || (currentLineType as any) || 'straight';
 
-    console.log('Loaded trigger line color:', this.selectedLineColor);
     this.cdr.detectChanges();
   }
 
@@ -2239,16 +2238,6 @@ export class DiagramComponent implements AfterContentInit, OnDestroy {
         (element.props && element.props.color) ||
         currentFillColor ||
         '#ffffff'
-    );
-
-    console.log(
-      'Processed values:',
-      this.selectedFontFamily,
-      this.selectedFontSize,
-      this.selectedFontColor,
-      this.selectedFontBold,
-      this.selectedFontItalic,
-      this.selectedFontUnderline
     );
 
     if (

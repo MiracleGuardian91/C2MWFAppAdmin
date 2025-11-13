@@ -20,6 +20,7 @@ import customElementRuleProvider from './custom-element-ruleProvider';
 import { ElementPropertiesCommand } from './element-properties-command';
 import BpmnRules from './bpmnRules';
 import { SharedData } from './share-data';
+import CustomAnchorProvider from './custom-anchor-provider';
 
 export const customModules = {
   __init__: [
@@ -41,6 +42,7 @@ export const customModules = {
     'forceLaneSpace',
     'shiftConnectionsByWaypoints',
     'connectionOverlapModule',
+    'anchorProvider',
     // 'fixConnectionsOnLaneResize',
   ],
   paletteProvider: ['type', CustomPalette],
@@ -67,6 +69,7 @@ export const customModules = {
   forceLaneSpace: ['type', ForceLaneSpace],
   shiftConnectionsByWaypoints: ['type', ShiftConnectionsByWaypoints],
   connectionOverlapModule: ['type', ConnectionOverlapModule],
+  anchorProvider: ['type', CustomAnchorProvider],
   // fixConnectionsOnLaneResize: ['type', FixConnectionsOnLaneResize],
   // autoPlace: ["value", null],
   // bpmnAutoPlace: ["value", null],
